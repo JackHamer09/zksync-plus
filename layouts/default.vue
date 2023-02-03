@@ -59,8 +59,6 @@
   }
 
   .app-layout-main {
-    display: flex;
-    flex-direction: column;
     @apply flex flex-col px-4 py-2 md:px-0 md:py-4;
     grid-area: main / main / main / main;
   }
