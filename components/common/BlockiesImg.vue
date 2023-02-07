@@ -18,6 +18,6 @@ const imgSrc = computed(() => {
 
 <style lang="scss" scoped>
 .navbar-desktop-account-icon {
-  @apply h-8 w-8 rounded-full text-inherit;
+  @apply h-6 w-6 rounded-full text-inherit xl:h-8 xl:w-8;
 }
 </style>

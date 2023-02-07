@@ -1,13 +1,9 @@
 <template>
   <NuxtLink :to="{ name: 'account' }" class="navbar-desktop-account">
-    <BlockiesImg address="Test-adress" />
+    <CommonBlockiesImg address="Test-adress" />
     <span class="navbar-desktop-account-name">Test user</span>
   </NuxtLink>
 </template>
-
-<script lang="ts" setup>
-import BlockiesImg from "@/common/BlockiesImg.vue";
-</script>
 
 <style lang="scss" scoped>
 .navbar-desktop-account {
