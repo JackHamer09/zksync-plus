@@ -11,6 +11,7 @@
           <ArrowsRightLeftIcon class="navbar-desktop-link-icon" aria-hidden="true" />
           <span class="navbar-desktop-link-label">Payments</span>
         </NuxtLink>
+        
       </div>
     </nav>
   </nav>

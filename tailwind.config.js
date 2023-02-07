@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   content: [
@@ -45,5 +46,16 @@ module.exports = {
       "2xl": "1920px",
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addBase, theme }) {
+      addBase({
+        ".h1": {
+          marginBottom: theme("margin.8"),
+          fontSize: theme("fontSize.2xl"),
+          fontWeight: theme("fontWeight.semibold"),
+          lineHeight: theme("lineHeight.tight"),
+        },
+      });
+    }),
+  ],
 };
