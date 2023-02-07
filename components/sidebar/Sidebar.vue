@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar-container">
     <nav class="navbar-desktop">
-      <!-- <SidebarAccountButton /> -->
+      <SidebarAccountButton />
       <div class="navbar-desktop-links">
         <NuxtLink :to="{ name: 'index' }" class="navbar-desktop-link">
           <HomeIcon class="navbar-desktop-link-icon" aria-hidden="true" />
