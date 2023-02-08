@@ -1,5 +1,5 @@
 <template>
-  <img :src="imgSrc" alt="" class="navbar-desktop-account-icon" />
+  <img :src="imgSrc" alt="" />
 </template>
 
 <script lang="ts" setup>
@@ -15,9 +15,3 @@ const imgSrc = computed(() => {
   return blockies.create({ seed: props.address }).toDataURL();
 });
 </script>
-
-<style lang="scss" scoped>
-.navbar-desktop-account-icon {
-  @apply h-6 w-6 rounded-full text-inherit xl:h-8 xl:w-8;
-}
-</style>
