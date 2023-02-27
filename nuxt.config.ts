@@ -33,6 +33,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    public: {},
+    public: {
+      walletConnectProjectID: process.env.WALLET_CONNECT_PROJECT_ID,
+      walletConnectProjectID2: process.env.NUXT_WALLET_CONNECT_PROJECT_ID,
+    },
   },
 });
