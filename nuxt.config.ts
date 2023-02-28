@@ -25,7 +25,7 @@ export default defineNuxtConfig({
       short_name: "zkSync Plus",
     },
   },
-  css: ["@/assets/css/tailwind.css"],
+  css: ["@/assets/css/tailwind.css", "web3-avatar-vue/dist/style.css"],
   postcss: {
     plugins: {
       tailwindcss: {},

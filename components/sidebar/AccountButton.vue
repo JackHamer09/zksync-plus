@@ -1,12 +1,14 @@
 <template>
   <NuxtLink :to="{ name: 'account' }" class="account-button">
-    <CommonAddressAvatar :address="address" class="account-icon" />
+    <Web3Avatar :address="address" class="account-icon" />
     <span class="account-name">Test user</span>
   </NuxtLink>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue";
+
+import Web3Avatar from "web3-avatar-vue";
 
 const address = ref("0xa1cf087DB965Ab02Fb3CFaCe1f5c63935815f044");
 </script>
