@@ -50,10 +50,11 @@ module.exports = {
     plugin(function ({ addBase, theme }) {
       addBase({
         ".h1": {
-          marginBottom: theme("margin.8"),
-          fontSize: theme("fontSize.2xl"),
-          fontWeight: theme("fontWeight.semibold"),
+          fontSize: "32px",
+          fontWeight: theme("fontWeight.bold"),
           lineHeight: theme("lineHeight.tight"),
+          paddingTop: theme("padding.5"),
+          paddingBottom: theme("padding.4"),
         },
       });
     }),

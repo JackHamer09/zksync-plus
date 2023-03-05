@@ -1,3 +1,4 @@
+import { useStorage } from "@vueuse/core";
 import { configureChains, createClient } from "@wagmi/core";
 import { goerli, mainnet } from "@wagmi/core/chains";
 import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3modal/ethereum";
@@ -9,6 +10,7 @@ import { useRuntimeConfig } from "#imports";
 
 const { public: env } = useRuntimeConfig();
 
+export const wasConnected = useStorage("wasConnected", false);
 export const account = ref<GetAccountResult>({
   address: undefined,
   connector: undefined,
@@ -18,6 +20,14 @@ export const account = ref<GetAccountResult>({
   isDisconnected: true,
   status: "disconnected",
 });
+watch(account, () => {
+  if (account.value.isConnected) {
+    wasConnected.value = true;
+  } else {
+    wasConnected.value = null;
+  }
+});
+
 export const network = ref<GetNetworkResult>({
   chain: undefined,
   chains: [goerli, mainnet],
@@ -46,3 +56,4 @@ ethereumClient.watchAccount((updatedAccount) => (account.value = updatedAccount)
 ethereumClient.watchNetwork((updatedNetwork) => (network.value = updatedNetwork));
 
 export const openModal = () => web3modal.openModal();
+export const disconnect = () => ethereumClient.disconnect();
