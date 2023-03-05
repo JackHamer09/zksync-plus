@@ -30,7 +30,7 @@ import { ArrowsRightLeftIcon, HomeIcon } from "@heroicons/vue/24/outline";
   }
   @media screen and (min-width: 720px) {
     overflow-y: overlay;
-    @apply pointer-events-auto top-0 bottom-auto max-h-screen px-8 py-4;
+    @apply pointer-events-auto top-0 bottom-auto max-h-screen px-4 py-8;
   }
   @media screen and (min-width: 1024px) {
     @apply px-6;
@@ -45,7 +45,7 @@ import { ArrowsRightLeftIcon, HomeIcon } from "@heroicons/vue/24/outline";
       .navbar-desktop-link {
         @apply flex w-full items-center rounded-xl bg-transparent py-3 px-4 text-gray-secondary no-underline transition-colors hover:bg-gray-200;
         &.router-link-exact-active {
-          @apply bg-white text-indigo-600;
+          @apply bg-white text-primary-400;
         }
 
         .navbar-desktop-link-icon {

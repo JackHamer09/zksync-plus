@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
+const plugin = require("tailwindcss/plugin");
 
 module.exports = {
   content: [
@@ -13,7 +14,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: [`'Montserrat'`, ...defaultTheme.fontFamily.sans],
+        sans: [`'Inter'`, ...defaultTheme.fontFamily.sans],
       },
       colors: {
         gray: {
@@ -45,5 +46,17 @@ module.exports = {
       "2xl": "1920px",
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addBase, theme }) {
+      addBase({
+        ".h1": {
+          fontSize: "32px",
+          fontWeight: theme("fontWeight.bold"),
+          lineHeight: theme("lineHeight.tight"),
+          paddingTop: theme("padding.5"),
+          paddingBottom: theme("padding.4"),
+        },
+      });
+    }),
+  ],
 };

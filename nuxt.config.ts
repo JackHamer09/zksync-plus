@@ -8,7 +8,7 @@ export default defineNuxtConfig({
       link: [
         {
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
         },
       ],
     },
@@ -25,7 +25,7 @@ export default defineNuxtConfig({
       short_name: "zkSync Plus",
     },
   },
-  css: ["@/assets/css/tailwind.css"],
+  css: ["@/assets/css/tailwind.css", "web3-avatar-vue/dist/style.css"],
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -33,6 +33,9 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    public: {},
+    public: {
+      walletConnectProjectID: process.env.WALLET_CONNECT_PROJECT_ID,
+      walletConnectProjectID2: process.env.NUXT_WALLET_CONNECT_PROJECT_ID,
+    },
   },
 });
