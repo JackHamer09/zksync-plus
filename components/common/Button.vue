@@ -9,7 +9,7 @@
 
 <style lang="scss">
 .default-button {
-  @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] bg-primary-100/50 px-4 text-sm font-medium text-primary-400 outline-none transition-colors;
+  @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] bg-primary-100/50 px-4 text-sm font-medium text-primary-400 transition-colors;
   &:enabled:not([aria-disabled="true"]) {
     @apply hover:bg-primary-100/75;
   }

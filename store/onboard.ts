@@ -20,8 +20,8 @@ export const account = ref<GetAccountResult>({
   isDisconnected: true,
   status: "disconnected",
 });
-watch(account, () => {
-  if (account.value.isConnected) {
+watch(account, (newAccount) => {
+  if (newAccount.isConnected) {
     wasConnected.value = true;
   } else {
     wasConnected.value = null;
