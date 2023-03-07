@@ -9,7 +9,6 @@ export default (networkName: ZkSyncNetworkName) => {
   const zkSyncNetworkName = ref<ZkSyncNetworkName>(networkName);
 
   const {
-    result: provider,
     inProgress: providerRequestInProgress,
     error: providerRequestError,
     execute: requestProvider,
@@ -21,9 +20,9 @@ export default (networkName: ZkSyncNetworkName) => {
     error: tokensRequestError,
     execute: requestTokens,
   } = usePromise<ZkSyncTokens>(async () => {
-    await requestProvider();
-    if (!provider.value) throw new Error("Provider is not available");
-    return await provider.value.getTokens();
+    const provider = await requestProvider();
+    if (!provider) throw new Error("Provider is not available");
+    return await provider.getTokens();
   });
 
   const changeZkSyncNetwork = async (networkName: ZkSyncNetworkName) => {
@@ -37,15 +36,15 @@ export default (networkName: ZkSyncNetworkName) => {
   };
 
   return {
-    provider,
     providerRequestInProgress,
     providerRequestError,
     requestProvider,
-    changeZkSyncNetwork,
 
     tokens,
     tokensRequestInProgress,
     tokensRequestError,
     requestTokens,
+
+    changeZkSyncNetwork,
   };
 };

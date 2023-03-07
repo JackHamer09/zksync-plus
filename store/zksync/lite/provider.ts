@@ -1,9 +1,10 @@
 import useProvider from "@/composables/zksync/lite/useProvider";
 
+import type { EthereumNetworkName } from "@/store/network";
+
 import { selectedEthereumNetwork } from "@/store/network";
 
 export const {
-  provider,
   providerRequestInProgress,
   providerRequestError,
   requestProvider,
@@ -13,6 +14,8 @@ export const {
   tokensRequestInProgress,
   tokensRequestError,
   requestTokens,
-} = useProvider(selectedEthereumNetwork.value);
+} = useProvider(selectedEthereumNetwork.value.name.toLowerCase() as EthereumNetworkName);
 
-watch(selectedEthereumNetwork, changeZkSyncNetwork);
+watch(selectedEthereumNetwork, async (network) => {
+  await changeZkSyncNetwork(network.name.toLowerCase() as EthereumNetworkName);
+});

@@ -9,7 +9,7 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
   } = {
     force: false,
   };
-  const execute = async (options = defaultOptions) => {
+  const execute = async (options = defaultOptions): Promise<ResultType | undefined> => {
     const { force } = Object.assign({}, defaultOptions, options);
     if (!promise || force) {
       error.value = undefined;
@@ -20,10 +20,19 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     try {
       result.value = await promise;
     } catch (e) {
+      console.log(e);
       error.value = e as unknown as ErrorType;
     } finally {
       inProgress.value = false;
     }
+    return result.value;
+  };
+
+  const clear = () => {
+    promise = undefined;
+    error.value = undefined;
+    result.value = undefined;
+    inProgress.value = false;
   };
 
   return {
@@ -31,5 +40,6 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     result,
     inProgress,
     execute,
+    clear,
   };
 };
