@@ -4,13 +4,15 @@ import { goerli, mainnet } from "@wagmi/core/chains";
 import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/html";
 
-import type { GetAccountResult, GetNetworkResult } from "@wagmi/core";
+import type { Client, GetAccountResult, GetNetworkResult, Provider } from "@wagmi/core";
 
 import { useRuntimeConfig } from "#imports";
+import { selectedEthereumNetwork } from "@/store/network";
 
 const { public: env } = useRuntimeConfig();
 
 export const wasConnected = useStorage("wasConnected", false);
+export let connector: Client<Provider>["connector"] | undefined = undefined;
 export const account = ref<GetAccountResult>({
   address: undefined,
   connector: undefined,
@@ -20,8 +22,8 @@ export const account = ref<GetAccountResult>({
   isDisconnected: true,
   status: "disconnected",
 });
-watch(account, () => {
-  if (account.value.isConnected) {
+watch(account, (newAccount) => {
+  if (newAccount.isConnected) {
     wasConnected.value = true;
   } else {
     wasConnected.value = null;
@@ -49,10 +51,14 @@ const wagmiClient = createClient({
 
 const ethereumClient = new EthereumClient(wagmiClient, network.value.chains);
 const web3modal = new Web3Modal(
-  { projectId: env.walletConnectProjectID, enableAccountView: true, themeMode: "light" },
+  { projectId: env.walletConnectProjectID, enableNetworkView: false, enableAccountView: true, themeMode: "light" },
   ethereumClient
 );
-ethereumClient.watchAccount((updatedAccount) => (account.value = updatedAccount));
+web3modal.setDefaultChain(selectedEthereumNetwork.value);
+ethereumClient.watchAccount((updatedAccount) => {
+  account.value = updatedAccount;
+  connector = updatedAccount.connector;
+});
 ethereumClient.watchNetwork((updatedNetwork) => (network.value = updatedNetwork));
 
 export const openModal = () => web3modal.openModal();

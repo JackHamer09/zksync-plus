@@ -9,10 +9,15 @@
       <div class="token-balance-amount">{{ symbol }} {{ removeSmallAmount(amount, decimals, price) }}</div>
       <div class="token-balance-price">{{ formatTokenPrice(amount, decimals, price) }}</div>
     </div>
+    <button class="send-button">
+      <PaperAirplaneIcon aria-hidden="true" />
+    </button>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
+
 import type { BigNumberish } from "ethers";
 
 defineProps<{
@@ -24,9 +29,9 @@ defineProps<{
 }>();
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .token-balance {
-  @apply grid cursor-pointer grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-50;
+  @apply grid cursor-pointer grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-50 xs:grid-cols-[40px_1fr_max-content_35px];
 
   .token-image {
     @apply h-10 w-10;
@@ -53,6 +58,13 @@ defineProps<{
   }
   .token-balances {
     @apply w-max text-right;
+  }
+  .send-button {
+    @apply hidden aspect-square w-full items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75 xs:flex;
+
+    svg {
+      @apply h-4 w-4 text-primary-400;
+    }
   }
 }
 </style>

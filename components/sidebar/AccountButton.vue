@@ -1,5 +1,5 @@
 <template>
-  <button class="account-button">
+  <button class="account-button" @click="disconnect">
     <Web3Avatar :address="account.address!" class="account-icon" />
     <span class="account-name">{{ shortenAddress(account.address!) }}</span>
   </button>
@@ -8,7 +8,7 @@
 <script lang="ts" setup>
 import Web3Avatar from "web3-avatar-vue";
 
-import { account } from "@/store/onboard";
+import { account, disconnect } from "@/store/onboard";
 </script>
 
 <style lang="scss" scoped>

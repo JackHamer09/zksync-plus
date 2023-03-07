@@ -3,7 +3,10 @@
     <h1 class="h1">Home</h1>
     <CommonBadgeTabs class="mb-4" />
     <CommonContentBlock>
-      <div class="total-balance">
+      <div v-if="balanceInProgress" class="total-balance">
+        <CommonContentLoader />
+      </div>
+      <div v-else class="total-balance">
         <span class="currency-symbol">{{ total.currencySymbol }}</span>
         <span class="total-int">{{ total.int }}</span>
         <span class="total-dec">.{{ total.dec }}</span>
@@ -28,15 +31,20 @@
           <CommonLabelButton>View all</CommonLabelButton>
         </div>
         <div class="token-balances-container">
-          <TokenBalance
-            v-for="item in displayedBalances"
-            :key="item.address"
-            :symbol="item.symbol"
-            :address="item.address"
-            :decimals="item.decimals"
-            :amount="item.amount"
-            :price="item.price"
-          />
+          <template v-if="balanceInProgress">
+            <TokenBalanceLoader v-for="index in 2" :key="index" />
+          </template>
+          <template v-else>
+            <TokenBalance
+              v-for="item in displayedBalances"
+              :key="item.address"
+              :symbol="item.symbol"
+              :address="item.address"
+              :decimals="item.decimals"
+              :amount="item.amount"
+              :price="item.price"
+            />
+          </template>
         </div>
       </div>
     </CommonContentBlock>
@@ -48,34 +56,11 @@ import { computed } from "vue";
 
 import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 
+import { balance, balanceInProgress } from "@/store/zksync/lite/wallet";
 import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 
-const balances = computed(() => [
-  {
-    symbol: "ETH",
-    address: "0x00000000000000000000000",
-    decimals: 18,
-    amount: "17500000000000000",
-    price: 1600,
-  },
-  {
-    symbol: "DAI",
-    address: "0x6b175474e89094c44da98b954eedeac495271d0f",
-    decimals: 18,
-    amount: "6831310000000000",
-    price: 1,
-  },
-  {
-    symbol: "USDT",
-    address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-    decimals: 18,
-    amount: "280000000000",
-    price: 1,
-  },
-]);
-
 const total = computed(() => {
-  const num = balances.value.reduce(
+  const num = balance.value.reduce(
     (acc, { amount, decimals, price }) => acc + parseFloat(parseTokenAmount(amount, decimals)) * price,
     0
   );
@@ -87,8 +72,8 @@ const total = computed(() => {
 });
 
 const displayedBalances = computed(() => {
-  return balances.value.filter(({ amount, decimals, price }) => {
-    if (removeSmallAmount(amount, decimals, price) !== "0.0000") {
+  return balance.value.filter(({ amount, decimals, price }) => {
+    if (removeSmallAmount(amount, decimals, price).replace(/0/g, "").replace(/\./g, "").length) {
       return true;
     }
     return false;

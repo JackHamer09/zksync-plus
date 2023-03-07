@@ -1,5 +1,8 @@
 <template>
-  <div class="connecting-container" v-if="wasConnected === true && !account.isConnected">
+  <div
+    class="connecting-container"
+    v-if="(wasConnected === true && !account.isConnected) || (account.isConnected && !walletCreated)"
+  >
     <svg
       aria-hidden="true"
       class="h-16 w-16 animate-spin fill-primary-300 text-gray-200"
@@ -21,7 +24,7 @@
   <LoginLayout v-if="!account.isConnected">
     <LoginPage />
   </LoginLayout>
-  <div class="app-layout" v-else>
+  <div class="app-layout" v-else-if="walletCreated">
     <Sidebar />
     <main class="app-layout-main">
       <slot />
@@ -33,6 +36,7 @@
 import LoginLayout from "@/layouts/login.vue";
 import LoginPage from "@/pages/login.vue";
 import { account, wasConnected } from "@/store/onboard";
+import { walletCreated } from "@/store/zksync/lite/wallet";
 </script>
 
 <style lang="scss" scoped>
