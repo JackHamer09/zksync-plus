@@ -1,12 +1,12 @@
 <template>
   <div class="token-balance">
-    <TokenImage class="token-image" :address="address" />
+    <TokenImage class="token-image-container" :symbol="symbol" :address="tokenIconAddress" :key="tokenIconAddress" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
-      <div class="token-address">{{ shortenAddress(address, 5) }}</div>
+      <div class="token-address" :title="address">{{ shortenAddress(address, 5) }}</div>
     </div>
     <div class="token-balances">
-      <div class="token-balance-amount">{{ symbol }} {{ displayedAmount }}</div>
+      <div class="token-balance-amount" :title="fullAmount">{{ symbol }} {{ displayedAmount }}</div>
       <div class="token-balance-price">{{ formatTokenPrice(amount, decimals, price) }}</div>
     </div>
     <button class="send-button">
@@ -19,12 +19,15 @@
 import { computed } from "vue";
 
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
+import { storeToRefs } from "pinia";
 
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
+import { useNetworkStore } from "@/store/network";
 import { parseTokenAmount, removeSmallAmount, shortenAddress } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
+import { testnetToMainnetTokenAddress } from "~~/utils/tokens/lite";
 
 const props = defineProps({
   amountDisplay: {
@@ -51,8 +54,22 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  zksync: {
+    type: String as PropType<"lite" | "era">,
+    default: "lite",
+  },
 });
 
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
+
+const tokenIconAddress = computed(() => {
+  if (props.zksync === "lite" && selectedEthereumNetwork.value.name !== "mainnet") {
+    return testnetToMainnetTokenAddress(props.address, selectedEthereumNetwork.value.id) ?? props.address;
+  }
+  return props.address;
+});
+
+const fullAmount = computed(() => parseTokenAmount(props.amount, props.decimals));
 const displayedAmount = computed(() => {
   const withoutSmallAmount = removeSmallAmount(props.amount, props.decimals, props.price);
   if (props.amountDisplay === "remove-small") {
@@ -63,7 +80,7 @@ const displayedAmount = computed(() => {
     }
     return `<${withoutSmallAmount.slice(0, -1)}1`;
   }
-  return parseTokenAmount(props.amount, props.decimals);
+  return fullAmount.value;
 });
 </script>
 
@@ -71,7 +88,7 @@ const displayedAmount = computed(() => {
 .token-balance {
   @apply grid cursor-pointer grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-50 xs:grid-cols-[40px_1fr_max-content_35px];
 
-  .token-image {
+  .token-image-container {
     @apply h-10 w-10;
   }
   .token-info,

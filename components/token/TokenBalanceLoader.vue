@@ -1,6 +1,6 @@
 <template>
   <div class="token-balance token-balance-loader">
-    <CommonContentLoader class="token-image token-image-loader" />
+    <CommonContentLoader class="token-image-container token-image-loader" />
     <div class="token-info">
       <div class="token-symbol"><CommonContentLoader :length="10" /></div>
       <div class="token-address"><CommonContentLoader :length="28" /></div>
