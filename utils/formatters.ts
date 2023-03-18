@@ -7,13 +7,19 @@ export function shortenAddress(address: string, chars = 3): string {
 }
 
 export function parseTokenAmount(amount: BigNumberish, decimals: number): string {
-  return formatUnits(amount.toString(), decimals).toString();
+  const result = formatUnits(amount.toString(), decimals).toString();
+  if (result.endsWith(".0")) {
+    return result.slice(0, -2);
+  }
+  return result;
 }
 
 export function formatTokenPrice(amount: BigNumberish, decimals: number, price: number): string {
   const tokenAmount = parseTokenAmount(amount, decimals);
   const totalPrice = parseFloat(tokenAmount) * price;
-  if (totalPrice < 0.01) {
+  if (!totalPrice) {
+    return "$0.00";
+  } else if (totalPrice < 0.01) {
     return "<$0.01";
   }
   return "$" + totalPrice.toFixed(2);
@@ -27,7 +33,11 @@ export function removeSmallAmount(
   maxChars = 6
 ): string {
   const tokenAmount = parseTokenAmount(amount, decimals);
-  const [whole, fractional] = tokenAmount.split(".");
+  // eslint-disable-next-line prefer-const
+  let [whole, fractional] = tokenAmount.split(".");
+  if (!fractional) {
+    fractional = "0";
+  }
   if (whole.length > maxChars) {
     return whole;
   }
@@ -41,6 +51,9 @@ export function removeSmallAmount(
     } else {
       break;
     }
+  }
+  if (acc.endsWith(".0")) {
+    return acc.slice(0, -2);
   }
   return acc;
 }

@@ -18,3 +18,7 @@ export function generateAvatarColors(address: string) {
   });
   return colors;
 }
+
+export function isOnlyZeroes(value: string) {
+  return value.replace(/0/g, "").replace(/\./g, "").length === 0;
+}

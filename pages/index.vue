@@ -28,7 +28,7 @@
       <div class="tokens-container">
         <div class="flex items-center justify-between py-4">
           <h2 class="text-sm text-gray-secondary">Balances</h2>
-          <CommonLabelButton>View all</CommonLabelButton>
+          <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
         <div class="token-balances-container">
           <template v-if="balanceInProgress">
@@ -55,9 +55,13 @@
 import { computed } from "vue";
 
 import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
+import { storeToRefs } from "pinia";
 
-import { balance, balanceInProgress } from "@/store/zksync/lite/wallet";
+import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
+import { isOnlyZeroes } from "@/utils/helpers";
+
+const { balance, balanceInProgress } = storeToRefs(useLiteWalletStore());
 
 const total = computed(() => {
   const num = balance.value.reduce(
@@ -73,7 +77,7 @@ const total = computed(() => {
 
 const displayedBalances = computed(() => {
   return balance.value.filter(({ amount, decimals, price }) => {
-    if (removeSmallAmount(amount, decimals, price).replace(/0/g, "").replace(/\./g, "").length) {
+    if (!isOnlyZeroes(removeSmallAmount(amount, decimals, price))) {
       return true;
     }
     return false;

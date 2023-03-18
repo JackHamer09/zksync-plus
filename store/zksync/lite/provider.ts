@@ -1,21 +1,39 @@
+import { defineStore, storeToRefs } from "pinia";
+
 import useProvider from "@/composables/zksync/lite/useProvider";
 
 import type { EthereumNetworkName } from "@/store/network";
 
-import { selectedEthereumNetwork } from "@/store/network";
+import { useNetworkStore } from "@/store/network";
 
-export const {
-  providerRequestInProgress,
-  providerRequestError,
-  requestProvider,
-  changeZkSyncNetwork,
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
-  tokens,
-  tokensRequestInProgress,
-  tokensRequestError,
-  requestTokens,
-} = useProvider(selectedEthereumNetwork.value.name.toLowerCase() as EthereumNetworkName);
+export const useLiteProviderStore = defineStore("liteProvider", () => {
+  const {
+    providerRequestInProgress,
+    providerRequestError,
+    requestProvider,
+    changeZkSyncNetwork,
 
-watch(selectedEthereumNetwork, async (network) => {
-  await changeZkSyncNetwork(network.name.toLowerCase() as EthereumNetworkName);
+    tokens,
+    tokensRequestInProgress,
+    tokensRequestError,
+    requestTokens,
+  } = useProvider(selectedEthereumNetwork.value.name.toLowerCase() as EthereumNetworkName);
+
+  watch(selectedEthereumNetwork, async (network) => {
+    await changeZkSyncNetwork(network.name.toLowerCase() as EthereumNetworkName);
+  });
+
+  return {
+    providerRequestInProgress,
+    providerRequestError,
+    requestProvider,
+    changeZkSyncNetwork,
+
+    tokens,
+    tokensRequestInProgress,
+    tokensRequestError,
+    requestTokens,
+  };
 });

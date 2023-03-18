@@ -41,6 +41,7 @@
     "@headlessui/vue": "^1.7.7",
     "@heroicons/vue": "^2.0.14",
     "@metamask/logo": "^3.1.1",
+    "@pinia/nuxt": "^0.4.7",
     "@vitejs/plugin-vue": "^3.2.0",
     "@vueuse/components": "^9.11.1",
     "@vueuse/core": "^9.13.0",
@@ -54,6 +55,7 @@
     "focus-trap": "^7.2.0",
     "jsdom": "^21.1.0",
     "ohmyfetch": "^0.4.21",
+    "pinia": "^2.0.33",
     "qrcode": "^1.5.1",
     "rxjs": "^7.8.0",
     "sass": "^1.57.1",
@@ -61,5 +63,8 @@
     "vitest": "^0.15.2",
     "web3-avatar-vue": "^1.0.0",
     "zksync": "^0.13.1"
+  },
+  "overrides": {
+    "vue": "latest"
   }
 }

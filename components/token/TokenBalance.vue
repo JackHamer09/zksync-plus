@@ -6,7 +6,7 @@
       <div class="token-address">{{ shortenAddress(address, 5) }}</div>
     </div>
     <div class="token-balances">
-      <div class="token-balance-amount">{{ symbol }} {{ removeSmallAmount(amount, decimals, price) }}</div>
+      <div class="token-balance-amount">{{ symbol }} {{ displayedAmount }}</div>
       <div class="token-balance-price">{{ formatTokenPrice(amount, decimals, price) }}</div>
     </div>
     <button class="send-button">
@@ -16,17 +16,55 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
+
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 
 import type { BigNumberish } from "ethers";
+import type { PropType } from "vue";
 
-defineProps<{
-  symbol: string;
-  address: string;
-  decimals: number;
-  amount: BigNumberish;
-  price: number;
-}>();
+import { parseTokenAmount, removeSmallAmount, shortenAddress } from "@/utils/formatters";
+import { isOnlyZeroes } from "@/utils/helpers";
+
+const props = defineProps({
+  amountDisplay: {
+    type: String as PropType<"remove-small" | "full">,
+    default: "remove-small",
+  },
+  symbol: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  decimals: {
+    type: Number,
+    required: true,
+  },
+  amount: {
+    type: String as PropType<BigNumberish>,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+});
+
+const displayedAmount = computed(() => {
+  const withoutSmallAmount = removeSmallAmount(props.amount, props.decimals, props.price);
+  if (props.amountDisplay === "remove-small") {
+    if (props.amount === "0") {
+      return "0";
+    } else if (!isOnlyZeroes(withoutSmallAmount)) {
+      return withoutSmallAmount;
+    }
+    return `<${withoutSmallAmount.slice(0, -1)}1`;
+  }
+  return parseTokenAmount(props.amount, props.decimals);
+});
 </script>
 
 <style lang="scss">

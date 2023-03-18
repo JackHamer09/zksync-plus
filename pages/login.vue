@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <h1 class="h1 mb-2 text-center">Log in to zkSync Plus</h1>
-    <button v-if="!account.address" @click="openModal" class="login-btn">
+    <button v-if="!account.address" @click="onboardStore.openModal" class="login-btn">
       <div class="login-btn-inner">
         <IconsEthereum class="mr-2 h-20 w-auto" />
         <div class="login-btn-description">Connect your Ethereum wallet to experience zkSync Plus</div>
@@ -27,18 +27,23 @@
 
 <script lang="ts" setup>
 import { ChevronRightIcon } from "@heroicons/vue/24/solid";
+import { storeToRefs } from "pinia";
 import Web3Avatar from "web3-avatar-vue";
 
 import { definePageMeta } from "#imports";
-import { account, disconnect, openModal } from "@/store/onboard";
+import { useOnboardStore } from "@/store/onboard";
+import { shortenAddress } from "@/utils/formatters";
+
+const onboardStore = useOnboardStore();
+const { account } = storeToRefs(onboardStore);
 
 definePageMeta({
   layout: "login",
 });
 
 const useAnotherAccount = async () => {
-  await disconnect();
-  await openModal();
+  await onboardStore.disconnect();
+  await onboardStore.openModal();
 };
 </script>
 
