@@ -19,6 +19,7 @@ export default (networkName: ZkSyncNetworkName) => {
     inProgress: tokensRequestInProgress,
     error: tokensRequestError,
     execute: requestTokens,
+    clear: clearTokens,
   } = usePromise<ZkSyncTokens>(async () => {
     const provider = await requestProvider();
     if (!provider) throw new Error("Provider is not available");
@@ -27,12 +28,9 @@ export default (networkName: ZkSyncNetworkName) => {
 
   const changeZkSyncNetwork = async (networkName: ZkSyncNetworkName) => {
     zkSyncNetworkName.value = networkName;
-    const providerPromise = requestProvider({ force: true });
-
-    if (tokens.value || tokensRequestInProgress.value) {
-      await requestTokens({ force: true });
-    }
-    await providerPromise;
+    clearTokens();
+    await requestProvider({ force: true });
+    await requestTokens();
   };
 
   return {

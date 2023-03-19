@@ -19,10 +19,10 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
     tokensRequestInProgress,
     tokensRequestError,
     requestTokens,
-  } = useProvider(selectedEthereumNetwork.value.name.toLowerCase() as EthereumNetworkName);
+  } = useProvider(selectedEthereumNetwork.value.network.toLowerCase() as EthereumNetworkName);
 
   watch(selectedEthereumNetwork, async (network) => {
-    await changeZkSyncNetwork(network.name.toLowerCase() as EthereumNetworkName);
+    await changeZkSyncNetwork(network.network.toLowerCase() as EthereumNetworkName);
   });
 
   return {

@@ -1,13 +1,17 @@
-import { utils } from "ethers";
+import liteTokenIcons from "@/assets/json/tokens/lite-tokens-icons.json";
 
-import liteTestnetToMainnetTokenAddress from "@/assets/json/lite-testnet-to-mainnet-token-address.json";
+type TokenIcons = {
+  thumb: string;
+  small: string;
+  large: string;
+};
 
-export function testnetToMainnetTokenAddress(testnetAddress: string, networkID: number): string | undefined {
-  const address = (liteTestnetToMainnetTokenAddress as Record<string, Record<string, string>>)[networkID.toString()]?.[
-    testnetAddress
-  ];
-  if (address) {
-    return utils.getAddress(address);
+export function getTokenIconUrlBySymbol(
+  symbol: string,
+  size: "thumb" | "small" | "large" = "small"
+): string | undefined {
+  if (symbol in liteTokenIcons) {
+    return (liteTokenIcons as Record<string, TokenIcons>)[symbol][size];
   }
-  return address;
+  return undefined;
 }

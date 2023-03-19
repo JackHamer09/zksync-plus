@@ -1,16 +1,19 @@
 <template>
   <div class="token-image-container">
-    <div class="token-placeholder"></div>
     <transition
-      enter-active-class="transition ease-out duration-100"
-      enter-from-class="transform opacity-0"
-      enter-to-class="transform opacity-100 scale-100"
       leave-active-class="transition ease-in duration-75"
-      leave-from-class="transform opacity-100 scale-100"
+      leave-from-class="transform opacity-100"
       leave-to-class="transform opacity-0"
     >
-      <img v-if="isReady && !error" class="token-image" :src="imgSrc" :alt="`${symbol} token icon`" />
+      <div v-if="!isReady || error" class="token-placeholder"></div>
     </transition>
+    <img
+      v-if="imgSrc"
+      class="token-image"
+      :class="{ loaded: isReady && !error }"
+      :src="imgSrc"
+      :alt="`${symbol} token icon`"
+    />
   </div>
 </template>
 
@@ -18,6 +21,10 @@
 import { computed } from "vue";
 
 import { useImage } from "@vueuse/core";
+
+import type { PropType } from "vue";
+
+import { getTokenIconUrlBySymbol } from "~~/utils/tokens/lite";
 
 const props = defineProps({
   symbol: {
@@ -28,18 +35,27 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  size: {
+    type: String as PropType<"thumb" | "small" | "large">,
+    default: "small",
+  },
+  zksync: {
+    type: String as PropType<"lite" | "era">,
+    default: "lite",
+  },
 });
 
 const imgSrc = computed(() => {
-  // check if its ETH address
-  if (props.address === "0x0000000000000000000000000000000000000000") {
-    return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png";
+  if (props.zksync === "lite") {
+    return getTokenIconUrlBySymbol(props.symbol, props.size);
   }
-  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${props.address}/logo.png`;
+  return undefined;
 });
-const { isReady, error } = useImage({
-  src: imgSrc.value,
-});
+const { isReady, error } = imgSrc.value
+  ? useImage({
+      src: imgSrc.value,
+    })
+  : { isReady: computed(() => true), error: computed(() => true) };
 </script>
 
 <style lang="scss" scoped>
@@ -47,10 +63,13 @@ const { isReady, error } = useImage({
   @apply relative;
 
   .token-image {
-    @apply absolute inset-0 h-full w-full rounded-full p-1;
+    @apply absolute inset-0 h-full w-full rounded-full object-contain opacity-0 transition-opacity duration-100;
+    &.loaded {
+      @apply opacity-100;
+    }
   }
   .token-placeholder {
-    @apply relative h-full w-full rounded-full border border-dashed;
+    @apply absolute inset-0 h-full w-full rounded-full border border-dashed;
     &::before {
       content: "";
       @apply absolute inset-0 m-[3px] rounded-full bg-gray-100;
