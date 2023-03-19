@@ -9,19 +9,17 @@ import type { AccountState } from "zksync/build/types";
 import { useEthWalletStore } from "@/store/ethWallet";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
+import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
 
-export type Balance = {
-  symbol: string;
-  address: string;
-  decimals: number;
+export interface Balance extends ZkSyncLiteToken {
   amount: BigNumberish;
-  price: number;
-};
+}
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
   let wallet: Wallet | undefined = undefined;
   const liteProvider = useLiteProviderStore();
-  const { tokens } = storeToRefs(liteProvider);
+  const liteTokens = useLiteTokensStore();
+  const { tokens } = storeToRefs(liteTokens);
   const { account } = storeToRefs(useOnboardStore());
   const { getEthWalletSigner } = useEthWalletStore();
 
@@ -41,10 +39,8 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
       return [];
     }
     return Object.entries(tokens.value ?? {}).map(([symbol, token]) => {
-      const { address, decimals } = token;
       const amount = accountState.value!.committed.balances[symbol] ?? "0";
-      const price = 10;
-      return { symbol, address, decimals, amount, price };
+      return { ...token, amount };
     });
   });
   const {
@@ -53,7 +49,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     execute: requestBalance,
     clear: clearBalance,
   } = usePromise<void>(async () => {
-    const [, tokens] = await Promise.all([requestAccountState(), liteProvider.requestTokens()]);
+    const [, tokens] = await Promise.all([requestAccountState(), liteTokens.requestTokens()]);
     if (!accountState.value) throw new Error("Account state is not available");
     if (!tokens) throw new Error("Tokens are not available");
     /* Object.entries(tokens.value).map(([symbol]) => {

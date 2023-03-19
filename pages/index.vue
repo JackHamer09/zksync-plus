@@ -35,15 +35,7 @@
             <TokenBalanceLoader v-for="index in 2" :key="index" />
           </template>
           <template v-else>
-            <TokenBalance
-              v-for="item in displayedBalances"
-              :key="item.address"
-              :symbol="item.symbol"
-              :address="item.address"
-              :decimals="item.decimals"
-              :amount="item.amount"
-              :price="item.price"
-            />
+            <TokenBalance v-for="item in displayedBalances" :key="item.address" v-bind="item" />
           </template>
         </div>
       </div>

@@ -1,28 +1,36 @@
 import { defineStore, storeToRefs } from "pinia";
-
-import useProvider from "@/composables/zksync/lite/useProvider";
+import { getDefaultRestProvider } from "zksync";
 
 import type { EthereumNetworkName } from "@/store/network";
+import type { RestProvider } from "zksync";
+import type { Network as ZkSyncNetworkName } from "zksync/build/types";
 
 import { useNetworkStore } from "@/store/network";
-
-const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
+import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 
 export const useLiteProviderStore = defineStore("liteProvider", () => {
-  const {
-    providerRequestInProgress,
-    providerRequestError,
-    requestProvider,
-    changeZkSyncNetwork,
+  const liteTokens = useLiteTokensStore();
+  const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
-    tokens,
-    tokensRequestInProgress,
-    tokensRequestError,
-    requestTokens,
-  } = useProvider(selectedEthereumNetwork.value.network.toLowerCase() as EthereumNetworkName);
+  const {
+    inProgress: providerRequestInProgress,
+    error: providerRequestError,
+    execute: requestProvider,
+    clear: clearProvider,
+  } = usePromise<RestProvider>(() =>
+    getDefaultRestProvider(selectedEthereumNetwork.value.network as ZkSyncNetworkName)
+  );
+
+  const changeZkSyncNetwork = async (networkName: ZkSyncNetworkName) => {
+    console.warn("changeZkSyncNetwork", networkName); // TEMP
+    clearProvider();
+    liteTokens.clearTokens();
+    await requestProvider();
+    await liteTokens.requestTokens();
+  };
 
   watch(selectedEthereumNetwork, async (network) => {
-    await changeZkSyncNetwork(network.network.toLowerCase() as EthereumNetworkName);
+    await changeZkSyncNetwork(network.network as EthereumNetworkName);
   });
 
   return {
@@ -30,10 +38,5 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
     providerRequestError,
     requestProvider,
     changeZkSyncNetwork,
-
-    tokens,
-    tokensRequestInProgress,
-    tokensRequestError,
-    requestTokens,
   };
 });

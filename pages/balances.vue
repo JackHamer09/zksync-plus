@@ -17,16 +17,7 @@
         <CommonContentBlock>
           <div class="tokens-container">
             <div class="token-balances-container">
-              <TokenBalance
-                v-for="item in group.balances"
-                :key="item.address"
-                :symbol="item.symbol"
-                :address="item.address"
-                :decimals="item.decimals"
-                :amount="item.amount"
-                :price="item.price"
-                full-amount
-              />
+              <TokenBalance v-for="item in group.balances" :key="item.address" v-bind="item" />
             </div>
           </div>
         </CommonContentBlock>

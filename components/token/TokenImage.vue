@@ -8,10 +8,10 @@
       <div v-if="!isReady || error" class="token-placeholder"></div>
     </transition>
     <img
-      v-if="imgSrc"
+      v-if="iconUrl"
       class="token-image"
       :class="{ loaded: isReady && !error }"
-      :src="imgSrc"
+      :src="iconUrl"
       :alt="`${symbol} token icon`"
     />
   </div>
@@ -22,10 +22,6 @@ import { computed } from "vue";
 
 import { useImage } from "@vueuse/core";
 
-import type { PropType } from "vue";
-
-import { getTokenIconUrlBySymbol } from "~~/utils/tokens/lite";
-
 const props = defineProps({
   symbol: {
     type: String,
@@ -35,25 +31,14 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  size: {
-    type: String as PropType<"thumb" | "small" | "large">,
-    default: "small",
-  },
-  zksync: {
-    type: String as PropType<"lite" | "era">,
-    default: "lite",
+  iconUrl: {
+    type: String,
   },
 });
 
-const imgSrc = computed(() => {
-  if (props.zksync === "lite") {
-    return getTokenIconUrlBySymbol(props.symbol, props.size);
-  }
-  return undefined;
-});
-const { isReady, error } = imgSrc.value
+const { isReady, error } = props.iconUrl
   ? useImage({
-      src: imgSrc.value,
+      src: props.iconUrl,
     })
   : { isReady: computed(() => true), error: computed(() => true) };
 </script>

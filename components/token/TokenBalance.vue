@@ -1,6 +1,6 @@
 <template>
   <div class="token-balance">
-    <TokenImage class="token-image-container" :symbol="symbol" :address="$props.address" />
+    <TokenImage class="token-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
       <div class="token-address" :title="address">{{ shortenAddress(address, 5) }}</div>
@@ -43,6 +43,9 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  iconUrl: {
+    type: String,
+  },
   amount: {
     type: String as PropType<BigNumberish>,
     required: true,
@@ -50,10 +53,6 @@ const props = defineProps({
   price: {
     type: Number,
     required: true,
-  },
-  zksync: {
-    type: String as PropType<"lite" | "era">,
-    default: "lite",
   },
 });
 
