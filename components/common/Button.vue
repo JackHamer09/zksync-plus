@@ -1,11 +1,20 @@
 <template>
-  <button type="button" class="default-button">
+  <component :is="as" type="button" class="default-button">
     <span v-if="$slots.icon" class="icon-container">
       <slot name="icon" />
     </span>
     <slot />
-  </button>
+  </component>
 </template>
+
+<script lang="ts" setup>
+defineProps({
+  as: {
+    type: String,
+    default: "button",
+  },
+});
+</script>
 
 <style lang="scss">
 .default-button {

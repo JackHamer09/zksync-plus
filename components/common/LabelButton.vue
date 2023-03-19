@@ -1,8 +1,17 @@
 <template>
-  <button type="button" class="label-button">
+  <component :is="as" type="button" class="label-button">
     <slot />
-  </button>
+  </component>
 </template>
+
+<script lang="ts" setup>
+defineProps({
+  as: {
+    type: String,
+    default: "button",
+  },
+});
+</script>
 
 <style lang="scss" scoped>
 .label-button {

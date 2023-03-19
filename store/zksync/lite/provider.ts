@@ -1,21 +1,42 @@
-import useProvider from "@/composables/zksync/lite/useProvider";
+import { defineStore, storeToRefs } from "pinia";
+import { getDefaultRestProvider } from "zksync";
 
 import type { EthereumNetworkName } from "@/store/network";
+import type { RestProvider } from "zksync";
+import type { Network as ZkSyncNetworkName } from "zksync/build/types";
 
-import { selectedEthereumNetwork } from "@/store/network";
+import { useNetworkStore } from "@/store/network";
+import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 
-export const {
-  providerRequestInProgress,
-  providerRequestError,
-  requestProvider,
-  changeZkSyncNetwork,
+export const useLiteProviderStore = defineStore("liteProvider", () => {
+  const liteTokens = useLiteTokensStore();
+  const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
-  tokens,
-  tokensRequestInProgress,
-  tokensRequestError,
-  requestTokens,
-} = useProvider(selectedEthereumNetwork.value.name.toLowerCase() as EthereumNetworkName);
+  const {
+    inProgress: providerRequestInProgress,
+    error: providerRequestError,
+    execute: requestProvider,
+    clear: clearProvider,
+  } = usePromise<RestProvider>(() =>
+    getDefaultRestProvider(selectedEthereumNetwork.value.network as ZkSyncNetworkName)
+  );
 
-watch(selectedEthereumNetwork, async (network) => {
-  await changeZkSyncNetwork(network.name.toLowerCase() as EthereumNetworkName);
+  const changeZkSyncNetwork = async (networkName: ZkSyncNetworkName) => {
+    console.warn("changeZkSyncNetwork", networkName); // TEMP
+    clearProvider();
+    liteTokens.clearTokens();
+    await requestProvider();
+    await liteTokens.requestTokens();
+  };
+
+  watch(selectedEthereumNetwork, async (network) => {
+    await changeZkSyncNetwork(network.network as EthereumNetworkName);
+  });
+
+  return {
+    providerRequestInProgress,
+    providerRequestError,
+    requestProvider,
+    changeZkSyncNetwork,
+  };
 });

@@ -13,7 +13,7 @@ export default defineNuxtConfig({
       ],
     },
   },
-  modules: ["@kevinmarrec/nuxt-pwa"],
+  modules: ["@kevinmarrec/nuxt-pwa", "@pinia/nuxt"],
   ssr: false,
   pwa: {
     meta: {

@@ -1,31 +1,32 @@
 import { useStorage } from "@vueuse/core";
 import { goerli, mainnet } from "@wagmi/core/chains";
+import { defineStore } from "pinia";
 
 import type { Chain } from "@wagmi/core/chains";
-
 export type EthereumNetworkName = "goerli" | "mainnet";
 
-export const networks: Chain[] = [
+export const chains: Chain[] = [
   goerli,
   {
     ...mainnet,
-    name: "mainnet",
+    network: "mainnet",
   },
 ];
 
-const selectedEthereumNetworkName = useStorage<EthereumNetworkName>(
-  "selectedEthereumNetwork",
-  networks[0].network as EthereumNetworkName
-);
-export const selectedEthereumNetwork = computed<Chain>(() => {
-  return (
-    networks.find((network) => {
-      const currentNetworkName =
-        selectedEthereumNetworkName.value === "mainnet" ? mainnet.network : selectedEthereumNetworkName.value;
-      return network.network === currentNetworkName;
-    }) ?? networks[0]
+export const useNetworkStore = defineStore("network", () => {
+  const selectedEthereumNetworkName = useStorage<EthereumNetworkName>(
+    "selectedEthereumNetwork",
+    chains[0].network as EthereumNetworkName
   );
+  const selectedEthereumNetwork = computed<Chain>(() => {
+    return chains.find((network) => network.network === selectedEthereumNetworkName.value) ?? chains[0];
+  });
+  const changeEthereumNetwork = (networkName: EthereumNetworkName) => {
+    selectedEthereumNetworkName.value = networkName;
+  };
+
+  return {
+    selectedEthereumNetwork,
+    changeEthereumNetwork,
+  };
 });
-export const changeEthereumNetwork = (networkName: EthereumNetworkName) => {
-  selectedEthereumNetworkName.value = networkName;
-};

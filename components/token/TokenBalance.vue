@@ -1,12 +1,12 @@
 <template>
   <div class="token-balance">
-    <TokenImage class="token-image" :address="address" />
+    <TokenImage class="token-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
-      <div class="token-address">{{ shortenAddress(address, 5) }}</div>
+      <div class="token-address" :title="address">{{ shortenAddress(address, 5) }}</div>
     </div>
     <div class="token-balances">
-      <div class="token-balance-amount">{{ symbol }} {{ removeSmallAmount(amount, decimals, price) }}</div>
+      <div class="token-balance-amount" :title="fullAmount">{{ symbol }} {{ displayedAmount }}</div>
       <div class="token-balance-price">{{ formatTokenPrice(amount, decimals, price) }}</div>
     </div>
     <button class="send-button">
@@ -16,24 +16,66 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
+
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 
 import type { BigNumberish } from "ethers";
+import type { PropType } from "vue";
 
-defineProps<{
-  symbol: string;
-  address: string;
-  decimals: number;
-  amount: BigNumberish;
-  price: number;
-}>();
+import { parseTokenAmount, removeSmallAmount, shortenAddress } from "@/utils/formatters";
+import { isOnlyZeroes } from "@/utils/helpers";
+
+const props = defineProps({
+  amountDisplay: {
+    type: String as PropType<"remove-small" | "full">,
+    default: "remove-small",
+  },
+  symbol: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+  decimals: {
+    type: Number,
+    required: true,
+  },
+  iconUrl: {
+    type: String,
+  },
+  amount: {
+    type: String as PropType<BigNumberish>,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+});
+
+const fullAmount = computed(() => parseTokenAmount(props.amount, props.decimals));
+const displayedAmount = computed(() => {
+  const withoutSmallAmount = removeSmallAmount(props.amount, props.decimals, props.price);
+  if (props.amountDisplay === "remove-small") {
+    if (props.amount === "0") {
+      return "0";
+    } else if (!isOnlyZeroes(withoutSmallAmount)) {
+      return withoutSmallAmount;
+    }
+    return `<${withoutSmallAmount.slice(0, -1)}1`;
+  }
+  return fullAmount.value;
+});
 </script>
 
 <style lang="scss">
 .token-balance {
   @apply grid cursor-pointer grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-50 xs:grid-cols-[40px_1fr_max-content_35px];
 
-  .token-image {
+  .token-image-container {
     @apply h-10 w-10;
   }
   .token-info,
