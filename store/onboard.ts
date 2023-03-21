@@ -3,7 +3,7 @@ import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3mod
 import { Web3Modal } from "@web3modal/html";
 import { defineStore, storeToRefs } from "pinia";
 
-import type { Client, GetAccountResult, GetNetworkResult, Provider } from "@wagmi/core";
+import type { Client, Provider } from "@wagmi/core";
 
 import { useRuntimeConfig } from "#imports";
 import { chains, useNetworkStore } from "@/store/network";
@@ -14,35 +14,21 @@ export let connector: Client<Provider>["connector"] | undefined = undefined;
 export const useOnboardStore = defineStore("onboard", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
-  const account = ref<GetAccountResult>({
-    address: undefined,
-    connector: undefined,
-    isConnected: false,
-    isReconnecting: false,
-    isConnecting: false,
-    isDisconnected: true,
-    status: "disconnected",
-  });
-  const network = ref<GetNetworkResult>({
-    chain: undefined,
-    chains: chains,
-  });
-
-  const { provider } = configureChains(network.value.chains, [
-    walletConnectProvider({ projectId: env.walletConnectProjectID }),
-  ]);
+  const { provider } = configureChains(chains, [walletConnectProvider({ projectId: env.walletConnectProjectID })]);
   const wagmiClient = createClient({
     autoConnect: true,
     connectors: modalConnectors({
       projectId: env.walletConnectProjectID,
       version: "1",
       appName: "web3Modal",
-      chains: network.value.chains,
+      chains: chains,
     }),
     provider,
   });
+  const ethereumClient = new EthereumClient(wagmiClient, chains);
 
-  const ethereumClient = new EthereumClient(wagmiClient, network.value.chains);
+  const account = ref(ethereumClient.getAccount());
+  const network = ref(ethereumClient.getNetwork());
   const web3modal = new Web3Modal(
     { projectId: env.walletConnectProjectID, enableNetworkView: false, enableAccountView: true, themeMode: "light" },
     ethereumClient
@@ -53,6 +39,11 @@ export const useOnboardStore = defineStore("onboard", () => {
     connector = updatedAccount.connector;
   });
   ethereumClient.watchNetwork((updatedNetwork) => (network.value = updatedNetwork));
+  web3modal.subscribeModal((state) => {
+    if (!state.open && !account.value.isConnected) {
+      disconnect();
+    }
+  });
 
   const openModal = () => web3modal.openModal();
   const disconnect = () => ethereumClient.disconnect();

@@ -20,8 +20,8 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     try {
       result.value = await promise;
     } catch (e) {
-      console.log(e);
       error.value = e as unknown as ErrorType;
+      throw e;
     } finally {
       inProgress.value = false;
     }

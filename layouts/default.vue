@@ -3,7 +3,7 @@
   <LoginLayout v-if="!account.isConnected">
     <LoginPage />
   </LoginLayout>
-  <div class="app-layout" v-else-if="walletCreated">
+  <div class="app-layout" v-else>
     <Sidebar />
     <main class="app-layout-main">
       <slot />
@@ -17,10 +17,8 @@ import { storeToRefs } from "pinia";
 import LoginLayout from "@/layouts/login.vue";
 import LoginPage from "@/pages/login.vue";
 import { useOnboardStore } from "@/store/onboard";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 
 const { account } = storeToRefs(useOnboardStore());
-const { walletCreated } = storeToRefs(useLiteWalletStore());
 </script>
 
 <style lang="scss" scoped>
