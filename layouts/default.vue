@@ -1,6 +1,6 @@
 <template>
   <LoadersConnecting />
-  <LoginLayout v-if="onboardStatus !== 'connected'">
+  <LoginLayout v-if="!account.isConnected">
     <LoginPage />
   </LoginLayout>
   <div class="app-layout" v-else>
@@ -18,7 +18,7 @@ import LoginLayout from "@/layouts/login.vue";
 import LoginPage from "@/pages/login.vue";
 import { useOnboardStore } from "@/store/onboard";
 
-const { onboardStatus } = storeToRefs(useOnboardStore());
+const { account } = storeToRefs(useOnboardStore());
 </script>
 
 <style lang="scss" scoped>

@@ -15,7 +15,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
   const onboardStatus = ref<"disconnected" | "connecting" | "connected">("disconnected");
 
-  let accountLoginPromise = {
+  const accountLoginPromise = {
     promise: undefined as undefined | Promise<void>,
     resolve: undefined as undefined | (() => void),
   };
@@ -41,68 +41,23 @@ export const useOnboardStore = defineStore("onboard", () => {
   );
   web3modal.setDefaultChain(selectedEthereumNetwork.value);
   ethereumClient.watchAccount((updatedAccount) => {
-    if (updatedAccount.isDisconnected && !updatedAccount.isConnecting && !updatedAccount.isReconnecting) {
-      setDisconnected();
-    }
     account.value = updatedAccount;
     connector = updatedAccount.connector;
-    if (updatedAccount.isConnected && accountLoginPromise.resolve) {
-      accountLoginPromise.resolve();
-    }
   });
   ethereumClient.watchNetwork((updatedNetwork) => (network.value = updatedNetwork));
   web3modal.subscribeModal((state) => {
-    if (!state.open && onboardStatus.value === "connecting") {
-      setDisconnected();
+    if (!state.open && !account.value.isConnected) {
+      disconnect();
     }
   });
 
   const openModal = () => web3modal.openModal();
   const disconnect = () => ethereumClient.disconnect();
-  const setDisconnected = () => {
-    onboardStatus.value = "disconnected";
-    if (accountLoginPromise.resolve) {
-      accountLoginPromise.resolve();
-      accountLoginPromise = { resolve: undefined, promise: undefined };
-    }
-  };
-
-  const waitForAccountLogin = async (): Promise<void> => {
-    if (accountLoginPromise.promise) return await accountLoginPromise.promise;
-    if (account.value.isConnected) return;
-    accountLoginPromise.promise = new Promise((resolve) => (accountLoginPromise.resolve = resolve));
-    await accountLoginPromise.promise;
-  };
-
-  const initiate = async () => {
-    try {
-      onboardStatus.value = "connecting";
-      if (!account.value.isConnected) {
-        if (!account.value.isReconnecting) {
-          await openModal();
-        }
-        await waitForAccountLogin();
-      }
-      if (!account.value.isConnected) {
-        return setDisconnected();
-      }
-      onboardStatus.value = "connected";
-      accountLoginPromise = { resolve: undefined, promise: undefined };
-    } catch (error) {
-      console.warn(`Onboard initiate error:\n`, error);
-      setDisconnected();
-    }
-  };
-
-  if (account.value.isReconnecting) {
-    initiate();
-  }
 
   return {
     account,
     onboardStatus,
     openModal,
     disconnect,
-    initiate,
   };
 });

@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <h1 class="h1 mb-2 text-center">Log in to zkSync Plus</h1>
-    <button v-if="!account.address" @click="onboardStore.initiate" class="login-btn">
+    <button v-if="!account.address" @click="onboardStore.openModal" class="login-btn">
       <div class="login-btn-inner">
         <IconsEthereum class="mr-2 h-20 w-auto" />
         <div class="login-btn-description">Connect your Ethereum wallet to experience zkSync Plus</div>
@@ -43,7 +43,7 @@ definePageMeta({
 
 const useAnotherAccount = async () => {
   await onboardStore.disconnect();
-  await onboardStore.initiate();
+  await onboardStore.openModal();
 };
 </script>
 
