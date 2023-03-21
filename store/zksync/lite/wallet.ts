@@ -56,7 +56,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     execute: requestBalance,
     clear: clearBalance,
   } = usePromise<void>(async () => {
-    await Promise.all([requestAccountState(), liteTokens.requestTokens()]);
+    await Promise.all([requestAccountState({ force: true }), liteTokens.requestTokens()]);
     if (!accountState.value) throw new Error("Account state is not available");
     if (!tokens.value) throw new Error("Tokens are not available");
     /* Object.entries(tokens.value).map(([symbol]) => {
