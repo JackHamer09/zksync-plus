@@ -1,4 +1,4 @@
-import { watchEffect } from "vue";
+import { watch } from "vue";
 
 import { defineStore, storeToRefs } from "pinia";
 import { Wallet } from "zksync";
@@ -23,13 +23,20 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   const { account } = storeToRefs(useOnboardStore());
   const { getEthWalletSigner } = useEthWalletStore();
 
-  const walletCreated = ref(false);
+  const { execute: createWalletInstance, clear: clearWalletInstance } = usePromise<Wallet>(async () => {
+    const provider = await liteProvider.requestProvider();
+    if (!provider) throw new Error("Provider is not available");
+    const ethWalletSigner = await getEthWalletSigner();
+    wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
+    return wallet;
+  });
 
   const {
     result: accountState,
     execute: requestAccountState,
     clear: clearAccountState,
   } = usePromise<AccountState>(async () => {
+    await createWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
     return await wallet.getAccountState();
   });
@@ -49,9 +56,9 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     execute: requestBalance,
     clear: clearBalance,
   } = usePromise<void>(async () => {
-    const [, tokens] = await Promise.all([requestAccountState(), liteTokens.requestTokens()]);
+    await Promise.all([requestAccountState(), liteTokens.requestTokens()]);
     if (!accountState.value) throw new Error("Account state is not available");
-    if (!tokens) throw new Error("Tokens are not available");
+    if (!tokens.value) throw new Error("Tokens are not available");
     /* Object.entries(tokens.value).map(([symbol]) => {
       // get token price
     }); */
@@ -59,41 +66,27 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
 
   const clear = () => {
     wallet = undefined;
-    walletCreated.value = false;
+    clearWalletInstance();
     clearAccountState();
     clearBalance();
   };
 
-  const createWallet = async () => {
-    clear();
-    const provider = await liteProvider.requestProvider();
-    if (!provider) throw new Error("Provider is not available");
-    const ethWalletSigner = await getEthWalletSigner();
-    wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
-    walletCreated.value = true;
-  };
-
-  watchEffect(() => {
+  watch(account, async () => {
     if (
       (account.value.isConnected && !wallet) ||
       (wallet && account.value.address && wallet.address() !== account.value.address)
     ) {
-      createWallet().then(() => {
-        requestBalance();
-      });
+      clear();
+      await requestBalance();
     } else if (account.value.isDisconnected) {
       clear();
     }
   });
 
   return {
-    walletCreated,
-
     balance,
     balanceInProgress,
     balanceError,
     requestBalance,
-
-    createWallet,
   };
 });

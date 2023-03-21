@@ -1,5 +1,8 @@
 <template>
-  <div class="connecting-container" v-if="account.isReconnecting || (account.isConnected && !walletCreated)">
+  <div
+    class="connecting-container"
+    v-if="(onboardStatus === 'connected' && account.isReconnecting) || onboardStatus === 'connecting'"
+  >
     <Web3Avatar v-if="account.address" :address="account.address" class="mb-2 h-16 w-16" />
     <h1 class="h1 mb-2 text-center">{{ title }}</h1>
     <svg
@@ -29,10 +32,8 @@ import { storeToRefs } from "pinia";
 import Web3Avatar from "web3-avatar-vue";
 
 import { useOnboardStore } from "@/store/onboard";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 
-const { account } = storeToRefs(useOnboardStore());
-const { walletCreated } = storeToRefs(useLiteWalletStore());
+const { account, onboardStatus } = storeToRefs(useOnboardStore());
 
 const title = computed(() => {
   if (account.value.connector) {

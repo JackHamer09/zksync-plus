@@ -37,7 +37,9 @@ import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
-const { balance, balanceInProgress } = storeToRefs(useLiteWalletStore());
+const walletLiteStore = useLiteWalletStore();
+const { balance, balanceInProgress } = storeToRefs(walletLiteStore);
+walletLiteStore.requestBalance();
 
 const displayedBalanceGroups = computed(() => {
   const groups: Record<string, { title: string | null; balances: Balance[] }> = {
