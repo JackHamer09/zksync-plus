@@ -3,7 +3,7 @@ import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3mod
 import { Web3Modal } from "@web3modal/html";
 import { defineStore, storeToRefs } from "pinia";
 
-import type { Client, GetAccountResult, GetNetworkResult, Provider } from "@wagmi/core";
+import type { Client, Provider } from "@wagmi/core";
 
 import { useRuntimeConfig } from "#imports";
 import { chains, useNetworkStore } from "@/store/network";
@@ -13,12 +13,6 @@ const { public: env } = useRuntimeConfig();
 export let connector: Client<Provider>["connector"] | undefined = undefined;
 export const useOnboardStore = defineStore("onboard", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
-  const onboardStatus = ref<"disconnected" | "connecting" | "connected">("disconnected");
-
-  const accountLoginPromise = {
-    promise: undefined as undefined | Promise<void>,
-    resolve: undefined as undefined | (() => void),
-  };
 
   const { provider } = configureChains(chains, [walletConnectProvider({ projectId: env.walletConnectProjectID })]);
   const wagmiClient = createClient({
@@ -33,8 +27,8 @@ export const useOnboardStore = defineStore("onboard", () => {
   });
   const ethereumClient = new EthereumClient(wagmiClient, chains);
 
-  const account = ref<GetAccountResult>(ethereumClient.getAccount());
-  const network = ref<GetNetworkResult>(ethereumClient.getNetwork());
+  const account = ref(ethereumClient.getAccount());
+  const network = ref(ethereumClient.getNetwork());
   const web3modal = new Web3Modal(
     { projectId: env.walletConnectProjectID, enableNetworkView: false, enableAccountView: true, themeMode: "light" },
     ethereumClient
@@ -56,7 +50,6 @@ export const useOnboardStore = defineStore("onboard", () => {
 
   return {
     account,
-    onboardStatus,
     openModal,
     disconnect,
   };
