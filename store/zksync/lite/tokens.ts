@@ -32,9 +32,9 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
   });
 
   return {
-    tokens,
-    tokensRequestInProgress,
-    tokensRequestError,
+    tokens: computed(() => tokens.value),
+    tokensRequestInProgress: computed(() => tokensRequestInProgress.value),
+    tokensRequestError: computed(() => tokensRequestError.value),
     requestTokens,
     resetTokens,
   };

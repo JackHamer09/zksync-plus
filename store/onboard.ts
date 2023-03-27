@@ -49,7 +49,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   const disconnect = () => ethereumClient.disconnect();
 
   return {
-    account,
+    account: computed(() => account.value),
     openModal,
     disconnect,
   };

@@ -34,8 +34,8 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
   });
 
   return {
-    providerRequestInProgress,
-    providerRequestError,
+    providerRequestInProgress: computed(() => providerRequestInProgress.value),
+    providerRequestError: computed(() => providerRequestError.value),
     requestProvider,
     changeZkSyncNetwork,
   };

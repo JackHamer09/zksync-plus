@@ -85,8 +85,8 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
 
   return {
     balance,
-    balanceInProgress,
-    balanceError,
+    balanceInProgress: computed(() => balanceInProgress.value),
+    balanceError: computed(() => balanceError.value),
     requestBalance,
   };
 });
