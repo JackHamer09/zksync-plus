@@ -18,7 +18,7 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     inProgress: tokensRequestInProgress,
     error: tokensRequestError,
     execute: requestTokens,
-    clear: clearTokens,
+    reset: resetTokens,
   } = usePromise<Record<string, ZkSyncLiteToken>>(async () => {
     const provider = await liteProvider.requestProvider();
     if (!provider) throw new Error("Provider is not available");
@@ -36,6 +36,6 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     tokensRequestInProgress,
     tokensRequestError,
     requestTokens,
-    clearTokens,
+    resetTokens,
   };
 });

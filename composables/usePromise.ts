@@ -36,7 +36,7 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     return result.value;
   };
 
-  const clear = () => {
+  const reset = () => {
     promise = undefined;
     error.value = undefined;
     result.value = undefined;
@@ -48,6 +48,6 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     result,
     inProgress,
     execute,
-    clear,
+    reset,
   };
 };

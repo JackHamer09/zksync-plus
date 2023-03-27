@@ -23,7 +23,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   const { account } = storeToRefs(useOnboardStore());
   const { getEthWalletSigner } = useEthWalletStore();
 
-  const { execute: createWalletInstance, clear: clearWalletInstance } = usePromise<Wallet>(async () => {
+  const { execute: createWalletInstance, reset: resetWalletInstance } = usePromise<Wallet>(async () => {
     const provider = await liteProvider.requestProvider();
     if (!provider) throw new Error("Provider is not available");
     const ethWalletSigner = await getEthWalletSigner();
@@ -34,7 +34,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   const {
     result: accountState,
     execute: requestAccountState,
-    clear: clearAccountState,
+    reset: resetAccountState,
   } = usePromise<AccountState>(async () => {
     await createWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
@@ -54,7 +54,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     inProgress: balanceInProgress,
     error: balanceError,
     execute: requestBalance,
-    clear: clearBalance,
+    reset: resetBalance,
   } = usePromise<void>(async () => {
     await Promise.all([requestAccountState({ force: true }), liteTokens.requestTokens()]);
     if (!accountState.value) throw new Error("Account state is not available");
@@ -64,11 +64,11 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     }); */
   });
 
-  const clear = () => {
+  const reset = () => {
     wallet = undefined;
-    clearWalletInstance();
-    clearAccountState();
-    clearBalance();
+    resetWalletInstance();
+    resetAccountState();
+    resetBalance();
   };
 
   watch(account, async () => {
@@ -76,10 +76,10 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
       (account.value.isConnected && !wallet) ||
       (wallet && account.value.address && wallet.address() !== account.value.address)
     ) {
-      clear();
+      reset();
       await requestBalance();
     } else if (account.value.isDisconnected) {
-      clear();
+      reset();
     }
   });
 

@@ -16,16 +16,16 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
     inProgress: providerRequestInProgress,
     error: providerRequestError,
     execute: requestProvider,
-    clear: clearProvider,
+    reset: resetProvider,
   } = usePromise<RestProvider>(() =>
     getDefaultRestProvider(selectedEthereumNetwork.value.network as ZkSyncNetworkName)
   );
 
   const changeZkSyncNetwork = async (networkName: ZkSyncNetworkName) => {
     console.warn("changeZkSyncNetwork", networkName); // TEMP
-    clearProvider();
-    liteTokens.clearTokens();
+    resetProvider();
     await requestProvider();
+    liteTokens.resetTokens();
     await liteTokens.requestTokens();
   };
 
