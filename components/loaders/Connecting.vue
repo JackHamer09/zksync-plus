@@ -1,14 +1,14 @@
 <template>
   <transition
-    leave-active-class="transition ease-in duration-150"
-    leave-from-class="transform opacity-100"
-    leave-to-class="transform opacity-0"
     enter-active-class="transition ease-in duration-250"
     enter-from-class="transform opacity-0"
     enter-to-class="transform opacity-100"
+    leave-active-class="transition ease-in duration-150"
+    leave-from-class="transform opacity-100"
+    leave-to-class="transform opacity-0"
   >
     <div class="connecting-container" v-if="account.isReconnecting || account.isConnecting">
-      <Web3Avatar v-if="account.address" :address="account.address" class="mb-2 h-16 w-16" />
+      <AddressAvatar v-if="account.address" :address="account.address" class="mb-2 h-16 w-16" />
       <h1 class="h1 mb-2 text-center">{{ title }}</h1>
       <svg
         aria-hidden="true"
@@ -35,7 +35,6 @@
 import { computed } from "vue";
 
 import { storeToRefs } from "pinia";
-import Web3Avatar from "web3-avatar-vue";
 
 import { useOnboardStore } from "@/store/onboard";
 

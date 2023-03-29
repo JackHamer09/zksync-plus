@@ -1,0 +1,183 @@
+<template>
+  <div>
+    <CommonBackButton @click="emit('back')" />
+    <h1 class="h1">Who to pay</h1>
+    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Name or address" autofocus>
+      <template #icon>
+        <MagnifyingGlassIcon aria-hidden="true" />
+      </template>
+    </CommonSmallInput>
+
+    <div v-if="displayedAddresses.length">
+      <template v-for="(group, groupIndex) in displayedAddresses" :key="groupIndex">
+        <TypographyCategoryLabel v-if="group.title" class="group-category-label">
+          {{ group.title }}
+        </TypographyCategoryLabel>
+        <CommonCardWithLineButtons>
+          <AddressCard
+            v-for="item in group.addresses"
+            :name="item.name"
+            :address="item.address"
+            :key="item.address"
+            @click="emit('selected', item.address)"
+          >
+            <template #icon v-if="item.icon">
+              <component :is="item.icon" class="mr-3 text-gray-secondary" aria-hidden="true" />
+            </template>
+          </AddressCard>
+        </CommonCardWithLineButtons>
+      </template>
+    </div>
+    <div v-else-if="!search">
+      <div class="search-empty-block">
+        You don't have any contacts yet
+        <br />
+        <span class="mt-1.5 inline-block">
+          You can add contact <NuxtLink class="link" :to="{ name: 'contacts' }">here</NuxtLink>
+        </span>
+      </div>
+    </div>
+    <div v-else>
+      <div class="search-empty-block">
+        Nothing was found for "{{ search }}"
+        <br />
+        <span class="mt-1.5 inline-block">Please enter a valid ethereum address</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { computed, ref } from "vue";
+
+import { ClockIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
+import { isAddress } from "ethers/lib/utils";
+import { storeToRefs } from "pinia";
+
+import type { Contact } from "@/store/contacts";
+import type { Component } from "vue";
+
+import { useContactsStore } from "@/store/contacts";
+import { useOnboardStore } from "@/store/onboard";
+import { usePreferencesStore } from "@/store/preferences";
+import { checksumAddress } from "@/utils/formatters";
+
+type ContactWithIcon = Contact & { icon?: Component };
+type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
+
+const props = defineProps({
+  ownAddressDisplayed: {
+    type: Boolean,
+  },
+});
+
+const emit = defineEmits<{
+  (eventName: "back"): void;
+  (eventName: "selected", address: string): void;
+}>();
+
+const contactsStore = useContactsStore();
+const { account } = storeToRefs(useOnboardStore());
+const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
+const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
+
+const search = ref("");
+const isAddressValid = computed(() => isAddress(search.value));
+
+function findContactsByText(contacts: ContactWithIcon[], text: string) {
+  const lowercaseSearch = text.toLowerCase();
+  return contacts.filter((item) =>
+    Object.values(item)
+      .filter((e) => typeof e === "string")
+      .some((value) => (value as string).toLowerCase().includes(lowercaseSearch))
+  );
+}
+
+const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
+  if (isAddressValid.value) {
+    return {
+      name: "",
+      address: checksumAddress(search.value),
+    };
+  }
+  return null;
+});
+const ownAccount = computed<ContactWithIcon>(() => ({
+  name: "Your account",
+  address: account.value.address!,
+  icon: UserIcon,
+}));
+const lastAddressAccount = computed<ContactWithIcon | null>(() => {
+  if (!lastTransactionAddress.value) {
+    return null;
+  }
+  const contact = contactsStore.findByAddress(lastTransactionAddress.value);
+  if (contact) {
+    return {
+      ...contact,
+      icon: ClockIcon,
+    };
+  } else {
+    return {
+      name: "Last transaction",
+      address: lastTransactionAddress.value,
+      icon: ClockIcon,
+    };
+  }
+});
+
+const displayedAddresses = computed<AddressesGroup[]>(() => {
+  const groups: Record<string, AddressesGroup> = {
+    default: {
+      title: null,
+      addresses: [],
+    },
+  };
+
+  if (props.ownAddressDisplayed) {
+    groups.default.addresses.push(ownAccount.value);
+  }
+
+  if (lastAddressAccount.value) {
+    groups.default.addresses.push(lastAddressAccount.value);
+  }
+
+  for (const [contactsGroupCharacter, contactsGroup] of Object.entries(userContactsByFirstCharacter.value)) {
+    groups[contactsGroupCharacter] = {
+      title: contactsGroupCharacter,
+      addresses: contactsGroup,
+    };
+  }
+
+  const result = Object.values(groups);
+  if (search.value.length) {
+    const filtered = result
+      .map((group) => {
+        return {
+          ...group,
+          addresses: findContactsByText(group.addresses, search.value),
+        };
+      })
+      .filter((group) => group.addresses.length);
+    if (inputtedAddressAccount.value && filtered.length === 0) {
+      return [
+        {
+          title: null,
+          addresses: [inputtedAddressAccount.value],
+        },
+      ];
+    }
+    return filtered;
+  }
+  return result.filter((group) => group.addresses.length);
+});
+</script>
+
+<style lang="scss" scoped>
+.group-category-label:first-child {
+  @apply pt-0;
+}
+.search-empty-block {
+  @apply rounded-lg border border-dashed p-4 text-center text-gray-500;
+}
+</style>

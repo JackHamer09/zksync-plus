@@ -5,6 +5,7 @@ const plugin = require("tailwindcss/plugin");
 module.exports = {
   content: [
     "./components/**/*.{js,vue,ts}",
+    "./views/**/*.vue",
     "./layouts/**/*.vue",
     "./pages/**/*.vue",
     "./plugins/**/*.{js,ts}",

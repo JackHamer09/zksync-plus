@@ -1,6 +1,6 @@
 <template>
-  <div class="token-balance">
-    <TokenImage class="token-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
+  <CommonLineButton class="token-balance">
+    <TokenImage class="token-balance-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
       <div class="token-address" :title="address">{{ shortenAddress(address, 5) }}</div>
@@ -9,10 +9,10 @@
       <div class="token-balance-amount" :title="fullAmount">{{ symbol }} {{ displayedAmount }}</div>
       <div class="token-balance-price">{{ formatTokenPrice(amount, decimals, price) }}</div>
     </div>
-    <button class="send-button">
+    <NuxtLink :to="{ name: 'transaction-send', query: { token: address } }" class="send-button">
       <PaperAirplaneIcon aria-hidden="true" />
-    </button>
-  </div>
+    </NuxtLink>
+  </CommonLineButton>
 </template>
 
 <script lang="ts" setup>
@@ -73,10 +73,10 @@ const displayedAmount = computed(() => {
 
 <style lang="scss">
 .token-balance {
-  @apply grid cursor-pointer grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 transition-colors hover:bg-gray-50 xs:grid-cols-[40px_1fr_max-content_35px];
+  @apply grid grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 xs:grid-cols-[40px_1fr_max-content_35px];
 
-  .token-image-container {
-    @apply h-10 w-10;
+  .token-balance-image-container {
+    @apply h-full w-auto;
   }
   .token-info,
   .token-balances {

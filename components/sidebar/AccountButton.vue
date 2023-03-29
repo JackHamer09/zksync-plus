@@ -1,13 +1,12 @@
 <template>
   <button class="account-button" @click="onboardStore.disconnect">
-    <Web3Avatar :address="account.address!" class="account-icon" />
+    <AddressAvatar :address="account.address!" class="account-icon" />
     <span class="account-name">{{ shortenAddress(account.address!) }}</span>
   </button>
 </template>
 
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import Web3Avatar from "web3-avatar-vue";
 
 import { useOnboardStore } from "@/store/onboard";
 import { shortenAddress } from "@/utils/formatters";

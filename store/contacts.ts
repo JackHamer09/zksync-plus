@@ -1,0 +1,66 @@
+import { useStorage } from "@vueuse/core";
+import { defineStore, storeToRefs } from "pinia";
+
+import { useOnboardStore } from "@/store/onboard";
+
+export type Contact = {
+  name: string;
+  address: string;
+};
+
+export const useContactsStore = defineStore("contacts", () => {
+  const { account } = storeToRefs(useOnboardStore());
+  const storageContacts = useStorage<{ [userAddress: string]: Contact[] }>("contacts", {});
+
+  const userContacts = computed<Contact[]>({
+    get: () => {
+      if (account.value.address && Array.isArray(storageContacts.value[account.value.address])) {
+        return [...storageContacts.value[account.value.address]].sort((a, b) => a.name.localeCompare(b.name));
+      }
+      return [];
+    },
+    set: (contacts: Contact[]) => {
+      if (!account.value.address) {
+        throw new Error("Account is not available");
+      }
+      storageContacts.value[account.value.address] = contacts;
+    },
+  });
+
+  const userContactsByFirstCharacter = computed(() => {
+    const contacts: { [firstCharacter: string]: Contact[] } = {};
+    for (const contact of userContacts.value) {
+      const firstCharacter = contact.name.slice(0, 1);
+      if (!contacts[firstCharacter]) {
+        contacts[firstCharacter] = [];
+      }
+      contacts[firstCharacter].push(contact);
+    }
+    return contacts;
+  });
+
+  const findByAddress = (contactAddress: string) => {
+    return userContacts.value.find((e) => e.address === contactAddress);
+  };
+  const saveContact = (contact: Contact) => {
+    if (contact.address === account.value.address) {
+      throw new Error("Can't add own account to contacts");
+    }
+    removeContact(contact.address);
+    userContacts.value.push(contact);
+  };
+  const removeContact = (contactAddress: string) => {
+    const contactIndex = userContacts.value.map((e) => e.address).indexOf(contactAddress);
+    if (contactIndex !== -1) {
+      userContacts.value.splice(contactIndex, 1);
+    }
+  };
+
+  return {
+    userContacts,
+    userContactsByFirstCharacter,
+    findByAddress,
+    saveContact,
+    removeContact,
+  };
+});

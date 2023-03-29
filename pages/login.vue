@@ -12,7 +12,7 @@
       <NuxtLink :to="{ name: 'index' }" class="login-btn">
         <div class="login-btn-inner">
           <div class="mr-2 flex h-20 items-center justify-center pr-0.5">
-            <Web3Avatar class="h-10 w-10" :address="account.address" />
+            <AddressAvatar class="h-10 w-10" :address="account.address" />
           </div>
           <div class="logged-in-address">{{ shortenAddress(account.address) }}</div>
           <ChevronRightIcon class="block h-6 w-6" aria-hidden="true" />
@@ -28,7 +28,6 @@
 <script lang="ts" setup>
 import { ChevronRightIcon } from "@heroicons/vue/24/solid";
 import { storeToRefs } from "pinia";
-import Web3Avatar from "web3-avatar-vue";
 
 import { definePageMeta } from "#imports";
 import { useOnboardStore } from "@/store/onboard";

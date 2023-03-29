@@ -1,4 +1,4 @@
-import { formatUnits } from "ethers/lib/utils.js";
+import { formatUnits, getAddress } from "ethers/lib/utils";
 
 import type { BigNumberish } from "ethers";
 
@@ -56,4 +56,12 @@ export function removeSmallAmount(
     return acc.slice(0, -2);
   }
   return acc;
+}
+
+export function checksumAddress(address: string) {
+  return getAddress(address);
+}
+
+export function capitalize(str: string) {
+  return str[0].toUpperCase() + str.slice(1);
 }

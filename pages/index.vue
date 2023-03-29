@@ -18,7 +18,7 @@
           </template>
           <template #default>Add money</template>
         </CommonButton>
-        <CommonButton>
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-send' }">
           <template #icon>
             <PaperAirplaneIcon aria-hidden="true" />
           </template>
@@ -32,8 +32,11 @@
         </div>
         <div class="token-balances-container">
           <template v-if="balanceInProgress">
-            <TokenBalanceLoader v-for="index in 2" :key="index" />
+            <TokenBalanceLoader v-for="index in 1" :key="index" />
           </template>
+          <CommonErrorBlock v-else-if="balanceError" class="m-3 mt-0" @try-again="fetch">
+            {{ balanceError.message }}
+          </CommonErrorBlock>
           <template v-else>
             <TokenBalance v-for="item in displayedBalances" :key="item.address" v-bind="item" />
           </template>
@@ -54,10 +57,21 @@ import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
 const walletLiteStore = useLiteWalletStore();
-const { balance, balanceInProgress } = storeToRefs(walletLiteStore);
-walletLiteStore.requestBalance();
+const { balance, balanceInProgress, balanceError } = storeToRefs(walletLiteStore);
+
+const fetch = () => {
+  walletLiteStore.requestBalance();
+};
+fetch();
 
 const total = computed(() => {
+  if (balanceError.value) {
+    return {
+      int: "?",
+      dec: "??",
+      currencySymbol: "$",
+    };
+  }
   const num = balance.value.reduce(
     (acc, { amount, decimals, price }) => acc + parseFloat(parseTokenAmount(amount, decimals)) * price,
     0
