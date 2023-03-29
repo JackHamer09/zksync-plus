@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import type { TokenInfo } from "zksync/build/types";
 
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
+import { checksumAddress } from "@/utils/formatters";
 import { getTokenIconUrlBySymbol } from "@/utils/tokens/lite";
 
 export interface ZkSyncLiteToken extends TokenInfo {
@@ -26,7 +27,7 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     return Object.fromEntries(
       Object.entries(tokens).map(([symbol, token]) => {
         const iconUrl = getTokenIconUrlBySymbol(symbol);
-        return [symbol, { ...token, price: 1, iconUrl }];
+        return [symbol, { ...token, address: checksumAddress(token.address), price: 1, iconUrl }];
       })
     );
   });

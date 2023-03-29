@@ -32,9 +32,9 @@
         </div>
         <div class="token-balances-container">
           <template v-if="balanceInProgress">
-            <TokenBalanceLoader v-for="index in 1" :key="index" />
+            <TokenBalanceLoader v-for="index in 2" :key="index" />
           </template>
-          <CommonErrorBlock v-else-if="balanceError" class="m-3 mt-0" @try-again="fetch">
+          <CommonErrorBlock v-else-if="balanceError" class="m-3 mb-2.5 -mt-1" @try-again="fetch">
             {{ balanceError.message }}
           </CommonErrorBlock>
           <template v-else>
@@ -103,7 +103,7 @@ const displayedBalances = computed(() => {
 }
 .tokens-container {
   .token-balances-container {
-    @apply -mx-3 -mb-3;
+    @apply -mx-3 -mt-1 -mb-3;
   }
 }
 </style>
