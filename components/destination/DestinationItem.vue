@@ -33,8 +33,12 @@ defineProps({
     @apply aspect-square h-full w-auto rounded-full bg-gray transition-shadow;
   }
   .destination-item-info {
-    @apply flex w-full flex-col justify-between whitespace-nowrap;
+    @apply flex w-full flex-col justify-between overflow-hidden whitespace-nowrap;
 
+    .destination-item-label,
+    .destination-item-description {
+      @apply overflow-hidden overflow-ellipsis;
+    }
     .destination-item-label {
       @apply font-medium leading-relaxed;
     }
