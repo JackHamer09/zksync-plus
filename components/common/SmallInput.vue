@@ -13,11 +13,11 @@
     />
     <transition
       enter-active-class="transition ease-in duration-200"
-      enter-from-class="transform opacity-0"
-      enter-to-class="transform opacity-100"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
       leave-active-class="transition ease-in duration-50"
-      leave-from-class="transform opacity-100"
-      leave-to-class="transform opacity-0"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
       <button v-if="inputted" class="small-input-clear-button" @click="inputted = ''">
         <XMarkIcon class="small-input-clear-button-icon" aria-hidden="true" />

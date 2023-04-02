@@ -2,8 +2,8 @@
   <div class="image-loader-container">
     <transition
       leave-active-class="transition ease-in duration-75"
-      leave-from-class="transform opacity-100"
-      leave-to-class="transform opacity-0"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
       <div v-if="$slots.placeholder && (!isReady || error)" class="image-loader-placeholder">
         <slot name="placeholder">
