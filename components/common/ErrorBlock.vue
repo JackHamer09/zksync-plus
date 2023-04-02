@@ -4,7 +4,7 @@
     <div class="error-block-text-container">
       <slot>Unexpected error</slot>
     </div>
-    <CommonButton color="error" @click="emit('try-again')">Try again</CommonButton>
+    <CommonButton variant="error" @click="emit('try-again')">Try again</CommonButton>
   </div>
 </template>
 

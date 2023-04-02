@@ -66,10 +66,10 @@ const inputted = computed({
 
 <style lang="scss">
 .small-input-container {
-  @apply flex h-9 w-full items-center rounded-[10px] bg-[#edeff2] p-1.5 transition-colors;
+  @apply flex h-9 w-full items-center rounded-[10px] bg-gray-input p-1.5 transition-colors;
   &.focused,
   &:hover {
-    @apply bg-[#dfe3e7];
+    @apply bg-gray-input-focus;
 
     .small-input-clear-button {
       @apply bg-gray-400;

@@ -11,13 +11,17 @@
           <ArrowsRightLeftIcon class="navbar-desktop-link-icon" aria-hidden="true" />
           <span class="navbar-desktop-link-label">Payments</span>
         </NuxtLink>
+        <NuxtLink :to="{ name: 'contacts' }" class="navbar-desktop-link">
+          <UserGroupIcon class="navbar-desktop-link-icon" aria-hidden="true" />
+          <span class="navbar-desktop-link-label">Contacts</span>
+        </NuxtLink>
       </div>
     </nav>
   </nav>
 </template>
 
 <script lang="ts" setup>
-import { ArrowsRightLeftIcon, HomeIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
 </script>
 
 <style lang="scss" scoped>

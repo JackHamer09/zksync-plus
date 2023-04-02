@@ -29,20 +29,20 @@
       </template>
     </div>
     <div v-else-if="!search">
-      <div class="search-empty-block">
+      <CommonEmptyBlock class="search-empty-block">
         You don't have any contacts yet
         <br />
         <span class="mt-1.5 inline-block">
           You can add contact <NuxtLink class="link" :to="{ name: 'contacts' }">here</NuxtLink>
         </span>
-      </div>
+      </CommonEmptyBlock>
     </div>
     <div v-else>
-      <div class="search-empty-block">
+      <CommonEmptyBlock class="search-empty-block">
         Nothing was found for "{{ search }}"
         <br />
         <span class="mt-1.5 inline-block">Please enter a valid ethereum address</span>
-      </div>
+      </CommonEmptyBlock>
     </div>
   </div>
 </template>
@@ -78,7 +78,7 @@ const emit = defineEmits<{
 
 const contactsStore = useContactsStore();
 const { account } = storeToRefs(useOnboardStore());
-const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
+const { userContacts, userContactsByFirstCharacter } = storeToRefs(contactsStore);
 const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const search = ref("");
@@ -111,7 +111,7 @@ const lastAddressAccount = computed<ContactWithIcon | null>(() => {
   if (!lastTransactionAddress.value) {
     return null;
   }
-  const contact = contactsStore.findByAddress(lastTransactionAddress.value);
+  const contact = userContacts.value.find((e) => e.address === lastTransactionAddress.value);
   if (contact) {
     return {
       ...contact,
@@ -176,8 +176,5 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
 <style lang="scss" scoped>
 .group-category-label:first-child {
   @apply pt-0;
-}
-.search-empty-block {
-  @apply rounded-lg border border-dashed p-4 text-center text-gray-500;
 }
 </style>

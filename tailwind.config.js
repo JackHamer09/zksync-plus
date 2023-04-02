@@ -21,6 +21,8 @@ module.exports = {
         gray: {
           DEFAULT: "#f7f7f7",
           secondary: "#75808a",
+          input: "#edeff2",
+          "input-focus": "#dfe3e7",
           ...defaultTheme.colors.gray,
         },
         primary: {

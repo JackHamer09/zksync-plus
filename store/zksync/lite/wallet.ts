@@ -17,14 +17,14 @@ export interface Balance extends ZkSyncLiteToken {
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
   let wallet: Wallet | undefined = undefined;
-  const liteProvider = useLiteProviderStore();
-  const liteTokens = useLiteTokensStore();
-  const { tokens } = storeToRefs(liteTokens);
+  const liteProviderStore = useLiteProviderStore();
+  const liteTokensStore = useLiteTokensStore();
+  const { tokens } = storeToRefs(liteTokensStore);
   const { account } = storeToRefs(useOnboardStore());
   const { getEthWalletSigner } = useEthWalletStore();
 
   const { execute: createWalletInstance, reset: resetWalletInstance } = usePromise<Wallet>(async () => {
-    const provider = await liteProvider.requestProvider();
+    const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
     const ethWalletSigner = await getEthWalletSigner();
     wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
@@ -56,13 +56,21 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     execute: requestBalance,
     reset: resetBalance,
   } = usePromise<void>(async () => {
-    await Promise.all([requestAccountState({ force: true }), liteTokens.requestTokens()]);
+    await Promise.all([requestAccountState({ force: true }), liteTokensStore.requestTokens()]);
     if (!accountState.value) throw new Error("Account state is not available");
     if (!tokens.value) throw new Error("Tokens are not available");
-    /* Object.entries(tokens.value).map(([symbol]) => {
-      // get token price
-    }); */
   });
+
+  watch(
+    balance,
+    (balances) => {
+      balances.map(({ symbol, amount }) => {
+        if (amount === "0") return;
+        liteTokensStore.requestTokenPrice(symbol);
+      });
+    },
+    { immediate: true }
+  );
 
   const reset = () => {
     wallet = undefined;

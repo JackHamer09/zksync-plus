@@ -1,4 +1,4 @@
-import { formatUnits, getAddress } from "ethers/lib/utils";
+import { formatUnits, getAddress, parseUnits } from "ethers/lib/utils";
 
 import type { BigNumberish } from "ethers";
 
@@ -14,15 +14,24 @@ export function parseTokenAmount(amount: BigNumberish, decimals: number): string
   return result;
 }
 
-export function formatTokenPrice(amount: BigNumberish, decimals: number, price: number): string {
+export function decimalToBigNumber(amount: string, decimals: number) {
+  return parseUnits(amount, decimals);
+}
+
+export function formatRawTokenPrice(amount: BigNumberish, decimals: number, price: number): number {
   const tokenAmount = parseTokenAmount(amount, decimals);
-  const totalPrice = parseFloat(tokenAmount) * price;
-  if (!totalPrice) {
+  return parseFloat(tokenAmount) * price;
+}
+export function formatPricePretty(price: number): string {
+  if (!price) {
     return "$0.00";
-  } else if (totalPrice < 0.01) {
+  } else if (price < 0.01) {
     return "<$0.01";
   }
-  return "$" + totalPrice.toFixed(2);
+  return "$" + price.toFixed(2);
+}
+export function formatTokenPrice(amount: BigNumberish, decimals: number, price: number): string {
+  return formatPricePretty(formatRawTokenPrice(amount, decimals, price));
 }
 
 export function removeSmallAmount(

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <CommonBackButton is="RouterLink" :to="{ name: 'index' }" />
     <h1 class="h1">Contacts</h1>
   </div>
 </template>

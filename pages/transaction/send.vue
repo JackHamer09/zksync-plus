@@ -9,6 +9,7 @@
     @selected="address = $event"
     @back="back()"
   />
+  <LiteTransferForm v-else-if="step === 'transaction-form'" :address="address!" @back="back()" />
 </template>
 
 <script lang="ts" setup>
@@ -25,6 +26,7 @@ import { usePreferencesStore } from "@/store/preferences";
 import { checksumAddress } from "@/utils/formatters";
 import SelectAddress from "@/views/SelectAddress.vue";
 import SelectDestination from "@/views/SelectDestination.vue";
+import LiteTransferForm from "@/views/transactions/lite/Transfer.vue";
 
 const router = useRouter();
 const route = useRoute();

@@ -39,9 +39,6 @@ export const useContactsStore = defineStore("contacts", () => {
     return contacts;
   });
 
-  const findByAddress = (contactAddress: string) => {
-    return userContacts.value.find((e) => e.address === contactAddress);
-  };
   const saveContact = (contact: Contact) => {
     if (contact.address === account.value.address) {
       throw new Error("Can't add own account to contacts");
@@ -59,7 +56,6 @@ export const useContactsStore = defineStore("contacts", () => {
   return {
     userContacts,
     userContactsByFirstCharacter,
-    findByAddress,
     saveContact,
     removeContact,
   };

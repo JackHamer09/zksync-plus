@@ -3,7 +3,7 @@
     <h1 class="h1">Home</h1>
     <CommonBadgeTabs class="mb-4" />
     <CommonContentBlock>
-      <div v-if="balanceInProgress" class="total-balance">
+      <div v-if="balanceInProgress || !allPricesLoaded" class="total-balance">
         <CommonContentLoader />
       </div>
       <div v-else class="total-balance">
@@ -31,14 +31,24 @@
           <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
         <div class="token-balances-container">
-          <template v-if="balanceInProgress">
+          <template v-if="balanceInProgress || !allPricesLoaded">
             <TokenBalanceLoader v-for="index in 2" :key="index" />
           </template>
           <CommonErrorBlock v-else-if="balanceError" class="m-3 mb-2.5 -mt-1" @try-again="fetch">
             {{ balanceError.message }}
           </CommonErrorBlock>
-          <template v-else>
+          <template v-else-if="displayedBalances.length">
             <TokenBalance v-for="item in displayedBalances" :key="item.address" v-bind="item" />
+          </template>
+          <template v-else>
+            <CommonEmptyBlock class="mx-3 mb-3 mt-1">
+              You don't have any balances on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span>
+              <br />
+              <span class="mt-1.5 inline-block">
+                Proceed to <NuxtLink class="link" :to="{ name: 'balances' }">balances</NuxtLink> to add balance to your
+                account
+              </span>
+            </CommonEmptyBlock>
           </template>
         </div>
       </div>
@@ -52,17 +62,21 @@ import { computed } from "vue";
 import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
+import { useDestinationsStore } from "@/store/destinations";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError } = storeToRefs(walletLiteStore);
+const { destinations } = storeToRefs(useDestinationsStore());
 
 const fetch = () => {
   walletLiteStore.requestBalance();
 };
 fetch();
+
+const allPricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
 
 const total = computed(() => {
   if (balanceError.value) {
@@ -72,10 +86,10 @@ const total = computed(() => {
       currencySymbol: "$",
     };
   }
-  const num = balance.value.reduce(
-    (acc, { amount, decimals, price }) => acc + parseFloat(parseTokenAmount(amount, decimals)) * price,
-    0
-  );
+  const num = balance.value.reduce((acc, { amount, decimals, price }) => {
+    if (typeof price !== "number") return acc;
+    return acc + parseFloat(parseTokenAmount(amount, decimals)) * price;
+  }, 0);
   return {
     int: Math.floor(num),
     dec: (num % 1).toFixed(2).slice(2),
@@ -85,7 +99,9 @@ const total = computed(() => {
 
 const displayedBalances = computed(() => {
   return balance.value.filter(({ amount, decimals, price }) => {
-    if (!isOnlyZeroes(removeSmallAmount(amount, decimals, price))) {
+    const decimalAmount =
+      typeof price === "number" ? removeSmallAmount(amount, decimals, price) : parseTokenAmount(amount, decimals);
+    if (!isOnlyZeroes(decimalAmount)) {
       return true;
     }
     return false;

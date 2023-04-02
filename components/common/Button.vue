@@ -1,5 +1,5 @@
 <template>
-  <component :is="as" type="button" class="default-button" :class="`color-${color}`">
+  <component :is="as" type="button" class="default-button" :class="`variant-${variant}`">
     <span v-if="$slots.icon" class="icon-container">
       <slot name="icon" />
     </span>
@@ -15,8 +15,8 @@ defineProps({
     type: String,
     default: "button",
   },
-  color: {
-    type: String as PropType<"primary" | "error">,
+  variant: {
+    type: String as PropType<"primary" | "primary-solid" | "error">,
     default: "primary",
   },
 });
@@ -24,15 +24,24 @@ defineProps({
 
 <style lang="scss">
 .default-button {
-  @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] px-4 text-sm font-medium transition-colors;
+  @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] px-4 text-sm font-medium backdrop-blur-sm transition-colors;
   &:enabled:not([aria-disabled="true"]) {
     @apply hover:bg-primary-100/75;
   }
-  &.color- {
+  &.variant- {
     &primary {
       @apply bg-primary-100/50 text-primary-400;
       &:enabled:not([aria-disabled="true"]) {
         @apply hover:bg-primary-100/75;
+      }
+    }
+    &primary-solid {
+      @apply h-12 w-full max-w-sm rounded-2xl bg-primary-400 text-base text-white;
+      &:enabled:not([aria-disabled="true"]) {
+        @apply hover:bg-primary-400;
+      }
+      &:disabled {
+        @apply bg-opacity-50;
       }
     }
     &error {

@@ -1,13 +1,25 @@
 <template>
-  <CommonLineButton class="token-balance">
+  <CommonLineButton class="token-balance" :class="{ 'is-zero-amount': isZeroAmount }">
     <TokenImage class="token-balance-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
       <div class="token-address" :title="address">{{ shortenAddress(address, 5) }}</div>
     </div>
     <div class="token-balances">
-      <div class="token-balance-amount" :title="fullAmount">{{ symbol }} {{ displayedAmount }}</div>
-      <div class="token-balance-price">{{ formatTokenPrice(amount, decimals, price) }}</div>
+      <div class="token-balance-amount" :title="fullAmount">
+        <template v-if="priceLoading">
+          <CommonContentLoader :length="15" />
+        </template>
+        <template v-else>{{ displayedAmount }}</template>
+      </div>
+      <div class="token-balance-price">
+        <template v-if="priceLoading">
+          <CommonContentLoader :length="12" />
+        </template>
+        <template v-else-if="price && !isZeroAmount">
+          {{ formatTokenPrice(amount, decimals, price as number) }}
+        </template>
+      </div>
     </div>
     <NuxtLink :to="{ name: 'transaction-send', query: { token: address } }" class="send-button">
       <PaperAirplaneIcon aria-hidden="true" />
@@ -20,6 +32,7 @@ import { computed } from "vue";
 
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 
+import type { ZkSyncLiteTokenPrice } from "@/store/zksync/lite/tokens";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
@@ -51,13 +64,18 @@ const props = defineProps({
     required: true,
   },
   price: {
-    type: Number,
-    required: true,
+    type: [String, Number] as PropType<ZkSyncLiteTokenPrice>,
   },
 });
 
+const priceLoading = computed(() => props.price === "loading");
+const isZeroAmount = computed(() => props.amount === "0");
+
 const fullAmount = computed(() => parseTokenAmount(props.amount, props.decimals));
 const displayedAmount = computed(() => {
+  if (typeof props.price !== "number") {
+    return fullAmount.value;
+  }
   const withoutSmallAmount = removeSmallAmount(props.amount, props.decimals, props.price);
   if (props.amountDisplay === "remove-small") {
     if (props.amount === "0") {
@@ -74,6 +92,15 @@ const displayedAmount = computed(() => {
 <style lang="scss">
 .token-balance {
   @apply grid grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 xs:grid-cols-[40px_1fr_max-content_35px];
+  &.is-zero-amount {
+    .token-balance-amount,
+    .send-button {
+      @apply opacity-50;
+    }
+    .token-balance-amount {
+      @apply text-gray-secondary;
+    }
+  }
 
   .token-balance-image-container {
     @apply h-full w-auto;

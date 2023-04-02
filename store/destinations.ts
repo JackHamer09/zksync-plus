@@ -17,12 +17,12 @@ export const useDestinationsStore = defineStore("destinations", () => {
   const destinations = computed(() => ({
     zkSyncLite: {
       key: "zkSyncLite",
-      label: "zkSync Lite",
+      label: `zkSync Lite ${capitalize(selectedEthereumNetwork.value.network)}`,
       iconUrl: "/img/zksync-lite.svg",
     },
     era: {
       key: "era",
-      label: "zkSync Era",
+      label: `zkSync Era ${capitalize(selectedEthereumNetwork.value.network)}`,
       iconUrl: "/img/era.svg",
     },
     ethereum: {

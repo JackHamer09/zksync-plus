@@ -4,7 +4,7 @@
     <h1 class="h1">Balances</h1>
     <CommonBadgeTabs class="mb-4" />
 
-    <CommonCardWithLineButtons v-if="balanceInProgress">
+    <CommonCardWithLineButtons v-if="balanceInProgress || !allPricesLoaded">
       <TokenBalanceLoader v-for="index in 2" :key="index" />
     </CommonCardWithLineButtons>
     <CommonCardWithLineButtons v-else-if="balanceError">
@@ -14,7 +14,9 @@
     </CommonCardWithLineButtons>
     <template v-else>
       <div v-for="(group, index) in displayedBalanceGroups" :key="index" class="category">
-        <TypographyCategoryLabel v-if="group.title">{{ group.title }}</TypographyCategoryLabel>
+        <TypographyCategoryLabel v-if="group.title" class="group-category-label">
+          {{ group.title }}
+        </TypographyCategoryLabel>
         <CommonCardWithLineButtons>
           <TokenBalance v-for="item in group.balances" :key="item.address" v-bind="item" />
         </CommonCardWithLineButtons>
@@ -31,11 +33,13 @@ import { storeToRefs } from "pinia";
 import type { Balance } from "@/store/zksync/lite/wallet";
 
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
-import { removeSmallAmount } from "@/utils/formatters";
+import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError } = storeToRefs(walletLiteStore);
+
+const allPricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
 
 const fetch = () => {
   walletLiteStore.requestBalance();
@@ -58,7 +62,10 @@ const displayedBalanceGroups = computed(() => {
     },
   };
   for (const balanceItem of balance.value) {
-    const balance = removeSmallAmount(balanceItem.amount, balanceItem.decimals, balanceItem.price);
+    const balance =
+      typeof balanceItem.price === "number"
+        ? removeSmallAmount(balanceItem.amount, balanceItem.decimals, balanceItem.price)
+        : parseTokenAmount(balanceItem.amount, balanceItem.decimals);
     if (!isOnlyZeroes(balance)) {
       groups.default.balances.push(balanceItem);
     } else if (balance === "0") {
@@ -71,4 +78,8 @@ const displayedBalanceGroups = computed(() => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.group-category-label:first-child {
+  @apply pt-0;
+}
+</style>
