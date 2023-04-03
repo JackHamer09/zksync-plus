@@ -21,19 +21,29 @@ export default (requestProvider: () => Promise<RestProvider | undefined>) => {
     try {
       inProgress.value = true;
       result.value = undefined;
+      error.value = undefined;
 
       const provider = await requestProvider();
       if (!provider) throw new Error("Provider is not available");
       let fee: BigNumber | undefined = undefined;
-      if (params.length === 1 && params[0].symbol === feeSymbol) {
+      if (params.length === 1) {
         const { type, to, symbol } = params[0];
         fee = (await provider.getTransactionFee(type, to, symbol)).totalFee;
       } else {
-        fee = await provider.getTransactionsBatchFee(
-          [...params.map((e) => e.type), "Transfer"],
-          [...params.map((e) => e.to), from],
-          feeSymbol
-        );
+        const payWithDifferentToken = params.some((e) => typeof e.type !== "string") || params[0].symbol !== feeSymbol;
+        if (payWithDifferentToken) {
+          fee = await provider.getTransactionsBatchFee(
+            [...params.map((e) => e.type), "Transfer"],
+            [...params.map((e) => e.to), from],
+            feeSymbol
+          );
+        } else {
+          fee = await provider.getTransactionsBatchFee(
+            params.map((e) => e.type),
+            params.map((e) => e.to),
+            feeSymbol
+          );
+        }
       }
       result.value = fee ? closestPackableTransactionFee(fee).toString() : undefined;
     } catch (err) {

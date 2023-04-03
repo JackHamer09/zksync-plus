@@ -1,71 +1,104 @@
 <template>
-  <div v-if="isModalOpened" class="modal-container">
-    <OnClickOutside @trigger="closeModal" role="document">
-      <div
-        ref="modal"
-        class="modal-card"
-        aria-hidden="true"
-        aria-modal="true"
-        role="dialog"
-        tabindex="-1"
-        @keydown.esc="closeModal"
+  <TransitionRoot as="template" :show="isModalOpened" @after-leave="search = ''">
+    <Dialog as="div" class="relative z-10" @close="closeModal">
+      <TransitionChild
+        as="template"
+        enter="ease-out duration-300"
+        enter-from="opacity-0"
+        enter-to="opacity-100"
+        leave="ease-in duration-200"
+        leave-from="opacity-100"
+        leave-to="opacity-0"
       >
-        <div class="modal-card-header">
-          <div class="modal-title">token_dropdown.choose_coin</div>
-          <button @click="closeModal">
-            <XMarkIcon class="h-5 w-5 text-neutral-700" aria-hidden="true" />
-          </button>
-        </div>
-        <div>
-          <Combobox v-model="selectedToken">
-            <div class="px-4 pb-2">
-              <div class="modal-input-container">
-                <!-- <div class="search-icon-container">
-                  <SearchIcon class="h-5 w-5 text-neutral-700" aria-hidden="true" />
-                </div> -->
-                <ComboboxInput
-                  id="search"
-                  type="text"
-                  class="search-input"
-                  :placeholder="'token_dropdown.placeholder'"
-                  @change="search = $event.target.value"
-                >
-                </ComboboxInput>
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+      </TransitionChild>
+
+      <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+          <TransitionChild
+            as="template"
+            enter="ease-out duration-300"
+            enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            enter-to="opacity-100 translate-y-0 sm:scale-100"
+            leave="ease-in duration-200"
+            leave-from="opacity-100 translate-y-0 sm:scale-100"
+            leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+          >
+            <DialogPanel
+              ref="modal"
+              class="modal-card"
+              aria-hidden="true"
+              aria-modal="true"
+              role="dialog"
+              tabindex="-1"
+              @trigger="closeModal"
+              @keydown.esc="closeModal"
+            >
+              <div class="mb-4 flex items-center justify-between">
+                <DialogTitle as="div" class="h2 py-0">Choose token</DialogTitle>
+                <button @click="closeModal">
+                  <XMarkIcon class="h-6 w-6 text-neutral-700" aria-hidden="true" />
+                </button>
               </div>
-            </div>
-            <div class="modal-list-title">token_dropdown.your_assets</div>
-            <ComboboxOptions static class="modal-search-options-container">
-              <ComboboxOption v-for="item in displayedBalances" :key="item.symbol" :value="item" as="template">
-                <!-- v-slot="{ active }" -->
-                <!-- <li class="modal-list-item" :class="[active && 'bg-black/[.05]']">
-                  <TokenLabel :token="item" />
-                  <div v-if="item.value" class="flex flex-col items-end">
-                    <div class="modal-list-label">{{ item.value }}</div>
-                    <p v-if="item.price === null" class="modal-list-price-error">token_dropdown.token_unknown_price</p>
-                    <p v-else-if="item.price" class="modal-list-light-text">~${{ item.price }}</p>
-                  </div>
-                  <div v-else class="custom-token-balance">0.00</div>
-                </li> -->
-              </ComboboxOption>
-            </ComboboxOptions>
-          </Combobox>
+              <Combobox v-model="selectedToken">
+                <!-- TODO: Refactor this to use ComboboxInput as main component but look like CommonSmallInput -->
+                <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Symbol or address" autofocus>
+                  <template #icon>
+                    <MagnifyingGlassIcon aria-hidden="true" />
+                  </template>
+                </CommonSmallInput>
+                <div class="h-full overflow-auto">
+                  <CommonCardWithLineButtons v-if="loading">
+                    <TokenBalanceLoader v-for="index in 2" :key="index" />
+                  </CommonCardWithLineButtons>
+                  <CommonCardWithLineButtons v-else-if="error">
+                    <CommonErrorBlock class="m-2" @try-again="emit('try-again')">
+                      {{ error.message }}
+                    </CommonErrorBlock>
+                  </CommonCardWithLineButtons>
+                  <template v-else-if="balanceGroups.length || !search">
+                    <div v-for="(group, index) in balanceGroups" :key="index" class="category">
+                      <TypographyCategoryLabel v-if="group.title" class="group-category-label">
+                        {{ group.title }}
+                      </TypographyCategoryLabel>
+                      <CommonCardWithLineButtons>
+                        <TokenBalance
+                          v-for="item in group.balances"
+                          :show-send-button="false"
+                          :key="item.address"
+                          v-bind="item"
+                          @click="selectedToken = item"
+                        />
+                      </CommonCardWithLineButtons>
+                    </div>
+                  </template>
+                  <CommonEmptyBlock v-else class="search-empty-block">
+                    No tokens was found for "{{ search }}"
+                    <br />
+                    <span class="mt-1.5 inline-block">Make sure you are using correct zkSync network</span>
+                  </CommonEmptyBlock>
+                </div>
+              </Combobox>
+            </DialogPanel>
+          </TransitionChild>
         </div>
       </div>
-    </OnClickOutside>
-  </div>
+    </Dialog>
+  </TransitionRoot>
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
-import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/vue";
-import { XMarkIcon } from "@heroicons/vue/24/outline";
-import { OnClickOutside } from "@vueuse/components";
-import { createFocusTrap } from "focus-trap";
+import { Combobox, Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from "@headlessui/vue";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/vue/24/outline";
+
+import CommonCardWithLineButtons from "@/components/common/CardWithLineButtons.vue";
 
 import type { Balance } from "@/store/zksync/lite/wallet";
-import type { FocusTrap } from "focus-trap";
 import type { PropType } from "vue";
+
+import { groupBalancesByAmount } from "@/utils/mappers";
 
 const props = defineProps({
   opened: {
@@ -75,9 +108,12 @@ const props = defineProps({
   tokenAddress: {
     type: String,
   },
-  pending: {
+  loading: {
     type: Boolean,
-    default: true,
+    default: false,
+  },
+  error: {
+    type: Error,
   },
   balances: {
     type: Array as PropType<Balance[]>,
@@ -88,6 +124,7 @@ const props = defineProps({
 const emit = defineEmits<{
   (eventName: "update:opened", value: boolean): void;
   (eventName: "update:tokenAddress", tokenAddress?: string): void;
+  (eventName: "try-again"): void;
 }>();
 
 const search = ref("");
@@ -99,115 +136,46 @@ const displayedBalances = computed(() => {
       .some((value) => value.toLowerCase().includes(lowercaseSearch))
   );
 });
+const balanceGroups = groupBalancesByAmount(displayedBalances);
 
 const selectedTokenAddress = computed({
   get: () => props.tokenAddress,
   set: (value) => emit("update:tokenAddress", value),
 });
-const selectedToken = computed(() => {
-  if (!props.balances) {
-    return undefined;
-  }
-  return props.balances.find((e) => e.address === selectedTokenAddress.value);
+const selectedToken = computed({
+  get: () => {
+    if (!props.balances) {
+      return undefined;
+    }
+    return props.balances.find((e) => e.address === selectedTokenAddress.value);
+  },
+  set: (value) => {
+    if (value) {
+      selectedTokenAddress.value = value.address;
+    } else {
+      selectedTokenAddress.value = undefined;
+    }
+    closeModal();
+  },
 });
 
-const modalEl = ref<HTMLElement | undefined>();
 const isModalOpened = computed({
   get: () => props.opened,
   set: (value) => emit("update:opened", value),
-});
-let trap: FocusTrap | null;
-watch(isModalOpened, async (opened) => {
-  search.value = "";
-  await nextTick(async () => {
-    if (opened && modalEl.value) {
-      trap = createFocusTrap(modalEl.value, {
-        initialFocus: document.getElementById("search") ?? false,
-        escapeDeactivates: true,
-        clickOutsideDeactivates: true,
-      }) as FocusTrap;
-      trap?.activate();
-    } else {
-      trap?.deactivate();
-      trap = null;
-    }
-  });
 });
 const closeModal = () => {
   isModalOpened.value = false;
 };
 </script>
+
 <style lang="scss" scoped>
-.option-button {
-  @apply relative inline-flex items-center rounded-md bg-white px-2.5 py-1 ring-2 ring-inset ring-neutral-700 ring-opacity-5 hover:bg-neutral-100 focus:outline-none focus:ring-2
-  focus:ring-primary-500 disabled:cursor-not-allowed disabled:hover:bg-white;
-}
-.token-balance-value {
-  @apply relative inline-flex items-center text-neutral-700;
-  .selected-custom-token {
-    @apply h-3 w-3 rounded-full;
+.modal-card {
+  @apply relative grid h-full max-h-[500px] w-full max-w-[500px] transform grid-rows-[max-content_max-content_1fr] overflow-hidden rounded-2xl bg-gray p-5 pb-6 text-left shadow-xl transition-all;
+  @media screen and (max-height: 640px) {
+    @apply max-h-[90vh];
   }
 }
-.arrow-icon-container {
-  @apply relative inline-flex items-center rounded-l-none rounded-r-md text-sm;
-}
-
-.token-balance-text {
-  @apply mx-1.5 w-max overflow-hidden text-ellipsis text-sm;
-}
-.modal-container {
-  @apply fixed left-0 top-0 z-30 flex h-full w-full items-center justify-center bg-[rgba(0,0,0,0.4)];
-  .modal-card {
-    @apply w-[300px] overflow-y-hidden rounded-lg bg-white;
-    .modal-title {
-      @apply text-base text-neutral-700;
-    }
-
-    .modal-card-header {
-      @apply flex justify-between p-4;
-    }
-
-    .empty-options-container {
-      @apply flex flex-col items-center justify-center;
-    }
-
-    .modal-list-title {
-      @apply px-4 py-2 text-xs text-neutral-700;
-    }
-
-    .modal-list-label {
-      @apply text-sm text-neutral-700;
-    }
-
-    .modal-search-options-container {
-      @apply h-[240px] scroll-py-2 overflow-y-auto py-2 text-sm text-neutral-700;
-    }
-    .modal-input-container {
-      @apply relative mt-1 flex items-center;
-    }
-
-    .modal-list-light-text {
-      @apply text-xs capitalize text-neutral-400;
-    }
-    .modal-list-price-error {
-      @apply text-error-500 text-xs;
-    }
-    .custom-token-balance {
-      @apply flex items-center tracking-tighter text-neutral-400;
-    }
-    .modal-list-item {
-      @apply flex cursor-pointer justify-between py-2 px-4 hover:bg-black/[.05];
-    }
-    .search-icon-container {
-      @apply pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3;
-    }
-    .search-input {
-      @apply block w-full rounded-md border-neutral-300 px-4 pb-2 pl-10 pr-2 text-neutral-700 placeholder-neutral-400 shadow-sm placeholder:text-xs focus:border-primary-500
-      focus:ring-primary-500;
-    }
-  }
-}
-.token-balance-loading {
-  @apply inline-flex h-5 w-5 animate-spin text-neutral-700;
+.category:first-child .group-category-label {
+  @apply pt-0;
 }
 </style>

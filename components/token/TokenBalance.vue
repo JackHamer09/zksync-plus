@@ -1,5 +1,5 @@
 <template>
-  <CommonLineButton class="token-balance" :class="{ 'is-zero-amount': isZeroAmount }">
+  <CommonLineButton class="token-balance" :class="{ 'is-zero-amount': isZeroAmount }" :as="as">
     <TokenImage class="token-balance-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
@@ -21,7 +21,7 @@
         </template>
       </div>
     </div>
-    <NuxtLink :to="{ name: 'transaction-send', query: { token: address } }" class="send-button">
+    <NuxtLink v-if="showSendButton" :to="{ name: 'transaction-send', query: { token: address } }" class="send-button">
       <PaperAirplaneIcon aria-hidden="true" />
     </NuxtLink>
   </CommonLineButton>
@@ -34,12 +34,15 @@ import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 
 import type { ZkSyncLiteTokenPrice } from "@/store/zksync/lite/tokens";
 import type { BigNumberish } from "ethers";
-import type { PropType } from "vue";
+import type { Component, PropType } from "vue";
 
 import { parseTokenAmount, removeSmallAmount, shortenAddress } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
 const props = defineProps({
+  as: {
+    type: [String, Object] as PropType<string | Component>,
+  },
   amountDisplay: {
     type: String as PropType<"remove-small" | "full">,
     default: "remove-small",
@@ -66,6 +69,10 @@ const props = defineProps({
   price: {
     type: [String, Number] as PropType<ZkSyncLiteTokenPrice>,
   },
+  showSendButton: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const priceLoading = computed(() => props.price === "loading");
@@ -91,7 +98,7 @@ const displayedAmount = computed(() => {
 
 <style lang="scss">
 .token-balance {
-  @apply grid grid-cols-[40px_1fr_max-content] items-center gap-4 rounded-lg p-2 xs:grid-cols-[40px_1fr_max-content_35px];
+  @apply grid grid-cols-[40px_1fr_max-content_max-content] items-center gap-4 rounded-lg p-2;
   &.is-zero-amount {
     .token-balance-amount,
     .send-button {
@@ -129,7 +136,7 @@ const displayedAmount = computed(() => {
     @apply w-max text-right;
   }
   .send-button {
-    @apply hidden aspect-square w-full items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75 xs:flex;
+    @apply hidden aspect-square h-9 w-auto items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75 xs:flex;
 
     svg {
       @apply h-4 w-4 text-primary-400;

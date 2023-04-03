@@ -7,7 +7,7 @@
       </template>
       <span
         v-else-if="feeToken && feeAmount"
-        :title="canDisplayFeeAsFiat ? 'Click to change how fee is displayed' : ''"
+        :title="canDisplayFeeAsFiat ? 'Click to toggle how fee is displayed' : ''"
         class="flex items-center justify-end"
         :class="{ 'cursor-pointer': canDisplayFeeAsFiat }"
         @click="displayFeeAsFiat = !displayFeeAsFiat"
@@ -24,7 +24,7 @@
         <template v-else>
           <span class="font-medium">{{ parseTokenAmount(feeAmount, feeToken.decimals) }}</span>
         </template>
-        <TokenImage class="ml-0.5 h-5 w-5" v-bind="feeToken" />
+        <TokenImage class="ml-1 mr-0.5 h-5 w-5" v-bind="feeToken" />
         <span class="font-medium">{{ feeToken.symbol }}</span>
       </span>
       <template v-else>Unknown fee</template>

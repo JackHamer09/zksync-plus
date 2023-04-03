@@ -58,16 +58,18 @@
 import { computed, ref, watch } from "vue";
 
 import { BigNumber } from "ethers";
+import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
 import useFee from "@/composables/zksync/lite/useFee";
 
 /* import { useDestinationsStore } from "@/store/destinations"; */
+import { useRoute } from "#app";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
-import { shortenAddress } from "@/utils/formatters";
+import { checksumAddress, shortenAddress } from "@/utils/formatters";
 
 const props = defineProps({
   address: {
@@ -80,10 +82,13 @@ const emit = defineEmits<{
   (eventName: "back"): void;
 }>();
 
+const route = useRoute();
+
 /* const { destinations } = storeToRefs(useDestinationsStore()); */
 const liteProviderStore = useLiteProviderStore();
 const walletLiteStore = useLiteWalletStore();
-const { tokens } = storeToRefs(useLiteTokensStore());
+const liteTokensStore = useLiteTokensStore();
+const { tokens } = storeToRefs(liteTokensStore);
 const { account } = storeToRefs(useOnboardStore());
 const { balance, balanceInProgress, balanceError } = storeToRefs(walletLiteStore);
 const {
@@ -95,7 +100,13 @@ const {
 
 const amount = ref("");
 
-const selectedTokenAddress = ref(balance.value[0]?.address);
+const routeTokenAddress = computed(() => {
+  if (!route.query.token || Array.isArray(route.query.token) || !isAddress(route.query.token)) {
+    return;
+  }
+  return checksumAddress(route.query.token);
+});
+const selectedTokenAddress = ref(routeTokenAddress.value ?? balance.value[0]?.address);
 const selectedToken = computed(() => {
   if (!balance.value) {
     return undefined;
@@ -109,7 +120,11 @@ const feeToken = computed(() => {
   if (!feeTokenAddress.value || !tokens.value) {
     return;
   }
-  return Object.entries(tokens.value).find(([, token]) => token.address === feeTokenAddress.value)?.[1];
+  const foundToken = Object.entries(tokens.value).find(([, token]) => token.address === feeTokenAddress.value)?.[1];
+  if (!foundToken?.enabledForFees) {
+    return tokens.value["ETH"];
+  }
+  return foundToken;
 });
 
 const maxAmount = computed(() => {
@@ -129,17 +144,35 @@ const maxAmount = computed(() => {
 });
 
 const estimate = async () => {
-  if (!account.value.address || !feeToken.value) {
+  if (!account.value.address || !selectedToken.value || !feeToken.value) {
     return;
   }
-  estimateFee([{ type: "Transfer", symbol: "ETH", to: props.address }], account.value.address, feeToken.value.symbol);
+  estimateFee(
+    [{ type: "Transfer", symbol: selectedToken.value.symbol, to: props.address }],
+    account.value.address,
+    feeToken.value.symbol
+  );
 };
 watch(
-  [() => props.address, () => feeToken.value?.symbol, () => account.value.address],
+  [() => props.address, () => selectedToken.value?.symbol, () => feeToken.value?.symbol, () => account.value.address],
   () => {
     estimate();
   },
   { immediate: true }
+);
+watch(
+  () => feeToken.value?.symbol,
+  (symbol) => {
+    if (!symbol) return;
+    liteTokensStore.requestTokenPrice(symbol);
+  }
+);
+watch(
+  () => selectedToken?.value?.symbol,
+  (symbol) => {
+    if (!symbol) return;
+    liteTokensStore.requestTokenPrice(symbol);
+  }
 );
 
 const fetch = () => {

@@ -7,9 +7,11 @@
 <script lang="ts" setup>
 import { ArrowLeftIcon } from "@heroicons/vue/24/solid";
 
+import type { Component, PropType } from "vue";
+
 defineProps({
   as: {
-    type: String,
+    type: [String, Object] as PropType<string | Component>,
     default: "button",
   },
 });

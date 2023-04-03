@@ -3,7 +3,7 @@
     <h1 class="h1">Home</h1>
     <CommonBadgeTabs class="mb-4" />
     <CommonContentBlock>
-      <div v-if="balanceInProgress || !allPricesLoaded" class="total-balance">
+      <div v-if="balanceInProgress || !allBalancePricesLoaded" class="total-balance">
         <CommonContentLoader />
       </div>
       <div v-else class="total-balance">
@@ -31,7 +31,7 @@
           <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
         <div class="token-balances-container">
-          <template v-if="balanceInProgress || !allPricesLoaded">
+          <template v-if="balanceInProgress || !allBalancePricesLoaded">
             <TokenBalanceLoader v-for="index in 2" :key="index" />
           </template>
           <CommonErrorBlock v-else-if="balanceError" class="m-3 mb-2.5 -mt-1" @try-again="fetch">
@@ -68,15 +68,13 @@ import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
 const walletLiteStore = useLiteWalletStore();
-const { balance, balanceInProgress, balanceError } = storeToRefs(walletLiteStore);
+const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
 const { destinations } = storeToRefs(useDestinationsStore());
 
 const fetch = () => {
   walletLiteStore.requestBalance();
 };
 fetch();
-
-const allPricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
 
 const total = computed(() => {
   if (balanceError.value) {

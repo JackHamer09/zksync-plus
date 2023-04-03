@@ -1,76 +1,84 @@
 <template>
-  <label class="amount-input-container" :class="{ focused, loading }">
-    <div class="amount-input-token">
-      <CommonContentLoader v-if="loading" :length="10" />
-      <template v-else-if="selectedToken">
-        <div class="flex items-center">
-          <TokenImage class="-ml-1 mr-0.5 h-5 w-5" v-bind="selectedToken" />
-          <span>{{ selectedToken.symbol }}</span>
+  <div>
+    <TokenSelectDropdown
+      v-model:opened="selectTokenModalOpened"
+      v-model:token-address="selectedTokenAddress"
+      :loading="loading"
+      :balances="balances"
+    />
+    <label class="amount-input-container" :class="{ focused, loading }">
+      <div class="amount-input-token">
+        <CommonContentLoader v-if="loading" :length="10" />
+        <template v-else-if="selectedToken">
+          <div class="flex items-center">
+            <TokenImage class="-ml-0.5 h-5 w-5" v-bind="selectedToken" />
+            <span class="ml-1 inline-block">{{ selectedToken.symbol }}</span>
+          </div>
+        </template>
+      </div>
+      <div class="amount-input-field-container">
+        <transition
+          enter-active-class="transition ease-in duration-250"
+          enter-from-class="opacity-0"
+          enter-to-class="opacity-100"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100"
+          leave-to-class="opacity-0"
+        >
+          <div
+            v-if="maxDecimalAmount && maxAmount !== '0'"
+            class="amount-input-max-button"
+            :class="{ 'is-max': isMaxAmount }"
+            :title="isMaxAmount ? 'Max amount is set' : `Your max amount is ${maxDecimalAmount}`"
+            @click.prevent="inputted = maxDecimalAmount!"
+          >
+            Max
+          </div>
+        </transition>
+        <input
+          ref="inputElement"
+          v-model="inputted"
+          class="amount-input-field"
+          placeholder="0"
+          type="text"
+          maxlength="20"
+          spellcheck="false"
+          :style="{ width: `${inputWidth}px` }"
+        />
+      </div>
+      <div class="amount-input-select-asset">
+        <CommonContentLoader v-if="loading" :length="35" />
+        <div v-else class="flex items-center" @click.prevent="selectTokenModalOpened = true">
+          <template v-if="selectedToken">
+            <span>
+              Balance:
+              {{ selectedToken.symbol }}
+              {{ parseTokenAmount(selectedToken.amount, selectedToken.decimals) }}
+            </span>
+          </template>
+          <template v-else>Select token</template>
+          <ChevronDownIcon class="ml-1.5 h-4 w-4" aria-hidden="true" />
         </div>
-      </template>
-    </div>
-    <div class="amount-input-field-container">
+      </div>
       <transition
-        enter-active-class="transition ease-in duration-250"
+        enter-active-class="transition ease-in duration-150"
         enter-from-class="opacity-0"
         enter-to-class="opacity-100"
-        leave-active-class="transition ease-in duration-150"
+        leave-active-class="transition ease-in duration-100"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div
-          v-if="maxDecimalAmount && maxAmount !== '0'"
-          class="amount-input-max-button"
-          :class="{ 'is-max': isMaxAmount }"
-          :title="isMaxAmount ? 'Max amount is set' : `Your max amount is ${maxDecimalAmount}`"
-          @click.prevent="inputted = maxDecimalAmount!"
-        >
-          Max
+        <div v-if="inputted" class="amount-input-note">
+          <template v-if="selectedToken?.price === 'loading'">
+            <CommonContentLoader class="shadow-sm" :length="15" />
+          </template>
+          <template v-else>
+            {{ totalAmountPrice }}
+          </template>
         </div>
       </transition>
-      <input
-        ref="inputElement"
-        v-model="inputted"
-        class="amount-input-field"
-        placeholder="0"
-        type="text"
-        maxlength="20"
-        spellcheck="false"
-        :style="{ width: `${inputWidth}px` }"
-      />
-    </div>
-    <div class="amount-input-select-asset">
-      <CommonContentLoader v-if="loading" :length="35" />
-      <div v-else class="flex items-center" @click.prevent="selectTokenModalOpened = true">
-        <template v-if="selectedToken">
-          <span>
-            Balance:
-            {{ selectedToken.symbol }}
-            {{ parseTokenAmount(selectedToken.amount, selectedToken.decimals) }}
-          </span>
-        </template>
-        <template v-else>Select token</template>
-        <ChevronDownIcon class="ml-1.5 h-4 w-4" aria-hidden="true" />
-      </div>
-    </div>
-    <transition
-      enter-active-class="transition ease-in duration-150"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition ease-in duration-100"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="inputted" class="amount-input-note">
-        <template v-if="selectedToken?.price === 'loading'">
-          <CommonContentLoader class="shadow-sm" :length="15" />
-        </template>
-        <template v-else>
-          {{ totalAmountPrice }}
-        </template>
-      </div>
-    </transition>
-  </label>
+    </label>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -114,9 +122,13 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (eventName: "update:modelValue", amount: string): void;
-  (eventName: "update:tokenAddress", tokenAddress: string): void;
+  (eventName: "update:tokenAddress", tokenAddress?: string): void;
 }>();
 
+const selectedTokenAddress = computed({
+  get: () => props.tokenAddress,
+  set: (value?: string) => emit("update:tokenAddress", value),
+});
 const selectedToken = computed(() => {
   if (!props.balances) {
     return undefined;

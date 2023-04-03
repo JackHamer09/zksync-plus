@@ -59,6 +59,13 @@ module.exports = {
           paddingTop: theme("padding.5"),
           paddingBottom: theme("padding.4"),
         },
+        ".h2": {
+          fontSize: "26px",
+          fontWeight: theme("fontWeight.bold"),
+          lineHeight: theme("lineHeight.tight"),
+          paddingTop: theme("padding.5"),
+          paddingBottom: theme("padding.4"),
+        },
       });
     }),
   ],

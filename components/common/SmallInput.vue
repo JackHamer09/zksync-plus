@@ -1,5 +1,5 @@
 <template>
-  <div class="small-input-container" :class="{ focused }">
+  <component :is="as" class="small-input-container" :class="{ focused }">
     <div v-if="$slots.icon" class="small-input-icon-container">
       <slot name="icon" />
     </div>
@@ -19,11 +19,11 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <button v-if="inputted" class="small-input-clear-button" @click="inputted = ''">
+      <button v-if="inputted" class="small-input-clear-button" type="button" @click="inputted = ''">
         <XMarkIcon class="small-input-clear-button-icon" aria-hidden="true" />
       </button>
     </transition>
-  </div>
+  </component>
 </template>
 
 <script lang="ts" setup>
@@ -32,7 +32,13 @@ import { computed, ref } from "vue";
 import { XMarkIcon } from "@heroicons/vue/24/outline";
 import { useFocus } from "@vueuse/core";
 
+import type { Component, PropType } from "vue";
+
 const props = defineProps({
+  as: {
+    type: [String, Object] as PropType<string | Component>,
+    default: "div",
+  },
   modelValue: {
     type: String,
     default: "",

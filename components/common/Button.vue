@@ -8,11 +8,11 @@
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from "vue";
+import type { Component, PropType } from "vue";
 
 defineProps({
   as: {
-    type: String,
+    type: [String, Object] as PropType<string | Component>,
     default: "button",
   },
   variant: {

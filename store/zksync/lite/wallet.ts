@@ -10,6 +10,8 @@ import { useEthWalletStore } from "@/store/ethWallet";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
+import { isOnlyZeroes } from "@/utils/helpers";
 
 export interface Balance extends ZkSyncLiteToken {
   amount: BigNumberish;
@@ -50,6 +52,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
       return { ...token, amount };
     });
   });
+  const allBalancePricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
   const {
     inProgress: balanceInProgress,
     error: balanceError,
@@ -95,6 +98,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     balance,
     balanceInProgress: computed(() => balanceInProgress.value),
     balanceError: computed(() => balanceError.value),
+    allBalancePricesLoaded,
     requestBalance,
   };
 });
