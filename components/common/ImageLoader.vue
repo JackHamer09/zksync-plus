@@ -5,7 +5,7 @@
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="$slots.placeholder && (!isReady || error)" class="image-loader-placeholder">
+      <div v-if="!isReady || error || !src" class="image-loader-placeholder">
         <slot name="placeholder">
           <CommonContentLoader class="image-loader-placeholder-default" />
         </slot>

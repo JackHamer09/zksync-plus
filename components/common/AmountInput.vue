@@ -6,7 +6,7 @@
       :loading="loading"
       :balances="balances"
     />
-    <label class="amount-input-container" :class="{ focused, loading }">
+    <label class="amount-input-container" :class="{ focused, loading, 'has-error': !!amountError }">
       <div class="amount-input-token">
         <CommonContentLoader v-if="loading" :length="10" />
         <template v-else-if="selectedToken">
@@ -25,15 +25,16 @@
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
-          <div
+          <button
             v-if="maxDecimalAmount && maxAmount !== '0'"
+            type="button"
             class="amount-input-max-button"
             :class="{ 'is-max': isMaxAmount }"
             :title="isMaxAmount ? 'Max amount is set' : `Your max amount is ${maxDecimalAmount}`"
-            @click.prevent="inputted = maxDecimalAmount!"
+            @click.prevent="setMax"
           >
             Max
-          </div>
+          </button>
         </transition>
         <input
           ref="inputElement"
@@ -48,12 +49,17 @@
       </div>
       <div class="amount-input-select-asset">
         <CommonContentLoader v-if="loading" :length="35" />
-        <div v-else class="flex items-center" @click.prevent="selectTokenModalOpened = true">
+        <div
+          v-else
+          class="grid grid-cols-[1fr_calc(1rem_+_0.375rem)] items-center"
+          @click.prevent="selectTokenModalOpened = true"
+        >
           <template v-if="selectedToken">
             <span>
               Balance:
-              {{ selectedToken.symbol }}
-              {{ parseTokenAmount(selectedToken.amount, selectedToken.decimals) }}
+              <span class="break-all">
+                {{ parseTokenAmount(selectedToken.amount, selectedToken.decimals) }}
+              </span>
             </span>
           </template>
           <template v-else>Select token</template>
@@ -68,7 +74,16 @@
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
       >
-        <div v-if="inputted" class="amount-input-note">
+        <div v-if="amountError" class="amount-input-error">
+          <template v-if="amountError === 'insufficient_balance'">Insufficient balance</template>
+          <template v-if="amountError === 'exceeds_max_amount'">
+            Max amount is
+            <button type="button" class="cursor-pointer font-medium underline underline-offset-2" @click="setMax">
+              {{ maxDecimalAmount }}
+            </button>
+          </template>
+        </div>
+        <div v-else-if="inputted" class="amount-input-note">
           <template v-if="selectedToken?.price === 'loading'">
             <CommonContentLoader class="shadow-sm" :length="15" />
           </template>
@@ -137,13 +152,26 @@ const selectedToken = computed(() => {
 });
 const selectTokenModalOpened = ref(false);
 
+const amountError = computed(() => {
+  if (!selectedToken.value) {
+    return;
+  }
+  if (props.maxAmount && totalComputeAmount.value.gt(props.maxAmount)) {
+    if (BigNumber.from(props.maxAmount).eq("0")) {
+      return "insufficient_balance";
+    }
+    return "exceeds_max_amount";
+  }
+  return undefined;
+});
+
 const inputElement = ref<HTMLInputElement | null>(null);
 const { focused } = useFocus(inputElement, { initialValue: !!props.autofocus });
 const inputWidth = ref(0);
 
 const inputted = computed({
   get: () => props.modelValue,
-  set: (value: string) => emit("update:modelValue", value),
+  set: (value: string) => emit("update:modelValue", value.replace(/[^0-9.,]/g, "").replace(",", ".")),
 });
 watch([inputted, inputElement], () => {
   recalculateInputWidth();
@@ -154,7 +182,7 @@ const totalComputeAmount = computed(() => {
     if (!inputted.value || !selectedToken.value) {
       return BigNumber.from("0");
     }
-    return decimalToBigNumber(inputted.value.replace(",", "."), selectedToken.value.decimals);
+    return decimalToBigNumber(inputted.value, selectedToken.value.decimals);
   } catch (error) {
     return BigNumber.from("0");
   }
@@ -177,6 +205,10 @@ const isMaxAmount = computed(() => {
   }
   return totalComputeAmount.value.eq(props.maxAmount);
 });
+const setMax = () => {
+  if (!maxDecimalAmount.value) return;
+  inputted.value = maxDecimalAmount.value;
+};
 
 const recalculateInputWidth = () => {
   inputWidth.value = 0;
@@ -202,6 +234,10 @@ const recalculateInputWidth = () => {
       }
     }
   }
+  &.has-error {
+    // @apply bg-red-100;
+    @apply ring-1 ring-inset ring-red-500;
+  }
 
   .amount-input-token {
     @apply text-xl font-medium leading-[1.4] text-gray-900;
@@ -225,16 +261,24 @@ const recalculateInputWidth = () => {
     }
   }
   .amount-input-select-asset,
-  .amount-input-note {
-    @apply mt-1 break-all text-sm text-gray-secondary xs:w-max;
+  .amount-input-note,
+  .amount-input-error {
+    @apply mt-1 text-sm text-gray-secondary xs:w-max;
   }
   .amount-input-select-asset {
     @apply flex cursor-pointer items-center whitespace-pre-line transition-colors hover:text-gray-400;
     grid-area: c / c / c / c;
   }
   .amount-input-note {
+    @apply break-all;
+  }
+  .amount-input-note,
+  .amount-input-error {
     @apply justify-self-end text-right;
     grid-area: d / d / d / d;
+  }
+  .amount-input-error {
+    @apply break-words text-red-500;
   }
 }
 </style>

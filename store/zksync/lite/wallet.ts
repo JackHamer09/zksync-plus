@@ -1,5 +1,6 @@
 import { watch } from "vue";
 
+import { BigNumber } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
 import { Wallet } from "zksync";
 
@@ -18,14 +19,16 @@ export interface Balance extends ZkSyncLiteToken {
 }
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
-  let wallet: Wallet | undefined = undefined;
   const liteProviderStore = useLiteProviderStore();
   const liteTokensStore = useLiteTokensStore();
   const { tokens } = storeToRefs(liteTokensStore);
   const { account } = storeToRefs(useOnboardStore());
   const { getEthWalletSigner } = useEthWalletStore();
 
-  const { execute: createWalletInstance, reset: resetWalletInstance } = usePromise<Wallet>(async () => {
+  let wallet: Wallet | undefined = undefined;
+  const isRemoteWallet = ref(false);
+
+  const { execute: getWalletInstance, reset: resetWalletInstance } = usePromise<Wallet>(async () => {
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
     const ethWalletSigner = await getEthWalletSigner();
@@ -38,7 +41,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     execute: requestAccountState,
     reset: resetAccountState,
   } = usePromise<AccountState>(async () => {
-    await createWalletInstance();
+    const wallet = await getWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
     return await wallet.getAccountState();
   });
@@ -68,7 +71,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     balance,
     (balances) => {
       balances.map(({ symbol, amount }) => {
-        if (amount === "0") return;
+        if (BigNumber.from(amount).eq("0")) return;
         liteTokensStore.requestTokenPrice(symbol);
       });
     },
@@ -95,6 +98,11 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   });
 
   return {
+    isRemoteWallet,
+    getWalletInstance,
+
+    requestAccountState,
+
     balance,
     balanceInProgress: computed(() => balanceInProgress.value),
     balanceError: computed(() => balanceError.value),

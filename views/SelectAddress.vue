@@ -2,7 +2,7 @@
   <div>
     <CommonBackButton @click="emit('back')" />
     <h1 class="h1">Who to pay</h1>
-    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Name or address" autofocus>
+    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
       <template #icon>
         <MagnifyingGlassIcon aria-hidden="true" />
       </template>

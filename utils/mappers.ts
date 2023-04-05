@@ -20,13 +20,13 @@ export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
       },
     };
     for (const balanceItem of balances.value) {
-      const balance =
+      const decimalBalance =
         typeof balanceItem.price === "number"
           ? removeSmallAmount(balanceItem.amount, balanceItem.decimals, balanceItem.price)
           : parseTokenAmount(balanceItem.amount, balanceItem.decimals);
-      if (!isOnlyZeroes(balance)) {
+      if (!isOnlyZeroes(decimalBalance)) {
         groups.default.balances.push(balanceItem);
-      } else if (balance === "0") {
+      } else if (decimalBalance === "0") {
         groups.zero.balances.push(balanceItem);
       } else {
         groups.small.balances.push(balanceItem);

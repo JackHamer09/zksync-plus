@@ -23,7 +23,6 @@ module.exports = {
           secondary: "#75808a",
           input: "#edeff2",
           "input-focus": "#dfe3e7",
-          ...defaultTheme.colors.gray,
         },
         primary: {
           50: "#F3F5FF",

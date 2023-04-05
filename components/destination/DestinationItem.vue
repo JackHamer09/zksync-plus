@@ -24,13 +24,13 @@ defineProps({
 
 <style lang="scss" scoped>
 .destination-item {
-  @apply grid grid-cols-[40px_1fr] items-center gap-4;
+  @apply grid grid-cols-[35px_1fr] items-center gap-2.5 xs:grid-cols-[40px_1fr] xs:gap-4;
   &:hover .destination-item-icon {
     @apply shadow-sm;
   }
 
   .destination-item-icon {
-    @apply aspect-square h-full w-auto rounded-full bg-gray transition-shadow;
+    @apply aspect-square h-auto w-full rounded-full bg-gray transition-shadow;
   }
   .destination-item-info {
     @apply flex w-full flex-col justify-between overflow-hidden whitespace-nowrap;

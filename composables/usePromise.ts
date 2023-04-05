@@ -43,11 +43,20 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     inProgress.value = false;
   };
 
+  // Reloads the promise if it is already in progress or has already been executed
+  const reload = async () => {
+    if (promise || inProgress.value || error.value || result.value) {
+      reset();
+      await execute({ force: true });
+    }
+  };
+
   return {
     error,
     result,
     inProgress,
     execute,
     reset,
+    reload,
   };
 };

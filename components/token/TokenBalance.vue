@@ -3,7 +3,8 @@
     <TokenImage class="token-balance-image-container" :symbol="symbol" :address="address" :icon-url="iconUrl" />
     <div class="token-info">
       <div class="token-symbol">{{ symbol }}</div>
-      <div class="token-address" :title="address">{{ shortenAddress(address, 5) }}</div>
+      <div class="token-address hidden xs:block" :title="address">{{ shortenAddress(address, 5) }}</div>
+      <div class="token-address xs:hidden" :title="address">{{ shortenAddress(address, 2) }}</div>
     </div>
     <div class="token-balances">
       <div class="token-balance-amount" :title="fullAmount">
@@ -31,6 +32,7 @@
 import { computed } from "vue";
 
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
+import { BigNumber } from "ethers";
 
 import type { ZkSyncLiteTokenPrice } from "@/store/zksync/lite/tokens";
 import type { BigNumberish } from "ethers";
@@ -76,7 +78,7 @@ const props = defineProps({
 });
 
 const priceLoading = computed(() => props.price === "loading");
-const isZeroAmount = computed(() => props.amount === "0");
+const isZeroAmount = computed(() => BigNumber.from(props.amount).eq(0));
 
 const fullAmount = computed(() => parseTokenAmount(props.amount, props.decimals));
 const displayedAmount = computed(() => {
@@ -85,7 +87,7 @@ const displayedAmount = computed(() => {
   }
   const withoutSmallAmount = removeSmallAmount(props.amount, props.decimals, props.price);
   if (props.amountDisplay === "remove-small") {
-    if (props.amount === "0") {
+    if (isZeroAmount.value) {
       return "0";
     } else if (!isOnlyZeroes(withoutSmallAmount)) {
       return withoutSmallAmount;
@@ -98,7 +100,7 @@ const displayedAmount = computed(() => {
 
 <style lang="scss">
 .token-balance {
-  @apply grid grid-cols-[40px_1fr_max-content_max-content] items-center gap-4 rounded-lg p-2;
+  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content_max-content] xs:gap-4;
   &.is-zero-amount {
     .token-balance-amount,
     .send-button {
@@ -110,7 +112,7 @@ const displayedAmount = computed(() => {
   }
 
   .token-balance-image-container {
-    @apply h-full w-auto;
+    @apply h-auto w-full;
   }
   .token-info,
   .token-balances {

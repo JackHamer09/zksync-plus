@@ -9,7 +9,7 @@
     </CommonCardWithLineButtons>
     <CommonCardWithLineButtons v-else-if="balanceError">
       <CommonErrorBlock class="m-2" @try-again="fetch">
-        {{ balanceError.message }}
+        {{ balanceError!.message }}
       </CommonErrorBlock>
     </CommonCardWithLineButtons>
     <template v-else>
@@ -43,7 +43,7 @@ const balanceGroups = groupBalancesByAmount(balance);
 </script>
 
 <style lang="scss" scoped>
-.group-category-label:first-child {
+.category:first-child .group-category-label {
   @apply pt-0;
 }
 </style>

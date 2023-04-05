@@ -25,10 +25,10 @@ defineProps({
 
 <style lang="scss">
 .address-card {
-  @apply grid grid-cols-[40px_1fr_max-content] items-center gap-4;
+  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
 
   .address-card-avatar {
-    @apply aspect-square h-full w-auto;
+    @apply aspect-square h-auto w-full;
   }
   .address-card-info {
     @apply flex w-full flex-col justify-between overflow-hidden whitespace-nowrap;

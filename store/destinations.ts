@@ -22,7 +22,7 @@ export const useDestinationsStore = defineStore("destinations", () => {
     },
     era: {
       key: "era",
-      label: `zkSync Era ${capitalize(selectedEthereumNetwork.value.network)}`,
+      label: `zkSync Era∎ ${capitalize(selectedEthereumNetwork.value.network)}`,
       iconUrl: "/img/era.svg",
     },
     ethereum: {

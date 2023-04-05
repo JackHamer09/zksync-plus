@@ -14,7 +14,7 @@
       </TransitionChild>
 
       <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+        <div class="flex h-full items-end justify-center p-2 text-center sm:items-center sm:p-0">
           <TransitionChild
             as="template"
             enter="ease-out duration-300"
@@ -49,7 +49,7 @@
                 </CommonSmallInput>
                 <div class="h-full overflow-auto">
                   <CommonCardWithLineButtons v-if="loading">
-                    <TokenBalanceLoader v-for="index in 2" :key="index" />
+                    <TokenBalanceLoader v-for="index in 2" :show-send-button="false" :key="index" />
                   </CommonCardWithLineButtons>
                   <CommonCardWithLineButtons v-else-if="error">
                     <CommonErrorBlock class="m-2" @try-again="emit('try-again')">
@@ -170,7 +170,7 @@ const closeModal = () => {
 
 <style lang="scss" scoped>
 .modal-card {
-  @apply relative grid h-full max-h-[500px] w-full max-w-[500px] transform grid-rows-[max-content_max-content_1fr] overflow-hidden rounded-2xl bg-gray p-5 pb-6 text-left shadow-xl transition-all;
+  @apply relative grid h-full max-h-[500px] w-full max-w-[500px] transform grid-rows-[max-content_max-content_1fr] overflow-hidden rounded-2xl bg-gray p-3 pb-4 text-left shadow-xl transition-all xs:p-5 xs:pb-6;
   @media screen and (max-height: 640px) {
     @apply max-h-[90vh];
   }

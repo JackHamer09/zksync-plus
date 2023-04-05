@@ -1,5 +1,5 @@
 <template>
-  <div class="token-balance token-balance-loader">
+  <CommonLineButton class="token-balance token-balance-loader">
     <CommonContentLoader :length="0" class="token-balance-image-container" />
     <div class="token-info">
       <div class="token-symbol"><CommonContentLoader :length="10" /></div>
@@ -9,12 +9,20 @@
       <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
       <div class="token-balance-price"><CommonContentLoader :length="15" /></div>
     </div>
-    <div class="send-button">
+    <div v-if="showSendButton" class="send-button">
       <CommonContentLoader class="send-button-loader" />
     </div>
-  </div>
+  </CommonLineButton>
 </template>
 
+<script lang="ts" setup>
+defineProps({
+  showSendButton: {
+    type: Boolean,
+    default: true,
+  },
+});
+</script>
 <style lang="scss" scoped>
 .token-balance-loader {
   @apply pointer-events-none;
@@ -26,7 +34,7 @@
     @apply bg-transparent;
 
     .send-button-loader {
-      @apply block h-full w-full rounded-full;
+      @apply block aspect-square h-full w-full rounded-full;
     }
   }
 }

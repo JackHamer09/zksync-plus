@@ -1,14 +1,14 @@
 <template>
   <div class="fee-details-container">
     <span>{{ label }}</span>
-    <div>
+    <div class="flex flex-col items-end xs:flex-row xs:items-center">
       <template v-if="loading">
         <CommonContentLoader :length="30" />
       </template>
       <span
         v-else-if="feeToken && feeAmount"
         :title="canDisplayFeeAsFiat ? 'Click to toggle how fee is displayed' : ''"
-        class="flex items-center justify-end"
+        class="flex items-center"
         :class="{ 'cursor-pointer': canDisplayFeeAsFiat }"
         @click="displayFeeAsFiat = !displayFeeAsFiat"
       >
@@ -28,6 +28,7 @@
         <span class="font-medium">{{ feeToken.symbol }}</span>
       </span>
       <template v-else>Unknown fee</template>
+      <slot />
     </div>
   </div>
 </template>
@@ -58,8 +59,8 @@ const props = defineProps({
   },
 });
 
+const displayFeeAsFiat = ref(true);
 const canDisplayFeeAsFiat = computed(() => (props.feeToken?.price ? true : false));
-const displayFeeAsFiat = ref(canDisplayFeeAsFiat.value);
 
 const totalPrice = computed(() => {
   if (typeof props.feeToken?.price !== "number" || !props.feeAmount) {
@@ -71,6 +72,6 @@ const totalPrice = computed(() => {
 
 <style lang="scss" scoped>
 .fee-details-container {
-  @apply mt-1 flex justify-between rounded-lg py-1.5 px-4 text-sm text-gray-secondary;
+  @apply flex items-center justify-between rounded-lg py-1.5 px-4 text-sm text-gray-secondary;
 }
 </style>

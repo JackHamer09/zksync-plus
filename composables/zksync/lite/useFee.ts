@@ -13,10 +13,26 @@ type FeeEstimationParams = {
 };
 
 export default (requestProvider: () => Promise<RestProvider | undefined>) => {
+  let estimationPromise: Promise<void> | undefined;
   const result = ref<BigNumberish | undefined>();
   const inProgress = ref(false);
   const error = ref<Error | undefined>();
+  const prevParams = ref("");
 
+  const estimate = async (params: FeeEstimationParams[], from: string, feeSymbol: string) => {
+    const stringified = JSON.stringify({ params, from, feeSymbol });
+    if (!estimationPromise || prevParams.value !== stringified) {
+      prevParams.value = stringified;
+      estimationPromise = estimateFee(params, from, feeSymbol);
+    }
+    await estimationPromise
+      .then(() => {
+        estimationPromise = undefined;
+      })
+      .catch(() => {
+        estimationPromise = undefined;
+      });
+  };
   const estimateFee = async (params: FeeEstimationParams[], from: string, feeSymbol: string) => {
     try {
       inProgress.value = true;
@@ -26,7 +42,7 @@ export default (requestProvider: () => Promise<RestProvider | undefined>) => {
       const provider = await requestProvider();
       if (!provider) throw new Error("Provider is not available");
       let fee: BigNumber | undefined = undefined;
-      if (params.length === 1) {
+      if (params.length === 1 && params[0].symbol === feeSymbol) {
         const { type, to, symbol } = params[0];
         fee = (await provider.getTransactionFee(type, to, symbol)).totalFee;
       } else {
@@ -57,6 +73,6 @@ export default (requestProvider: () => Promise<RestProvider | undefined>) => {
     result,
     inProgress,
     error,
-    estimateFee,
+    estimateFee: estimate,
   };
 };
