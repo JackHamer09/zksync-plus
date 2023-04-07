@@ -1,5 +1,5 @@
 <template>
-  <div class="alert-container" :class="`variant-${variant}`">
+  <div class="alert-container" :class="[`variant-${variant}`, { 'has-icon': !!icon }]">
     <div v-if="icon">
       <component :is="icon" class="alert-icon" aria-hidden="true" />
     </div>
@@ -15,7 +15,7 @@ import type { PropType } from "vue";
 
 defineProps({
   variant: {
-    type: String as PropType<"info" | "error">,
+    type: String as PropType<"info" | "neutral" | "error">,
   },
   icon: {
     type: [Object, Function] as PropType<Component>,
@@ -25,7 +25,10 @@ defineProps({
 
 <style lang="scss">
 .alert-container {
-  @apply grid grid-cols-[1.25rem_1fr] gap-3 rounded-md p-4;
+  @apply w-full rounded-md p-4;
+  &.has-icon {
+    @apply grid grid-cols-[1.25rem_1fr] gap-3;
+  }
   &.variant- {
     &info {
       @apply bg-primary-100 text-primary-700;
@@ -33,6 +36,15 @@ defineProps({
       .alert-body {
         .alert-link {
           @apply hover:text-primary-600;
+        }
+      }
+    }
+    &neutral {
+      @apply bg-gray-200 text-gray-700;
+
+      .alert-body {
+        .alert-link {
+          @apply hover:text-gray-500;
         }
       }
     }
@@ -54,7 +66,7 @@ defineProps({
     @apply flex-1 items-center text-sm xs:flex xs:justify-between;
 
     .alert-link {
-      @apply mt-2 flex items-center whitespace-nowrap  font-medium underline underline-offset-2 transition-colors xs:ml-6 xs:mt-0;
+      @apply mt-2 flex items-center whitespace-nowrap font-medium underline underline-offset-2 transition-colors xs:ml-6 xs:mt-0;
     }
   }
 }

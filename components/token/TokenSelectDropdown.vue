@@ -35,7 +35,7 @@
               @keydown.esc="closeModal"
             >
               <div class="mb-4 flex items-center justify-between">
-                <DialogTitle as="div" class="h2 py-0">Choose token</DialogTitle>
+                <DialogTitle as="div" class="h2 py-0">{{ title }}</DialogTitle>
                 <button @click="closeModal">
                   <XMarkIcon class="h-6 w-6 text-neutral-700" aria-hidden="true" />
                 </button>
@@ -78,6 +78,7 @@
                     <span class="mt-1.5 inline-block">Make sure you are using correct zkSync network</span>
                   </CommonEmptyBlock>
                 </div>
+                <slot name="body-bottom" />
               </Combobox>
             </DialogPanel>
           </TransitionChild>
@@ -101,6 +102,10 @@ import type { PropType } from "vue";
 import { groupBalancesByAmount } from "@/utils/mappers";
 
 const props = defineProps({
+  title: {
+    type: String,
+    default: "Choose token",
+  },
   opened: {
     type: Boolean,
     default: false,
@@ -170,7 +175,7 @@ const closeModal = () => {
 
 <style lang="scss" scoped>
 .modal-card {
-  @apply relative grid h-full max-h-[500px] w-full max-w-[500px] transform grid-rows-[max-content_max-content_1fr] overflow-hidden rounded-2xl bg-gray p-3 pb-4 text-left shadow-xl transition-all xs:p-5 xs:pb-6;
+  @apply relative grid h-full max-h-[540px] w-full max-w-[500px] transform grid-rows-[max-content_max-content_1fr] overflow-hidden rounded-2xl bg-gray p-3 pb-4 text-left shadow-xl transition-all xs:p-5 xs:pb-6;
   @media screen and (max-height: 640px) {
     @apply max-h-[90vh];
   }

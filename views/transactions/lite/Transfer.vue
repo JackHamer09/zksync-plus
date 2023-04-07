@@ -3,9 +3,20 @@
     <TokenSelectDropdown
       v-model:opened="selectFeeTokenModalOpened"
       v-model:token-address="selectedFeeTokenAddress"
+      title="Choose fee token"
       :loading="balancesLoading"
-      :balances="balance"
-    />
+      :balances="feeTokenBalances"
+    >
+      <template #body-bottom>
+        <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
+          <p>Only tokens available for paying fees are displayed</p>
+          <a href="https://docs.zksync.io/userdocs/tokens/#how-fees-are-paid" target="_blank" class="alert-link">
+            Learn more
+            <ArrowUpRightIcon class="ml-1 h-3 w-3" />
+          </a>
+        </CommonAlert>
+      </template>
+    </TokenSelectDropdown>
 
     <CommonBackButton @click="emit('back')" />
     <div class="transaction-header">
@@ -16,13 +27,21 @@
           {{ shortenAddress(props.address, 5) }}
         </div>
       </div>
-      <AddressAvatar class="transaction-header-avatar" :address="props.address" />
+      <AddressAvatar class="transaction-header-avatar" :address="props.address">
+        <template #icon>
+          <img
+            v-tooltip="`Sending to ${destinations.zkSyncLite.label}`"
+            :src="destinations.zkSyncLite.iconUrl"
+            :alt="destinations.zkSyncLite.label"
+          />
+        </template>
+      </AddressAvatar>
     </div>
 
     <CommonErrorBlock v-if="balanceError" @try-again="fetchBalances">
       {{ balanceError.message }}
     </CommonErrorBlock>
-    <form v-else class="transaction-form">
+    <form v-else class="transaction-form pb-2">
       <CommonAmountInput
         v-model.trim="amount"
         v-model:token-address="selectedTokenAddress"
@@ -59,11 +78,11 @@
       </transition>
       <transition
         enter-active-class="transition ease-in duration-200"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
         leave-active-class="transition ease-in duration-50"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
       >
         <CommonAlert v-if="!enoughBalanceToCoverFee" class="mt-1" variant="error" :icon="ExclamationTriangleIcon">
           <p>
@@ -74,11 +93,11 @@
       </transition>
       <transition
         enter-active-class="transition ease-in duration-200"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
         leave-active-class="transition ease-in duration-50"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
       >
         <CommonAlert
           v-if="isAccountActivated === false && !accountActivationCheckInProgress"
@@ -87,8 +106,9 @@
           :icon="InformationCircleIcon"
         >
           <p>
-            This is your first transaction on <span class="font-medium">zkSync Lite</span> network, which means your
-            account requires <span class="font-medium">one-time</span> account activation. Transaction
+            This is your first transaction on
+            <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> network, which means your account
+            requires <span class="font-medium">one-time</span> account activation. Transaction
             <span class="font-medium">fee</span> will be <span class="font-medium">higher than usual</span>.
           </p>
           <a
@@ -104,10 +124,36 @@
     </form>
 
     <div class="transaction-footer">
-      <CommonButton disabled variant="primary-solid">
-        Continue
-        <!-- Send to {{ destinations.zkSyncLite.label }} -->
+      <transition
+        enter-active-class="transition ease-in duration-200"
+        enter-from-class="opacity-0 scale-95"
+        enter-to-class="opacity-100 scale-100"
+        leave-active-class="transition ease-in duration-50"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-95"
+      >
+        <CommonErrorBlock
+          v-if="!isAuthorized && authorizationError"
+          class="mb-2"
+          @try-again="walletLiteStore.authorizeWallet().catch(() => {})"
+        >
+          Authorization error: {{ authorizationError.message }}
+        </CommonErrorBlock>
+      </transition>
+      <CommonButton
+        v-if="!isAuthorized"
+        :disabled="authorizationInProgress"
+        variant="primary-solid"
+        @click="walletLiteStore.authorizeWallet().catch(() => {})"
+      >
+        Authorize to continue
       </CommonButton>
+      <template v-else>
+        <CommonButton disabled variant="primary-solid">
+          Continue
+          <!-- Send to {{ destinations.zkSyncLite.label }} -->
+        </CommonButton>
+      </template>
     </div>
   </div>
 </template>
@@ -123,8 +169,10 @@ import { storeToRefs } from "pinia";
 
 import useFee from "@/composables/zksync/lite/useFee";
 
-/* import { useDestinationsStore } from "@/store/destinations"; */
+import type { FeeEstimationParams } from "@/composables/zksync/lite/useFee";
+
 import { useRoute } from "#app";
+import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
@@ -145,14 +193,22 @@ const emit = defineEmits<{
 
 const route = useRoute();
 
-/* const { destinations } = storeToRefs(useDestinationsStore()); */
 const liteProviderStore = useLiteProviderStore();
 const walletLiteStore = useLiteWalletStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 const liteTokensStore = useLiteTokensStore();
+const { destinations } = storeToRefs(useDestinationsStore());
 const { tokens } = storeToRefs(liteTokensStore);
 const { account } = storeToRefs(useOnboardStore());
-const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(walletLiteStore);
+const {
+  isAuthorized,
+  authorizationInProgress,
+  authorizationError,
+  balance,
+  balanceInProgress,
+  allBalancePricesLoaded,
+  balanceError,
+} = storeToRefs(walletLiteStore);
 const { isAccountActivated, accountActivationCheckInProgress } = storeToRefs(liteAccountActivationStore);
 const {
   result: fee,
@@ -188,6 +244,12 @@ const selectedToken = computed(() => {
 const selectFeeTokenModalOpened = ref(false);
 const selectedFeeTokenAddress = ref<string | undefined>();
 const feeTokenAddress = computed(() => selectedFeeTokenAddress.value ?? selectedTokenAddress.value);
+const feeTokenBalances = computed(() => {
+  if (!balance.value) {
+    return;
+  }
+  return balance.value.filter((e) => e.enabledForFees);
+});
 const feeToken = computed(() => {
   if (!feeTokenAddress.value || !tokens.value) {
     return;
@@ -198,7 +260,9 @@ const feeToken = computed(() => {
   }
   return foundToken;
 });
-const feeLoading = computed(() => feeInProgress.value || (!fee.value && balancesLoading.value));
+const feeLoading = computed(
+  () => feeInProgress.value || (!fee.value && balancesLoading.value) || accountActivationCheckInProgress.value
+);
 const openFeeTokenModal = () => {
   selectFeeTokenModalOpened.value = true;
 };
@@ -224,7 +288,7 @@ const maxAmount = computed(() => {
 });
 
 const enoughBalanceToCoverFee = computed(() => {
-  if (!feeToken.value) {
+  if (!feeToken.value || feeLoading.value) {
     return true;
   }
   const feeTokenBalance = balance.value.find((e) => e.address === feeToken.value!.address);
@@ -236,17 +300,30 @@ const enoughBalanceToCoverFee = computed(() => {
 });
 
 const estimate = async () => {
-  if (!account.value.address || !selectedToken.value || !feeToken.value) {
+  if (!account.value.address || !selectedToken.value || !feeToken.value || accountActivationCheckInProgress.value) {
     return;
   }
-  estimateFee(
-    [{ type: "Transfer", symbol: selectedToken.value.symbol, to: props.address }],
-    account.value.address,
-    feeToken.value.symbol
-  );
+  const fees: FeeEstimationParams[] = [{ type: "Transfer", symbol: selectedToken.value.symbol, to: props.address }];
+  if (isAccountActivated.value === false) {
+    fees.push({
+      type: {
+        ChangePubKey: { onchainPubkeyAuth: false },
+      },
+      symbol: selectedToken.value.symbol,
+      to: account.value.address,
+    });
+  }
+  estimateFee(fees, account.value.address, feeToken.value.symbol);
 };
 watch(
-  [() => props.address, () => selectedToken.value?.symbol, () => feeToken.value?.symbol, () => account.value.address],
+  [
+    () => props.address,
+    () => selectedToken.value?.symbol,
+    () => feeToken.value?.symbol,
+    () => account.value.address,
+    accountActivationCheckInProgress,
+    isAccountActivated,
+  ],
   () => {
     estimate();
   },
@@ -282,12 +359,6 @@ const fetchBalances = () => {
 fetchBalances();
 
 liteAccountActivationStore.checkAccountActivation();
-watch(
-  () => account.value.address,
-  () => {
-    liteAccountActivationStore.reloadAccountActivation();
-  }
-);
 </script>
 
 <style lang="scss" scoped>
@@ -314,6 +385,6 @@ watch(
   }
 }
 .transaction-footer {
-  @apply sticky bottom-6 z-[2] mt-auto flex flex-col items-center pt-6;
+  @apply sticky bottom-6 z-[2] mt-auto flex flex-col items-center bg-gray bg-opacity-60 pt-6 backdrop-blur-sm;
 }
 </style>

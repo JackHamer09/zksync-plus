@@ -6,7 +6,7 @@ import type { BigNumber, BigNumberish } from "ethers";
 import type { RestProvider } from "zksync";
 import type { IncomingTxFeeType } from "zksync/build/types";
 
-type FeeEstimationParams = {
+export type FeeEstimationParams = {
   type: IncomingTxFeeType;
   to: string;
   symbol: string;

@@ -1,7 +1,7 @@
 <template>
   <div class="image-loader-container">
     <transition
-      leave-active-class="transition ease-in duration-75"
+      leave-active-class="transition ease-in duration-[50ms]"
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
@@ -50,7 +50,7 @@ const { isReady, error } = props.src
     @apply absolute inset-0 h-full w-full;
 
     .image-loader-placeholder-default {
-      @apply h-full w-full rounded-full;
+      @apply block h-full w-full rounded-full;
     }
   }
 }

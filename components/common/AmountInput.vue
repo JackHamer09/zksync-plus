@@ -78,7 +78,11 @@
           <template v-if="amountError === 'insufficient_balance'">Insufficient balance</template>
           <template v-if="amountError === 'exceeds_max_amount'">
             Max amount is
-            <button type="button" class="cursor-pointer font-medium underline underline-offset-2" @click="setMax">
+            <button
+              type="button"
+              class="cursor-pointer font-medium underline underline-offset-2"
+              @click.prevent="setMax"
+            >
               {{ maxDecimalAmount }}
             </button>
           </template>
@@ -253,7 +257,7 @@ const recalculateInputWidth = () => {
         @apply cursor-pointer hover:bg-primary-100;
       }
       &.is-max {
-        @apply bg-primary-600 text-white;
+        @apply cursor-default bg-primary-600 text-white;
       }
     }
     .amount-input-field {

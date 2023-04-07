@@ -13,6 +13,7 @@ export default defineNuxtConfig({
       ],
     },
   },
+  plugins: [{ src: "@/plugins/tooltip.ts", mode: "client" }],
   modules: ["@kevinmarrec/nuxt-pwa", "@pinia/nuxt"],
   ssr: false,
   pwa: {

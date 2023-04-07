@@ -1,10 +1,12 @@
 import { defineStore, storeToRefs } from "pinia";
 
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 
 export const useLiteAccountActivationStore = defineStore("liteAccountActivation", () => {
   const liteWalletStore = useLiteWalletStore();
-  const { isRemoteWallet } = storeToRefs(liteWalletStore);
+  const { isAuthorized, isRemoteWallet } = storeToRefs(liteWalletStore);
+  const { account } = storeToRefs(useOnboardStore());
 
   const {
     result: isAccountActivated,
@@ -27,6 +29,10 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
       activated = accountState.committed.pubKeyHash !== "sync:0000000000000000000000000000000000000000";
     }
     return activated;
+  });
+
+  watch([() => account.value.address, isAuthorized], () => {
+    reloadAccountActivation();
   });
 
   return {

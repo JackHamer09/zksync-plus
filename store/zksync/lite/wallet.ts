@@ -11,8 +11,6 @@ import { useEthWalletStore } from "@/store/ethWallet";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
-import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
-import { isOnlyZeroes } from "@/utils/helpers";
 
 export interface Balance extends ZkSyncLiteToken {
   amount: BigNumberish;
@@ -26,15 +24,42 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   const { getEthWalletSigner } = useEthWalletStore();
 
   let wallet: Wallet | undefined = undefined;
+  const isAuthorized = ref(false);
   const isRemoteWallet = ref(false);
 
-  const { execute: getWalletInstance, reset: resetWalletInstance } = usePromise<Wallet>(async () => {
+  const { execute: getWalletInstanceNoSigner, reset: resetWalletInstanceNoSigner } = usePromise<Wallet>(async () => {
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
     const ethWalletSigner = await getEthWalletSigner();
     wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
+    isAuthorized.value = wallet.syncSignerConnected();
     return wallet;
   });
+  const {
+    execute: getWalletInstanceWithSigner,
+    reset: resetWalletInstanceWithSigner,
+    inProgress: authorizationInProgress,
+    error: authorizationError,
+  } = usePromise<Wallet>(async () => {
+    const provider = await liteProviderStore.requestProvider();
+    if (!provider) throw new Error("Provider is not available");
+    const ethWalletSigner = await getEthWalletSigner();
+    wallet = await Wallet.fromEthSigner(ethWalletSigner, provider);
+    isAuthorized.value = wallet.syncSignerConnected();
+    console.log("isAuthorized.value", isAuthorized.value);
+    return wallet;
+  });
+  const getWalletInstance = async (withSigner = false) => {
+    if (withSigner || (wallet && wallet.syncSignerConnected())) {
+      return await getWalletInstanceWithSigner();
+    }
+    return await getWalletInstanceNoSigner();
+  };
+  const resetWalletInstance = () => {
+    wallet = undefined;
+    resetWalletInstanceNoSigner();
+    resetWalletInstanceWithSigner();
+  };
 
   const {
     result: accountState,
@@ -80,6 +105,8 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
 
   const reset = () => {
     wallet = undefined;
+    isAuthorized.value = false;
+    isRemoteWallet.value = false;
     resetWalletInstance();
     resetAccountState();
     resetBalance();
@@ -98,6 +125,23 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   });
 
   return {
+    isAuthorized,
+    authorizationInProgress,
+    authorizationError: computed(() => {
+      const message = authorizationError.value?.message;
+      if (typeof message === "string") {
+        if (
+          message.includes("User denied") ||
+          message.includes("User rejected") ||
+          message.includes(`"Request rejected"`)
+        ) {
+          return undefined;
+        }
+      }
+      return authorizationError.value;
+    }),
+    authorizeWallet: () => getWalletInstance(true),
+
     isRemoteWallet,
     getWalletInstance,
 
