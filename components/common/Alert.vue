@@ -25,7 +25,7 @@ defineProps({
 
 <style lang="scss">
 .alert-container {
-  @apply w-full rounded-md p-4;
+  @apply w-full rounded-lg p-4;
   &.has-icon {
     @apply grid grid-cols-[1.25rem_1fr] gap-3;
   }

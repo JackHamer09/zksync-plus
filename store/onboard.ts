@@ -50,6 +50,7 @@ export const useOnboardStore = defineStore("onboard", () => {
 
   return {
     account: computed(() => account.value),
+    network: computed(() => network.value),
     openModal,
     disconnect,
   };

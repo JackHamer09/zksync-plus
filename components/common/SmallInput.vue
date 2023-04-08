@@ -11,14 +11,7 @@
       :type="type"
       spellcheck="false"
     />
-    <transition
-      enter-active-class="transition ease-in duration-200"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition ease-in duration-50"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
+    <transition v-bind="TransitionOpacity()">
       <button v-if="inputted" class="small-input-clear-button" type="button" @click="inputted = ''">
         <XMarkIcon class="small-input-clear-button-icon" aria-hidden="true" />
       </button>
@@ -33,6 +26,8 @@ import { XMarkIcon } from "@heroicons/vue/24/outline";
 import { useFocus } from "@vueuse/core";
 
 import type { Component, PropType } from "vue";
+
+import { TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
   as: {

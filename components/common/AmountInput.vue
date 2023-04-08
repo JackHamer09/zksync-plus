@@ -17,14 +17,7 @@
         </template>
       </div>
       <div class="amount-input-field-container">
-        <transition
-          enter-active-class="transition ease-in duration-250"
-          enter-from-class="opacity-0"
-          enter-to-class="opacity-100"
-          leave-active-class="transition ease-in duration-150"
-          leave-from-class="opacity-100"
-          leave-to-class="opacity-0"
-        >
+        <transition v-bind="TransitionOpacity(250, 150)">
           <button
             v-if="maxDecimalAmount && maxAmount !== '0'"
             type="button"
@@ -66,14 +59,7 @@
           <ChevronDownIcon class="ml-1.5 h-4 w-4" aria-hidden="true" />
         </div>
       </div>
-      <transition
-        enter-active-class="transition ease-in duration-150"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition ease-in duration-100"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
+      <transition v-bind="TransitionOpacity()">
         <div v-if="amountError" class="amount-input-error">
           <template v-if="amountError === 'insufficient_balance'">Insufficient balance</template>
           <template v-if="amountError === 'exceeds_max_amount'">
@@ -112,6 +98,7 @@ import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
 import { decimalToBigNumber, formatTokenPrice, parseTokenAmount } from "@/utils/formatters";
+import { TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
   modelValue: {

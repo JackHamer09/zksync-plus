@@ -5,7 +5,7 @@
       v-model:token-address="selectedFeeTokenAddress"
       title="Choose fee token"
       :loading="balancesLoading"
-      :balances="feeTokenBalances"
+      :balances="tokensAvailableForFee"
     >
       <template #body-bottom>
         <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
@@ -53,14 +53,7 @@
       <CommonErrorBlock v-if="feeError" class="mt-2" @try-again="estimate">
         Fee estimation error: {{ feeError.message }}
       </CommonErrorBlock>
-      <transition
-        enter-active-class="transition ease-in duration-200"
-        enter-from-class="opacity-0"
-        enter-to-class="opacity-100"
-        leave-active-class="transition ease-in duration-50"
-        leave-from-class="opacity-100"
-        leave-to-class="opacity-0"
-      >
+      <transition v-bind="TransitionOpacity()">
         <TransactionFeeDetails
           v-if="fee || feeLoading"
           class="mt-1"
@@ -76,14 +69,7 @@
           </button>
         </TransactionFeeDetails>
       </transition>
-      <transition
-        enter-active-class="transition ease-in duration-200"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-50"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
+      <transition v-bind="TransitionAlertScaleInOutTransition">
         <CommonAlert v-if="!enoughBalanceToCoverFee" class="mt-1" variant="error" :icon="ExclamationTriangleIcon">
           <p>
             Insufficient <span class="font-medium">{{ feeToken?.symbol }}</span> balance to cover the fee
@@ -91,25 +77,13 @@
           <button type="button" class="alert-link" @click="openFeeTokenModal">Change fee token</button>
         </CommonAlert>
       </transition>
-      <transition
-        enter-active-class="transition ease-in duration-200"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-50"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
-        <CommonAlert
-          v-if="isAccountActivated === false && !accountActivationCheckInProgress"
-          class="mt-1"
-          variant="info"
-          :icon="InformationCircleIcon"
-        >
+      <transition v-bind="TransitionAlertScaleInOutTransition">
+        <CommonAlert v-if="isAccountActivated === false" class="mt-1" variant="info" :icon="InformationCircleIcon">
           <p>
             This is your first transaction on
             <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> network, which means your account
             requires <span class="font-medium">one-time</span> account activation. Transaction
-            <span class="font-medium">fee</span> will be <span class="font-medium">higher than usual</span>.
+            <span class="font-medium">fee</span> will be <span class="font-medium">higher than usual</span>
           </p>
           <a
             href="https://docs.zksync.io/userdocs/faq/#what-is-the-account-activation-fee"
@@ -123,38 +97,11 @@
       </transition>
     </form>
 
-    <div class="transaction-footer">
-      <transition
-        enter-active-class="transition ease-in duration-200"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition ease-in duration-50"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-      >
-        <CommonErrorBlock
-          v-if="!isAuthorized && authorizationError"
-          class="mb-2"
-          @try-again="walletLiteStore.authorizeWallet().catch(() => {})"
-        >
-          Authorization error: {{ authorizationError.message }}
-        </CommonErrorBlock>
-      </transition>
-      <CommonButton
-        v-if="!isAuthorized"
-        :disabled="authorizationInProgress"
-        variant="primary-solid"
-        @click="walletLiteStore.authorizeWallet().catch(() => {})"
-      >
-        Authorize to continue
-      </CommonButton>
-      <template v-else>
-        <CommonButton disabled variant="primary-solid">
-          Continue
-          <!-- Send to {{ destinations.zkSyncLite.label }} -->
-        </CommonButton>
+    <ZksyncLiteTransactionFooter>
+      <template #after-checks>
+        <CommonButton disabled variant="primary-solid">Continue</CommonButton>
       </template>
-    </div>
+    </ZksyncLiteTransactionFooter>
   </div>
 </template>
 
@@ -167,18 +114,20 @@ import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
+import ZksyncLiteTransactionFooter from "@/components/transaction/zksync/lite/TransactionFooter.vue";
+
 import useFee from "@/composables/zksync/lite/useFee";
 
 import type { FeeEstimationParams } from "@/composables/zksync/lite/useFee";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
-import { useOnboardStore } from "@/store/onboard";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { checksumAddress, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
+import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
   address: {
@@ -199,23 +148,9 @@ const liteAccountActivationStore = useLiteAccountActivationStore();
 const liteTokensStore = useLiteTokensStore();
 const { destinations } = storeToRefs(useDestinationsStore());
 const { tokens } = storeToRefs(liteTokensStore);
-const { account } = storeToRefs(useOnboardStore());
-const {
-  isAuthorized,
-  authorizationInProgress,
-  authorizationError,
-  balance,
-  balanceInProgress,
-  allBalancePricesLoaded,
-  balanceError,
-} = storeToRefs(walletLiteStore);
+const { walletAddress, balance, balanceInProgress, allBalancePricesLoaded, balanceError } =
+  storeToRefs(walletLiteStore);
 const { isAccountActivated, accountActivationCheckInProgress } = storeToRefs(liteAccountActivationStore);
-const {
-  result: fee,
-  inProgress: feeInProgress,
-  error: feeError,
-  estimateFee,
-} = useFee(liteProviderStore.requestProvider);
 
 const amount = ref("");
 
@@ -240,28 +175,44 @@ const selectedToken = computed(() => {
   }
   return balance.value.find((e) => e.address === selectedTokenAddress.value);
 });
+watch(
+  () => selectedToken?.value?.symbol,
+  (symbol) => {
+    if (!symbol) return;
+    liteTokensStore.requestTokenPrice(symbol);
+  }
+);
+watch(allBalancePricesLoaded, (loaded) => {
+  if (loaded && !selectedToken.value) {
+    selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
+  }
+});
 
 const selectFeeTokenModalOpened = ref(false);
 const selectedFeeTokenAddress = ref<string | undefined>();
 const feeTokenAddress = computed(() => selectedFeeTokenAddress.value ?? selectedTokenAddress.value);
-const feeTokenBalances = computed(() => {
-  if (!balance.value) {
-    return;
-  }
-  return balance.value.filter((e) => e.enabledForFees);
-});
-const feeToken = computed(() => {
-  if (!feeTokenAddress.value || !tokens.value) {
-    return;
-  }
-  const foundToken = Object.entries(tokens.value).find(([, token]) => token.address === feeTokenAddress.value)?.[1];
-  if (!foundToken?.enabledForFees) {
-    return tokens.value["ETH"];
-  }
-  return foundToken;
-});
+const {
+  result: fee,
+  inProgress: feeInProgress,
+  error: feeError,
+  estimateFee,
+
+  tokensAvailableForFee,
+  feeToken,
+  enoughBalanceToCoverFee,
+} = useFee(liteProviderStore.requestProvider, tokens, feeTokenAddress, balance);
 const feeLoading = computed(
-  () => feeInProgress.value || (!fee.value && balancesLoading.value) || accountActivationCheckInProgress.value
+  () =>
+    feeInProgress.value ||
+    (!fee.value && balancesLoading.value) ||
+    (accountActivationCheckInProgress.value && isAccountActivated.value === undefined)
+);
+watch(
+  () => feeToken.value?.symbol,
+  (symbol) => {
+    if (!symbol) return;
+    liteTokensStore.requestTokenPrice(symbol);
+  }
 );
 const openFeeTokenModal = () => {
   selectFeeTokenModalOpened.value = true;
@@ -275,8 +226,8 @@ const maxAmount = computed(() => {
   if (!selectedToken.value) {
     return undefined;
   }
-  if (feeTokenAddress.value === selectedToken.value.address) {
-    if (!feeToken.value || !fee.value) {
+  if (feeToken.value?.address === selectedToken.value.address) {
+    if (!fee.value) {
       return undefined;
     }
     if (BigNumber.from(fee.value).gt(selectedToken.value.amount)) {
@@ -287,20 +238,14 @@ const maxAmount = computed(() => {
   return selectedToken.value.amount;
 });
 
-const enoughBalanceToCoverFee = computed(() => {
-  if (!feeToken.value || feeLoading.value) {
-    return true;
-  }
-  const feeTokenBalance = balance.value.find((e) => e.address === feeToken.value!.address);
-  if (!feeTokenBalance) return true;
-  if (fee.value && BigNumber.from(fee.value).gt(feeTokenBalance.amount)) {
-    return false;
-  }
-  return true;
-});
-
 const estimate = async () => {
-  if (!account.value.address || !selectedToken.value || !feeToken.value || accountActivationCheckInProgress.value) {
+  if (
+    !walletAddress.value ||
+    !selectedToken.value ||
+    !feeToken.value ||
+    accountActivationCheckInProgress.value ||
+    isAccountActivated.value === undefined
+  ) {
     return;
   }
   const fees: FeeEstimationParams[] = [{ type: "Transfer", symbol: selectedToken.value.symbol, to: props.address }];
@@ -310,18 +255,17 @@ const estimate = async () => {
         ChangePubKey: { onchainPubkeyAuth: false },
       },
       symbol: selectedToken.value.symbol,
-      to: account.value.address,
+      to: walletAddress.value,
     });
   }
-  estimateFee(fees, account.value.address, feeToken.value.symbol);
+  estimateFee(fees, walletAddress.value, feeToken.value.symbol);
 };
 watch(
   [
     () => props.address,
     () => selectedToken.value?.symbol,
     () => feeToken.value?.symbol,
-    () => account.value.address,
-    accountActivationCheckInProgress,
+    walletAddress,
     isAccountActivated,
   ],
   () => {
@@ -329,25 +273,6 @@ watch(
   },
   { immediate: true }
 );
-watch(
-  () => feeToken.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
-  }
-);
-watch(
-  () => selectedToken?.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
-  }
-);
-watch(allBalancePricesLoaded, (loaded) => {
-  if (loaded && !selectedToken.value) {
-    selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
-  }
-});
 
 const fetchBalances = () => {
   walletLiteStore.requestBalance().then(() => {
@@ -383,8 +308,5 @@ liteAccountActivationStore.checkAccountActivation();
   .change-fee-token-icon {
     @apply ml-1 h-3 w-3;
   }
-}
-.transaction-footer {
-  @apply sticky bottom-6 z-[2] mt-auto flex flex-col items-center bg-gray bg-opacity-60 pt-6 backdrop-blur-sm;
 }
 </style>

@@ -1,6 +1,6 @@
 import { watch } from "vue";
 
-import { BigNumber } from "ethers";
+import { BigNumber, VoidSigner } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
 import { Wallet } from "zksync";
 
@@ -11,6 +11,9 @@ import { useEthWalletStore } from "@/store/ethWallet";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import { InfuraProviderEx } from "@/utils/InfuraProviderEx";
+import { checksumAddress, formatError } from "@/utils/formatters";
+import { useNetworkStore } from "~~/store/network";
 
 export interface Balance extends ZkSyncLiteToken {
   amount: BigNumberish;
@@ -20,19 +23,26 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   const liteProviderStore = useLiteProviderStore();
   const liteTokensStore = useLiteTokensStore();
   const { tokens } = storeToRefs(liteTokensStore);
-  const { account } = storeToRefs(useOnboardStore());
+  const { account, network } = storeToRefs(useOnboardStore());
+  const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
   const { getEthWalletSigner } = useEthWalletStore();
 
   let wallet: Wallet | undefined = undefined;
+  const walletAddress = ref<string | undefined>(undefined);
   const isAuthorized = ref(false);
   const isRemoteWallet = ref(false);
 
   const { execute: getWalletInstanceNoSigner, reset: resetWalletInstanceNoSigner } = usePromise<Wallet>(async () => {
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
-    const ethWalletSigner = await getEthWalletSigner();
-    wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
-    isAuthorized.value = wallet.syncSignerConnected();
+    const walletNetworkId = network.value.chain?.id;
+    if (walletNetworkId !== selectedEthereumNetwork.value.id) {
+      const voidSigner = new VoidSigner(account.value.address!, new InfuraProviderEx(selectedEthereumNetwork.value.id));
+      wallet = await Wallet.fromEthSignerNoKeys(voidSigner, provider);
+    } else {
+      const ethWalletSigner = await getEthWalletSigner();
+      wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
+    }
     return wallet;
   });
   const {
@@ -41,24 +51,43 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     inProgress: authorizationInProgress,
     error: authorizationError,
   } = usePromise<Wallet>(async () => {
+    const walletNetworkId = network.value.chain?.id;
+    if (walletNetworkId !== selectedEthereumNetwork.value.id) {
+      throw new Error(
+        `Incorrect wallet network selected: #${walletNetworkId} (expected: ${selectedEthereumNetwork.value.name} #${selectedEthereumNetwork.value.id})`
+      );
+    }
+
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
     const ethWalletSigner = await getEthWalletSigner();
     wallet = await Wallet.fromEthSigner(ethWalletSigner, provider);
-    isAuthorized.value = wallet.syncSignerConnected();
-    console.log("isAuthorized.value", isAuthorized.value);
     return wallet;
   });
   const getWalletInstance = async (withSigner = false) => {
-    if (withSigner || (wallet && wallet.syncSignerConnected())) {
-      return await getWalletInstanceWithSigner();
+    if (withSigner || wallet?.syncSignerConnected()) {
+      await getWalletInstanceWithSigner();
+    } else {
+      await getWalletInstanceNoSigner();
     }
-    return await getWalletInstanceNoSigner();
+    if (wallet) {
+      isAuthorized.value = wallet.syncSignerConnected();
+      walletAddress.value = checksumAddress(wallet.address());
+    } else {
+      isAuthorized.value = false;
+      walletAddress.value = undefined;
+    }
+    return wallet;
   };
   const resetWalletInstance = () => {
     wallet = undefined;
     resetWalletInstanceNoSigner();
     resetWalletInstanceWithSigner();
+  };
+  const getSignerPubKeyHash = async () => {
+    const wallet = await getWalletInstance(true);
+    if (!wallet) throw new Error("Wallet is not available");
+    return isRemoteWallet.value ? await wallet.syncSignerPubKeyHash() : await wallet.signer!.pubKeyHash();
   };
 
   const {
@@ -91,7 +120,6 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     if (!accountState.value) throw new Error("Account state is not available");
     if (!tokens.value) throw new Error("Tokens are not available");
   });
-
   watch(
     balance,
     (balances) => {
@@ -105,6 +133,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
 
   const reset = () => {
     wallet = undefined;
+    walletAddress.value = undefined;
     isAuthorized.value = false;
     isRemoteWallet.value = false;
     resetWalletInstance();
@@ -125,26 +154,18 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   });
 
   return {
+    walletAddress,
+
     isAuthorized,
     authorizationInProgress,
-    authorizationError: computed(() => {
-      const message = authorizationError.value?.message;
-      if (typeof message === "string") {
-        if (
-          message.includes("User denied") ||
-          message.includes("User rejected") ||
-          message.includes(`"Request rejected"`)
-        ) {
-          return undefined;
-        }
-      }
-      return authorizationError.value;
-    }),
+    authorizationError: computed(() => formatError(authorizationError.value)),
     authorizeWallet: () => getWalletInstance(true),
+    getSignerPubKeyHash,
 
     isRemoteWallet,
     getWalletInstance,
 
+    accountState,
     requestAccountState,
 
     balance,

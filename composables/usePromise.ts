@@ -19,9 +19,9 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
   const execute = async (options?: UsePromiseOptions): Promise<ResultType | undefined> => {
     const { force } = Object.assign({}, defaultOptions, options);
     if (!promise || force) {
+      promise = fn();
       inProgress.value = true;
       error.value = undefined;
-      promise = fn();
     }
 
     try {

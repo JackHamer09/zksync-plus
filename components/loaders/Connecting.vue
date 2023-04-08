@@ -1,12 +1,5 @@
 <template>
-  <transition
-    enter-active-class="transition ease-in duration-250"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
-    leave-active-class="transition ease-in duration-150"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
+  <transition v-bind="TransitionOpacity(250, 150)">
     <div class="connecting-container" v-if="account.isReconnecting || account.isConnecting">
       <AddressAvatar v-if="account.address" :address="account.address" class="mb-2 h-16 w-16" />
       <h1 class="h1 mb-2 text-center">{{ title }}</h1>
@@ -37,6 +30,7 @@ import { computed } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useOnboardStore } from "@/store/onboard";
+import { TransitionOpacity } from "@/utils/transitions";
 
 const { account } = storeToRefs(useOnboardStore());
 

@@ -74,3 +74,19 @@ export function checksumAddress(address: string) {
 export function capitalize(str: string) {
   return str[0].toUpperCase() + str.slice(1);
 }
+
+export function formatError(error?: Error) {
+  const message = error?.message;
+  if (typeof message === "string") {
+    if (
+      message.includes("User denied") ||
+      message.includes("User rejected") ||
+      message.includes('"Request rejected"')
+    ) {
+      return undefined;
+    } else if (message.includes("Fee is to low")) {
+      return new Error("Transaction fee was to low. Try again.");
+    }
+  }
+  return error;
+}
