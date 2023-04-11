@@ -1,16 +1,22 @@
 import { defineStore } from "pinia";
 
+import liteTokenIcons from "@/assets/json/tokens/lite-tokens-icons.json";
+
 import type { ExtendedTokens, TokenInfo } from "zksync/build/types";
 
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { checksumAddress } from "@/utils/formatters";
-import { getTokenIconUrlBySymbol } from "@/utils/tokens/lite";
 
 export type ZkSyncLiteTokenPrice = number | "loading" | undefined;
 export interface ZkSyncLiteToken extends TokenInfo {
   price: ZkSyncLiteTokenPrice;
   iconUrl?: string;
 }
+type TokenIcons = {
+  thumb: string;
+  small: string;
+  large: string;
+};
 
 export const useLiteTokensStore = defineStore("liteTokens", () => {
   const liteProvider = useLiteProviderStore();
@@ -47,6 +53,12 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     }
   };
 
+  function getTokenIconUrlBySymbol(symbol: string, size: "thumb" | "small" | "large" = "small"): string | undefined {
+    if (symbol in liteTokenIcons) {
+      return (liteTokenIcons as Record<string, TokenIcons>)[symbol][size];
+    }
+    return undefined;
+  }
   const tokens = computed<{ [tokenSymbol: string]: ZkSyncLiteToken } | undefined>(() => {
     if (!tokensRaw.value) return undefined;
     return Object.fromEntries(

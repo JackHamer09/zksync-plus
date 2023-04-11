@@ -8,12 +8,12 @@ import type { BigNumberish } from "ethers";
 import type { AccountState } from "zksync/build/types";
 
 import { useEthWalletStore } from "@/store/ethWallet";
+import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
 import { InfuraProviderEx } from "@/utils/InfuraProviderEx";
 import { checksumAddress, formatError } from "@/utils/formatters";
-import { useNetworkStore } from "~~/store/network";
 
 export interface Balance extends ZkSyncLiteToken {
   amount: BigNumberish;

@@ -42,7 +42,7 @@
           </template>
           <template v-else>
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">
-              You don't have any balances on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span>
+              You don't have any balances on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
               <br />
               <span class="mt-1.5 inline-block">
                 Proceed to <NuxtLink class="link" :to="{ name: 'balances' }">balances</NuxtLink> to add balance to your

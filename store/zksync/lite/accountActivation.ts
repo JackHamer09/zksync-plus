@@ -1,6 +1,6 @@
 import { useStorage } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
-import { getChangePubkeyLegacyMessage, MAX_TIMESTAMP } from "zksync/src/utils";
+import { getChangePubkeyLegacyMessage, MAX_TIMESTAMP } from "zksync/build/utils";
 
 import type { BatchBuilder } from "zksync/build/batch-builder";
 import type { PubKeyHash } from "zksync/build/types";
@@ -33,7 +33,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     result: isAccountActivated,
     inProgress: accountActivationCheckInProgress,
     execute: checkAccountActivation,
-    reload: reloadAccountActivation,
+    reset: resetAccountActivation,
   } = usePromise<boolean>(async () => {
     const wallet = await liteWalletStore.getWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
@@ -79,7 +79,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     execute: accountActivationSign,
     reset: resetAccountActivationSign,
   } = usePromise<void>(async () => {
-    const accountState = await liteWalletStore.requestAccountState();
+    const accountState = await liteWalletStore.requestAccountState({ force: true });
     if (!accountState) throw new Error("Account state is not available");
     if (!canSignAccountActivation.value) {
       throw new TypeError(
@@ -99,6 +99,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     }
 
     const newPubKeyHash = await liteWalletStore.getSignerPubKeyHash();
+    console.log("1", { newPubKeyHash, nonce: accountState.committed.nonce, id: accountState.id! });
     const changePubKeyMessage = getChangePubkeyLegacyMessage(
       newPubKeyHash,
       accountState.committed.nonce,
@@ -114,30 +115,41 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
       validFrom: 0,
       validUntil: MAX_TIMESTAMP,
     };
+    console.log(2, {
+      accountId: accountState.id!,
+      account: wallet.address(),
+      newPkHash: newPubKeyHash,
+      nonce: accountState.committed.nonce,
+      ethSignature,
+      validFrom: 0,
+      validUntil: MAX_TIMESTAMP,
+    });
   });
 
-  const addAccountActivationToBatch = async (batchBuilder: BatchBuilder, feeTokenId: number) => {
+  const getAccountActivationTransaction = async (feeTokenId: number) => {
     if (!isAccountActivationSigned.value) throw new Error("Account activation is not signed");
 
     const wallet = await liteWalletStore.getWalletInstance(true);
     if (!wallet) throw new Error("Wallet is not available");
 
     const signedActivation = storageAccountActivations.value[walletAddress.value!];
-    const changePubKeyTx = await wallet.signer!.signSyncChangePubKey({
+    return await wallet.signer!.signSyncChangePubKey({
       ...signedActivation,
       fee: "0",
       feeTokenId,
     });
-    batchBuilder.addChangePubKey({
-      tx: changePubKeyTx,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      alreadySigned: true,
-    });
   };
 
-  watch(walletAddress, () => {
-    reloadAccountActivation();
+  watch(walletAddress, (address, oldAddress) => {
+    if (address) {
+      if (oldAddress) {
+        checkAccountActivation({ force: true });
+      } else {
+        checkAccountActivation();
+      }
+    } else {
+      resetAccountActivation();
+    }
     resetAccountActivationSign();
   });
 
@@ -145,7 +157,6 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     isAccountActivated,
     accountActivationCheckInProgress,
     checkAccountActivation,
-    reloadAccountActivation,
 
     isAccountActivationSigned,
     canSignAccountActivation,
@@ -153,6 +164,6 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     accountActivationSigningInProgress,
     accountActivationSign,
 
-    addAccountActivationToBatch,
+    getAccountActivationTransaction,
   };
 });

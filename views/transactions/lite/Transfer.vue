@@ -30,7 +30,7 @@
       <AddressAvatar class="transaction-header-avatar" :address="props.address">
         <template #icon>
           <img
-            v-tooltip="`Sending to ${destinations.zkSyncLite.label}`"
+            v-tooltip="`Sending to ${destinations.zkSyncLite.label} (L2)`"
             :src="destinations.zkSyncLite.iconUrl"
             :alt="destinations.zkSyncLite.label"
           />
@@ -99,7 +99,9 @@
 
     <ZksyncLiteTransactionFooter>
       <template #after-checks>
-        <CommonButton disabled variant="primary-solid">Continue</CommonButton>
+        <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="makeTransaction">
+          Continue
+        </CommonButton>
       </template>
     </ZksyncLiteTransactionFooter>
   </div>
@@ -117,8 +119,10 @@ import { storeToRefs } from "pinia";
 import ZksyncLiteTransactionFooter from "@/components/transaction/zksync/lite/TransactionFooter.vue";
 
 import useFee from "@/composables/zksync/lite/useFee";
+import useTransaction from "@/composables/zksync/lite/useTransaction";
 
 import type { FeeEstimationParams } from "@/composables/zksync/lite/useFee";
+import type { TransactionParams } from "@/composables/zksync/lite/useTransaction";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
@@ -126,7 +130,7 @@ import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActiva
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
-import { checksumAddress, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
+import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
@@ -146,13 +150,12 @@ const liteProviderStore = useLiteProviderStore();
 const walletLiteStore = useLiteWalletStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 const liteTokensStore = useLiteTokensStore();
+const { commitTransaction } = useTransaction(() => walletLiteStore.getWalletInstance(true));
 const { destinations } = storeToRefs(useDestinationsStore());
 const { tokens } = storeToRefs(liteTokensStore);
 const { walletAddress, balance, balanceInProgress, allBalancePricesLoaded, balanceError } =
   storeToRefs(walletLiteStore);
 const { isAccountActivated, accountActivationCheckInProgress } = storeToRefs(liteAccountActivationStore);
-
-const amount = ref("");
 
 const routeTokenAddress = computed(() => {
   if (!route.query.token || Array.isArray(route.query.token) || !isAddress(route.query.token)) {
@@ -201,43 +204,6 @@ const {
   feeToken,
   enoughBalanceToCoverFee,
 } = useFee(liteProviderStore.requestProvider, tokens, feeTokenAddress, balance);
-const feeLoading = computed(
-  () =>
-    feeInProgress.value ||
-    (!fee.value && balancesLoading.value) ||
-    (accountActivationCheckInProgress.value && isAccountActivated.value === undefined)
-);
-watch(
-  () => feeToken.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
-  }
-);
-const openFeeTokenModal = () => {
-  selectFeeTokenModalOpened.value = true;
-};
-
-const balancesLoading = computed(() => {
-  return balanceInProgress.value || (!selectedToken.value && !allBalancePricesLoaded.value);
-});
-
-const maxAmount = computed(() => {
-  if (!selectedToken.value) {
-    return undefined;
-  }
-  if (feeToken.value?.address === selectedToken.value.address) {
-    if (!fee.value) {
-      return undefined;
-    }
-    if (BigNumber.from(fee.value).gt(selectedToken.value.amount)) {
-      return "0";
-    }
-    return BigNumber.from(selectedToken.value.amount).sub(fee.value).toString();
-  }
-  return selectedToken.value.amount;
-});
-
 const estimate = async () => {
   if (
     !walletAddress.value ||
@@ -274,6 +240,56 @@ watch(
   { immediate: true }
 );
 
+const feeLoading = computed(
+  () =>
+    feeInProgress.value ||
+    (!fee.value && balancesLoading.value) ||
+    (accountActivationCheckInProgress.value && isAccountActivated.value === undefined)
+);
+watch(
+  () => feeToken.value?.symbol,
+  (symbol) => {
+    if (!symbol) return;
+    liteTokensStore.requestTokenPrice(symbol);
+  }
+);
+const openFeeTokenModal = () => {
+  selectFeeTokenModalOpened.value = true;
+};
+
+const balancesLoading = computed(() => {
+  return balanceInProgress.value || (!selectedToken.value && !allBalancePricesLoaded.value);
+});
+
+const amount = ref("");
+const maxAmount = computed(() => {
+  if (!selectedToken.value) {
+    return undefined;
+  }
+  if (feeToken.value?.address === selectedToken.value.address) {
+    if (!fee.value) {
+      return undefined;
+    }
+    if (BigNumber.from(fee.value).gt(selectedToken.value.amount)) {
+      return "0";
+    }
+    return BigNumber.from(selectedToken.value.amount).sub(fee.value).toString();
+  }
+  return selectedToken.value.amount;
+});
+const totalComputeAmount = computed(() => {
+  try {
+    if (!amount.value || !selectedToken.value) {
+      return BigNumber.from("0");
+    }
+    return decimalToBigNumber(amount.value, selectedToken.value.decimals);
+  } catch (error) {
+    return BigNumber.from("0");
+  }
+});
+
+const continueButtonDisabled = computed(() => !enoughBalanceToCoverFee.value || totalComputeAmount.value.eq(0));
+
 const fetchBalances = () => {
   walletLiteStore.requestBalance().then(() => {
     if (allBalancePricesLoaded.value && !selectedToken.value) {
@@ -284,6 +300,20 @@ const fetchBalances = () => {
 fetchBalances();
 
 liteAccountActivationStore.checkAccountActivation();
+
+const makeTransaction = async () => {
+  const transactions: TransactionParams[] = [
+    { type: "Transfer", symbol: selectedToken.value!.symbol, to: props.address, amount: totalComputeAmount.value },
+  ];
+  await commitTransaction(
+    transactions,
+    feeToken.value!.symbol,
+    fee.value!,
+    isAccountActivated.value === false
+      ? await liteAccountActivationStore.getAccountActivationTransaction(feeToken.value!.id)
+      : undefined
+  );
+};
 </script>
 
 <style lang="scss" scoped>
