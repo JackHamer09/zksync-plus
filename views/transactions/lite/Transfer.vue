@@ -18,6 +18,85 @@
       </template>
     </TokenSelectDropdown>
 
+    <TransactionConfirmTransactionModal v-model:opened="transactionConfirmModalOpened" :key="walletAddress">
+      <template v-if="isAccountActivated === false">
+        <CommonCardWithLineButtons>
+          <AddressCard as="div" name="Account activation" :address="walletAddress!">
+            <template #icon>
+              <CheckBadgeIcon class="text-gray-secondary" aria-hidden="true" />
+            </template>
+            <template #address-icon>
+              <img
+                v-tooltip="`Activating your ${destinations.zkSyncLite.label} (L2) account`"
+                :src="destinations.zkSyncLite.iconUrl"
+                :alt="destinations.zkSyncLite.label"
+              />
+            </template>
+          </AddressCard>
+        </CommonCardWithLineButtons>
+        <TransactionItemIcon :icon="PlusIcon" />
+      </template>
+      <CommonCardWithLineButtons>
+        <AddressCard as="div" name="Your account" :address="walletAddress!">
+          <template #icon>
+            <UserIcon class="text-gray-secondary" aria-hidden="true" />
+          </template>
+          <template #address-icon>
+            <img
+              v-tooltip="`Sending from ${destinations.zkSyncLite.label} (L2)`"
+              :src="destinations.zkSyncLite.iconUrl"
+              :alt="destinations.zkSyncLite.label"
+            />
+          </template>
+        </AddressCard>
+        <TokenBalance
+          v-if="selectedToken"
+          v-bind="selectedToken"
+          as="div"
+          :amount="totalComputeAmount.toString()"
+          :show-send-button="false"
+        />
+      </CommonCardWithLineButtons>
+      <TransactionItemIcon :icon="ArrowDownIcon" />
+      <CommonCardWithLineButtons>
+        <AddressCard as="div" v-bind="selectedAddress">
+          <template #address-icon>
+            <img
+              v-tooltip="`Sending to ${destinations.zkSyncLite.label} (L2)`"
+              :src="destinations.zkSyncLite.iconUrl"
+              :alt="destinations.zkSyncLite.label"
+            />
+          </template>
+          <template #icon v-if="selectedAddress.icon">
+            <component :is="selectedAddress.icon" class="text-gray-secondary" aria-hidden="true" />
+          </template>
+        </AddressCard>
+      </CommonCardWithLineButtons>
+      <TransactionFeeDetails class="mt-2" label="Fee:" :fee-token="feeToken" :fee-amount="fee" :loading="feeLoading" />
+
+      <div class="mx-4 mt-3 mb-3.5 border-t border-dashed"></div>
+
+      <TransactionFeeDetails
+        v-for="(item, index) in totalOfEachToken"
+        class="-my-0.5"
+        :key="item.token.address"
+        :label="index === 0 ? 'Total:' : ''"
+        :fee-token="item.token"
+        :fee-amount="item.amount"
+      />
+
+      <div class="sticky bottom-0 mt-auto w-full">
+        <CommonButton
+          class="mx-auto mt-6"
+          :disabled="continueButtonDisabled"
+          variant="primary-solid"
+          @click="makeTransaction"
+        >
+          Confirm transaction
+        </CommonButton>
+      </div>
+    </TransactionConfirmTransactionModal>
+
     <CommonBackButton @click="emit('back')" />
     <div class="transaction-header">
       <div class="transaction-header-info">
@@ -61,6 +140,8 @@
           :fee-token="feeToken"
           :fee-amount="fee"
           :loading="feeLoading"
+          :update-duration="60000"
+          @update="estimate"
         >
           <button class="change-fee-token-button" type="button" title="Change fee token" @click="openFeeTokenModal">
             Change
@@ -99,7 +180,7 @@
 
     <ZksyncLiteTransactionFooter>
       <template #after-checks>
-        <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="makeTransaction">
+        <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="openConfirmationModal">
           Continue
         </CommonButton>
       </template>
@@ -110,11 +191,21 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 
-import { ArrowUpRightIcon, ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
+import {
+  ArrowDownIcon,
+  ArrowUpRightIcon,
+  CheckBadgeIcon,
+  ClockIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  PlusIcon,
+  UserIcon,
+} from "@heroicons/vue/24/outline";
 import { PencilIcon } from "@heroicons/vue/24/solid";
 import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
+import { closestPackableTransactionAmount } from "zksync";
 
 import ZksyncLiteTransactionFooter from "@/components/transaction/zksync/lite/TransactionFooter.vue";
 
@@ -123,9 +214,14 @@ import useTransaction from "@/composables/zksync/lite/useTransaction";
 
 import type { FeeEstimationParams } from "@/composables/zksync/lite/useFee";
 import type { TransactionParams } from "@/composables/zksync/lite/useTransaction";
+import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { BigNumberish } from "ethers";
+import type { Component } from "vue";
 
 import { useRoute } from "#app";
+import { useContactsStore } from "@/store/contacts";
 import { useDestinationsStore } from "@/store/destinations";
+import { usePreferencesStore } from "@/store/preferences";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
@@ -156,6 +252,8 @@ const { tokens } = storeToRefs(liteTokensStore);
 const { walletAddress, balance, balanceInProgress, allBalancePricesLoaded, balanceError } =
   storeToRefs(walletLiteStore);
 const { isAccountActivated, accountActivationCheckInProgress } = storeToRefs(liteAccountActivationStore);
+const { userContacts } = storeToRefs(useContactsStore());
+const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const routeTokenAddress = computed(() => {
   if (!route.query.token || Array.isArray(route.query.token) || !isAddress(route.query.token)) {
@@ -210,7 +308,8 @@ const estimate = async () => {
     !selectedToken.value ||
     !feeToken.value ||
     accountActivationCheckInProgress.value ||
-    isAccountActivated.value === undefined
+    isAccountActivated.value === undefined ||
+    transactionConfirmModalOpened.value
   ) {
     return;
   }
@@ -273,9 +372,9 @@ const maxAmount = computed(() => {
     if (BigNumber.from(fee.value).gt(selectedToken.value.amount)) {
       return "0";
     }
-    return BigNumber.from(selectedToken.value.amount).sub(fee.value).toString();
+    return closestPackableTransactionAmount(BigNumber.from(selectedToken.value.amount).sub(fee.value)).toString();
   }
-  return selectedToken.value.amount;
+  return closestPackableTransactionAmount(selectedToken.value.amount).toString();
 });
 const totalComputeAmount = computed(() => {
   try {
@@ -290,6 +389,34 @@ const totalComputeAmount = computed(() => {
 
 const continueButtonDisabled = computed(() => !enoughBalanceToCoverFee.value || totalComputeAmount.value.eq(0));
 
+const selectedAddress = computed<{ name: string; address: string; icon?: Component }>(() => {
+  if (props.address === walletAddress.value) {
+    return {
+      name: "Your account",
+      address: props.address,
+      icon: UserIcon,
+    };
+  }
+
+  const foundContact = userContacts.value.find((e) => e.address === props.address);
+  if (foundContact) {
+    return foundContact;
+  }
+
+  if (lastTransactionAddress.value === props.address) {
+    return {
+      name: "Last transaction",
+      address: props.address,
+      icon: ClockIcon,
+    };
+  }
+
+  return {
+    name: "",
+    address: props.address,
+  };
+});
+
 const fetchBalances = () => {
   walletLiteStore.requestBalance().then(() => {
     if (allBalancePricesLoaded.value && !selectedToken.value) {
@@ -300,6 +427,52 @@ const fetchBalances = () => {
 fetchBalances();
 
 liteAccountActivationStore.checkAccountActivation();
+
+const transactionConfirmModalOpened = ref(false);
+watch(walletAddress, () => {
+  transactionConfirmModalOpened.value = false;
+});
+const openConfirmationModal = () => {
+  if (continueButtonDisabled.value) {
+    return;
+  }
+  transactionConfirmModalOpened.value = true;
+};
+
+const totalOfEachToken = computed<{ token: ZkSyncLiteToken; amount: BigNumberish }[]>(() => {
+  if (!tokens.value) {
+    return [];
+  }
+
+  const totalByAddress: { [symbol: string]: BigNumberish } = {};
+  const addToTotal = (tokenAddress: string, amount: BigNumberish) => {
+    if (totalByAddress[tokenAddress]) {
+      totalByAddress[tokenAddress] = BigNumber.from(totalByAddress[tokenAddress]).add(amount);
+    } else {
+      totalByAddress[tokenAddress] = amount;
+    }
+  };
+
+  if (selectedToken.value) {
+    addToTotal(selectedToken.value.address, totalComputeAmount.value);
+  }
+  if (feeToken.value && fee.value) {
+    addToTotal(feeToken.value.address, fee.value);
+  }
+
+  const tokensByAddress = Object.entries(tokens.value!).reduce((acc, [, token]) => {
+    acc[token.address] = token;
+    return acc;
+  }, {} as { [address: string]: ZkSyncLiteToken });
+  return Object.entries(totalByAddress)
+    .filter(([tokenAddress]) => tokensByAddress[tokenAddress])
+    .map(([tokenAddress, amount]) => {
+      return {
+        token: tokensByAddress[tokenAddress],
+        amount: amount.toString(),
+      };
+    });
+});
 
 const makeTransaction = async () => {
   const transactions: TransactionParams[] = [
@@ -312,7 +485,7 @@ const makeTransaction = async () => {
     isAccountActivated.value === false
       ? await liteAccountActivationStore.getAccountActivationTransaction(feeToken.value!.id)
       : undefined
-  );
+  ).catch(() => undefined);
 };
 </script>
 

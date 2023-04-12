@@ -1,6 +1,10 @@
 <template>
-  <CommonLineButton class="address-card">
-    <AddressAvatar class="address-card-avatar" :address="address" />
+  <CommonLineButton :as="as" class="address-card">
+    <AddressAvatar class="address-card-avatar" :address="address">
+      <template v-if="$slots['address-icon']" #icon>
+        <slot name="address-icon" />
+      </template>
+    </AddressAvatar>
     <div class="address-card-info">
       <div v-if="name" class="address-card-name">{{ name }}</div>
       <div class="address-card-address" :title="address">{{ shortenAddress(address) }}</div>
@@ -12,7 +16,12 @@
 </template>
 
 <script lang="ts" setup>
+import type { Component, PropType } from "vue";
+
 defineProps({
+  as: {
+    type: [String, Object] as PropType<string | Component>,
+  },
   name: {
     type: String,
   },

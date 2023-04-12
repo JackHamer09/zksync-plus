@@ -6,25 +6,27 @@
       <div class="token-address hidden xs:block" :title="address">{{ shortenAddress(address, 5) }}</div>
       <div class="token-address xs:hidden" :title="address">{{ shortenAddress(address, 2) }}</div>
     </div>
-    <div class="token-balances">
-      <div class="token-balance-amount" :title="fullAmount">
-        <template v-if="priceLoading">
-          <CommonContentLoader :length="15" />
-        </template>
-        <template v-else>{{ displayedAmount }}</template>
+    <div class="token-balance-side">
+      <div class="token-balances">
+        <div class="token-balance-amount" :title="fullAmount">
+          <template v-if="priceLoading">
+            <CommonContentLoader :length="15" />
+          </template>
+          <template v-else>{{ displayedAmount }}</template>
+        </div>
+        <div class="token-balance-price">
+          <template v-if="priceLoading">
+            <CommonContentLoader :length="12" />
+          </template>
+          <template v-else-if="price && !isZeroAmount">
+            {{ formatTokenPrice(amount, decimals, price as number) }}
+          </template>
+        </div>
       </div>
-      <div class="token-balance-price">
-        <template v-if="priceLoading">
-          <CommonContentLoader :length="12" />
-        </template>
-        <template v-else-if="price && !isZeroAmount">
-          {{ formatTokenPrice(amount, decimals, price as number) }}
-        </template>
-      </div>
+      <NuxtLink v-if="showSendButton" :to="{ name: 'transaction-send', query: { token: address } }" class="send-button">
+        <PaperAirplaneIcon aria-hidden="true" />
+      </NuxtLink>
     </div>
-    <NuxtLink v-if="showSendButton" :to="{ name: 'transaction-send', query: { token: address } }" class="send-button">
-      <PaperAirplaneIcon aria-hidden="true" />
-    </NuxtLink>
   </CommonLineButton>
 </template>
 
@@ -100,7 +102,7 @@ const displayedAmount = computed(() => {
 
 <style lang="scss">
 .token-balance {
-  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content_max-content] xs:gap-4;
+  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
   &.is-zero-amount {
     .token-balance-amount,
     .send-button {
@@ -134,14 +136,18 @@ const displayedAmount = computed(() => {
       @apply font-medium;
     }
   }
-  .token-balances {
-    @apply w-max text-right;
-  }
-  .send-button {
-    @apply hidden aspect-square h-9 w-auto items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75 xs:flex;
+  .token-balance-side {
+    @apply flex items-center;
 
-    svg {
-      @apply h-4 w-4 text-primary-400;
+    .token-balances {
+      @apply w-max text-right;
+    }
+    .send-button {
+      @apply ml-4 hidden aspect-square h-9 w-auto items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75 xs:flex;
+
+      svg {
+        @apply h-4 w-4 text-primary-400;
+      }
     }
   }
 }

@@ -5,12 +5,14 @@
       <div class="token-symbol"><CommonContentLoader :length="10" /></div>
       <div class="token-address"><CommonContentLoader :length="28" /></div>
     </div>
-    <div class="token-balances">
-      <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
-      <div class="token-balance-price"><CommonContentLoader :length="15" /></div>
-    </div>
-    <div v-if="showSendButton" class="send-button">
-      <CommonContentLoader class="send-button-loader" />
+    <div class="token-balance-side">
+      <div class="token-balances">
+        <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
+        <div class="token-balance-price"><CommonContentLoader :length="15" /></div>
+      </div>
+      <div v-if="showSendButton" class="send-button">
+        <CommonContentLoader class="send-button-loader" />
+      </div>
     </div>
   </CommonLineButton>
 </template>

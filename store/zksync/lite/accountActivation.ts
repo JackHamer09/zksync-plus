@@ -99,7 +99,6 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     }
 
     const newPubKeyHash = await liteWalletStore.getSignerPubKeyHash();
-    console.log("1", { newPubKeyHash, nonce: accountState.committed.nonce, id: accountState.id! });
     const changePubKeyMessage = getChangePubkeyLegacyMessage(
       newPubKeyHash,
       accountState.committed.nonce,
@@ -115,15 +114,6 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
       validFrom: 0,
       validUntil: MAX_TIMESTAMP,
     };
-    console.log(2, {
-      accountId: accountState.id!,
-      account: wallet.address(),
-      newPkHash: newPubKeyHash,
-      nonce: accountState.committed.nonce,
-      ethSignature,
-      validFrom: 0,
-      validUntil: MAX_TIMESTAMP,
-    });
   });
 
   const getAccountActivationTransaction = async (feeTokenId: number) => {
