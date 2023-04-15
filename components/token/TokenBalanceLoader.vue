@@ -1,20 +1,26 @@
 <template>
-  <CommonLineButton class="token-balance token-balance-loader">
-    <CommonContentLoader :length="0" class="token-balance-image-container" />
-    <div class="token-info">
-      <div class="token-symbol"><CommonContentLoader :length="10" /></div>
-      <div class="token-address"><CommonContentLoader :length="28" /></div>
-    </div>
-    <div class="token-balance-side">
-      <div class="token-balances">
-        <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
-        <div class="token-balance-price"><CommonContentLoader :length="15" /></div>
+  <CommonButtonLineWithImg class="token-balance token-balance-loader">
+    <template #image>
+      <CommonContentLoader :length="0" class="token-balance-image-container" />
+    </template>
+    <template #default>
+      <div class="token-info">
+        <div class="token-symbol"><CommonContentLoader :length="10" /></div>
+        <div class="token-address"><CommonContentLoader :length="28" /></div>
       </div>
-      <div v-if="showSendButton" class="send-button">
-        <CommonContentLoader class="send-button-loader" />
+    </template>
+    <template #right>
+      <div class="token-balance-side">
+        <div class="token-balances">
+          <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
+          <div class="token-balance-price"><CommonContentLoader :length="20" /></div>
+        </div>
+        <div v-if="showSendButton" class="send-button">
+          <CommonContentLoader class="send-button-loader" />
+        </div>
       </div>
-    </div>
-  </CommonLineButton>
+    </template>
+  </CommonButtonLineWithImg>
 </template>
 
 <script lang="ts" setup>
@@ -30,7 +36,7 @@ defineProps({
   @apply pointer-events-none;
 
   .token-balance-image-container {
-    @apply aspect-square rounded-full;
+    @apply block aspect-square rounded-full;
   }
   .send-button {
     @apply bg-transparent;

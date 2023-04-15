@@ -1,0 +1,68 @@
+<template>
+  <AddressCard as="div" :name="addressCard.name" :address="addressCard.address">
+    <template #icon v-if="addressCard.icon">
+      <component :is="addressCard.icon" class="text-gray-secondary" aria-hidden="true" />
+    </template>
+    <template #address-icon v-if="destination">
+      <img v-tooltip="tooltip" :src="destination!.iconUrl" :alt="destination!.label" />
+    </template>
+  </AddressCard>
+</template>
+
+<script lang="ts" setup>
+import { computed } from "vue";
+
+import { ClockIcon, UserIcon } from "@heroicons/vue/24/outline";
+import { storeToRefs } from "pinia";
+
+import type { TransactionDestination } from "@/store/destinations";
+import type { PropType } from "vue";
+
+import { useContactsStore } from "@/store/contacts";
+import { useOnboardStore } from "@/store/onboard";
+import { usePreferencesStore } from "@/store/preferences";
+
+const props = defineProps({
+  address: {
+    type: String,
+    required: true,
+  },
+  destination: {
+    type: Object as PropType<TransactionDestination>,
+  },
+  tooltip: {
+    type: String,
+  },
+});
+
+const { account } = storeToRefs(useOnboardStore());
+const { userContacts } = storeToRefs(useContactsStore());
+const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
+
+const addressCard = computed(() => {
+  if (props.address === account.value.address) {
+    return {
+      name: `Your${props.destination ? " " + props.destination.label : ""} account`,
+      address: account.value.address,
+      icon: UserIcon,
+    };
+  }
+  const contact = userContacts.value.find((e) => e.address === lastTransactionAddress.value);
+  if (props.address === lastTransactionAddress.value) {
+    return {
+      name: contact?.name ?? "Last transaction address",
+      icon: ClockIcon,
+      address: props.address,
+    };
+  } else if (contact) {
+    return {
+      name: contact.name,
+      address: props.address,
+    };
+  }
+  return {
+    name: "",
+    address: props.address,
+  };
+});
+</script>

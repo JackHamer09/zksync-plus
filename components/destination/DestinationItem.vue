@@ -1,15 +1,24 @@
 <template>
-  <CommonLineButton class="destination-item">
-    <CommonImageLoader class="destination-item-icon" :src="iconUrl" />
-    <div class="destination-item-info">
-      <div class="destination-item-label">{{ label }}</div>
-      <div v-if="description" class="destination-item-description">{{ description }}</div>
-    </div>
-  </CommonLineButton>
+  <CommonButtonLineWithImg :as="as" class="destination-item">
+    <template #image>
+      <CommonImageLoader class="destination-item-icon" :src="iconUrl" />
+    </template>
+    <template #default>
+      <div class="destination-item-info">
+        <div class="destination-item-label">{{ label }}</div>
+        <div v-if="description" class="destination-item-description">{{ description }}</div>
+      </div>
+    </template>
+  </CommonButtonLineWithImg>
 </template>
 
 <script lang="ts" setup>
+import type { Component, PropType } from "vue";
+
 defineProps({
+  as: {
+    type: [String, Object] as PropType<string | Component>,
+  },
   label: {
     type: String,
   },
@@ -22,15 +31,16 @@ defineProps({
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .destination-item {
-  @apply grid grid-cols-[35px_1fr] items-center gap-2.5 xs:grid-cols-[40px_1fr] xs:gap-4;
-  &:hover .destination-item-icon {
-    @apply shadow-sm;
+  &:enabled:not([aria-disabled="true"]) {
+    &:hover .destination-item-icon {
+      @apply shadow-sm;
+    }
   }
 
   .destination-item-icon {
-    @apply aspect-square h-auto w-full rounded-full bg-gray transition-shadow;
+    @apply aspect-square h-auto w-full rounded-full border bg-white transition-shadow;
   }
   .destination-item-info {
     @apply flex w-full flex-col justify-between overflow-hidden whitespace-nowrap;

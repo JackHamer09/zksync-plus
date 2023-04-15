@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot as="template" :show="isModalOpened" @after-leave="afterLeave">
-    <Dialog as="div" class="relative z-10" @close="closeModal">
+    <Dialog as="div" class="relative z-10" @close="closeOnBackgroundClick">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -31,8 +31,8 @@
               aria-modal="true"
               role="dialog"
               tabindex="-1"
-              @trigger="closeModal"
-              @keydown.esc="closeModal"
+              @trigger="closeOnBackgroundClick"
+              @keydown.esc="closeOnBackgroundClick"
             >
               <div class="mb-4 flex items-center justify-between">
                 <DialogTitle as="div" class="h2 py-0">{{ title }}</DialogTitle>
@@ -64,6 +64,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  closeOnBackgroundClick: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits<{
@@ -75,6 +79,11 @@ const isModalOpened = computed({
   get: () => props.opened,
   set: (value) => emit("update:opened", value),
 });
+const closeOnBackgroundClick = () => {
+  if (props.closeOnBackgroundClick) {
+    closeModal();
+  }
+};
 const closeModal = () => {
   isModalOpened.value = false;
 };
@@ -85,7 +94,7 @@ const afterLeave = () => {
 
 <style lang="scss" scoped>
 .modal-card {
-  @apply relative max-h-[540px] w-full max-w-[500px] transform overflow-hidden rounded-2xl bg-gray p-3 text-left shadow-xl transition-all xs:p-5 xs:pb-6;
+  @apply relative max-h-[570px] w-full max-w-[500px] transform overflow-hidden rounded-2xl bg-gray p-3 text-left shadow-xl transition-all xs:p-5 xs:pb-6;
   @media screen and (max-height: 640px) {
     @apply max-h-[90vh];
   }

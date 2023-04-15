@@ -44,7 +44,7 @@
           v-tooltip="`Updating fee every ${Math.ceil(updateDuration / 1000)} seconds`"
           :duration="updateDuration"
           :active="!loading"
-          class="ml-1.5"
+          class="ml-1.5 cursor-help"
           @finished="emit('update')"
         />
       </div>

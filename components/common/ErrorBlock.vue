@@ -4,12 +4,19 @@
     <div class="error-block-text-container">
       <slot>Unexpected error</slot>
     </div>
-    <CommonButton variant="error" @click="emit('try-again')">Try again</CommonButton>
+    <CommonButton v-if="retryButton" variant="error" @click="emit('try-again')">Try again</CommonButton>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { FaceFrownIcon } from "@heroicons/vue/24/outline";
+
+defineProps({
+  retryButton: {
+    type: Boolean,
+    default: true,
+  },
+});
 
 const emit = defineEmits<{
   (eventName: "try-again"): void;

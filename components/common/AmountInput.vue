@@ -17,6 +17,16 @@
         </template>
       </div>
       <div class="amount-input-field-container">
+        <input
+          ref="inputElement"
+          v-model="inputted"
+          class="amount-input-field"
+          placeholder="0"
+          type="text"
+          maxlength="20"
+          spellcheck="false"
+          :style="{ width: `${inputWidth}px` }"
+        />
         <transition v-bind="TransitionOpacity(250, 150)">
           <button
             v-if="maxDecimalAmount && maxAmount !== '0'"
@@ -29,16 +39,6 @@
             Max
           </button>
         </transition>
-        <input
-          ref="inputElement"
-          v-model="inputted"
-          class="amount-input-field"
-          placeholder="0"
-          type="text"
-          maxlength="20"
-          spellcheck="false"
-          :style="{ width: `${inputWidth}px` }"
-        />
       </div>
       <div class="amount-input-select-asset">
         <CommonContentLoader v-if="loading" :length="35" />
@@ -236,7 +236,7 @@ const recalculateInputWidth = () => {
   }
   .amount-input-field-container {
     grid-area: b / b / b / b;
-    @apply flex items-center justify-end gap-2 overflow-hidden pl-2;
+    @apply flex flex-row-reverse items-center justify-start gap-2 overflow-hidden pl-2;
 
     .amount-input-max-button {
       @apply rounded bg-primary-100/50 px-1.5 py-1 text-xs font-medium uppercase text-primary-400 transition-all;

@@ -119,7 +119,7 @@ const lastAddressAccount = computed<ContactWithIcon | null>(() => {
     };
   } else {
     return {
-      name: "Last transaction",
+      name: "Last transaction address",
       address: lastTransactionAddress.value,
       icon: ClockIcon,
     };

@@ -37,8 +37,8 @@
           <br />
           <span class="mt-1.5 inline-block">Make sure you are using correct zkSync network</span>
         </CommonEmptyBlock>
+        <slot name="body-bottom" />
       </div>
-      <slot name="body-bottom" />
     </Combobox>
   </CommonModal>
 </template>

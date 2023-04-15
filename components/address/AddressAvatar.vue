@@ -26,7 +26,7 @@ defineProps({
     @apply h-full w-full;
   }
   .address-avatar-icon {
-    @apply absolute -bottom-1 -right-1 aspect-square h-2/4 w-2/4 rounded-full bg-white bg-opacity-80 shadow-sm backdrop-blur-sm;
+    @apply absolute -bottom-1 -right-1 aspect-square h-[60%] w-[60%] rounded-full bg-white bg-opacity-90 shadow backdrop-blur-sm;
 
     img,
     svg {

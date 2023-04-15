@@ -1,5 +1,5 @@
 <template>
-  <div class="radial-progress" :class="{ 'animate-pulse': !active }" data-progress="100">
+  <div class="radial-progress" :class="{ loading: !active }" data-progress="100">
     <div v-if="active" class="circle">
       <div class="mask full">
         <div class="fill"></div>
@@ -8,7 +8,9 @@
         <div class="fill"></div>
       </div>
     </div>
-    <div class="inset"></div>
+    <div class="inset flex p-[2px]">
+      <div class="h-full w-full rounded-full bg-gray-input"></div>
+    </div>
   </div>
 </template>
 
@@ -30,21 +32,21 @@ const emit = defineEmits<{
   (eventName: "finished"): void;
 }>();
 
-let timeout: ReturnType<typeof setTimeout> | undefined;
+let interval: ReturnType<typeof setInterval> | undefined;
 watchEffect(() => {
   if (props.active) {
-    timeout = setTimeout(() => {
+    interval = setInterval(() => {
       emit("finished");
     }, props.duration);
   } else {
-    clearTimeout(timeout);
+    clearInterval(interval);
   }
 });
 
 const animationDuration = computed(() => `${props.duration}ms`);
 
 onBeforeUnmount(() => {
-  clearTimeout(timeout);
+  clearInterval(interval);
 });
 </script>
 
@@ -54,9 +56,13 @@ onBeforeUnmount(() => {
   $circle-size: 20px;
   $inset-size: 14px;
 
-  @apply relative rounded-full bg-gray-200;
+  @apply relative rounded-full transition-colors duration-300;
   width: $circle-size;
   height: $circle-size;
+
+  &.loading {
+    @apply animate-pulse bg-gray-100;
+  }
 
   .circle {
     .mask {
@@ -71,7 +77,7 @@ onBeforeUnmount(() => {
       }
       &.full,
       .fill {
-        animation: animateCircle linear 0s forwards;
+        animation: animateCircle linear 0s infinite;
         animation-duration: v-bind(animationDuration);
       }
       .fill {

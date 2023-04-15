@@ -62,6 +62,7 @@
     "vite": "^3.0.0",
     "vitest": "^0.15.2",
     "vue-tippy": "^6.0.0",
+    "vue3-lottie": "^2.5.0",
     "web3-avatar-vue": "^1.0.0",
     "zksync": "^0.13.1"
   },

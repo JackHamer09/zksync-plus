@@ -40,7 +40,7 @@ defineProps({
       }
     }
     &neutral {
-      @apply bg-gray-200 text-gray-700;
+      @apply bg-gray-200 bg-opacity-70 text-gray-700 backdrop-blur-sm;
 
       .alert-body {
         .alert-link {

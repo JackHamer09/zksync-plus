@@ -14,15 +14,27 @@ export const usePreferencesStore = defineStore("preferences", () => {
 
   return {
     version: computed(() => version.value),
-    lastTransactionAddress: computed(() => {
-      if (!account.value.address) {
-        return null;
-      }
-      const lastAddress = lastTransactionAddress.value[account.value.address];
-      if (isAddress(lastAddress)) {
-        return getAddress(lastAddress);
-      }
-      return null;
+    lastTransactionAddress: computed({
+      get: () => {
+        if (!account.value.address) {
+          return undefined;
+        }
+        const lastAddress = lastTransactionAddress.value[account.value.address];
+        if (isAddress(lastAddress)) {
+          return getAddress(lastAddress) as string;
+        }
+        return undefined;
+      },
+      set: (address?: string) => {
+        if (!account.value.address || !address) {
+          return;
+        }
+        address = getAddress(address);
+        if (address === account.value.address) {
+          return;
+        }
+        lastTransactionAddress.value[account.value.address] = address;
+      },
     }),
   };
 });
