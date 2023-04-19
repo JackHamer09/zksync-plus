@@ -1,6 +1,6 @@
 <template>
   <transition v-bind="TransitionOpacity(250, 150)">
-    <div class="connecting-container" v-if="account.isReconnecting || account.isConnecting">
+    <div v-if="account.isReconnecting || account.isConnecting" class="connecting-container">
       <AddressAvatar v-if="account.address" :address="account.address" class="mb-2 h-16 w-16" />
       <h1 class="h1 mb-2 text-center">{{ title }}</h1>
       <svg
@@ -32,11 +32,11 @@ import { storeToRefs } from "pinia";
 import { useOnboardStore } from "@/store/onboard";
 import { TransitionOpacity } from "@/utils/transitions";
 
-const { account } = storeToRefs(useOnboardStore());
+const { account, walletName } = storeToRefs(useOnboardStore());
 
 const title = computed(() => {
-  if (account.value.connector) {
-    return `Logging in with ${account.value.connector.name}`;
+  if (walletName.value) {
+    return `Logging in with ${walletName.value}`;
   }
   return "Logging in...";
 });

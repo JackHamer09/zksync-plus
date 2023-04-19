@@ -43,6 +43,7 @@
       <TransactionFeeDetails class="my-2" label="Fee:" :fee-token="feeToken" :fee-amount="fee" />
 
       <div class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm">
+        <slot name="alerts" />
         <div class="mx-4 mb-3 border-t border-dashed border-gray-300"></div>
         <TransactionFeeDetails
           v-for="(item, index) in totalOfEachToken"
@@ -56,7 +57,7 @@
           {{ error.message }}
         </CommonErrorBlock>
         <CommonButton
-          :disabled="status !== 'not-started'"
+          :disabled="buttonDisabled || status !== 'not-started'"
           class="mx-auto mt-3"
           variant="primary-solid"
           @click="makeTransaction"
@@ -77,7 +78,7 @@
       </div>
     </div>
   </CommonModal>
-  <TransactionSuccessfulModal v-else v-bind="$attrs" :transactions="computedTransactions" />
+  <TransactionSuccessfulModal v-else v-bind="$attrs" :transaction-hashes="transactionHashes" />
 </template>
 
 <script lang="ts" setup>
@@ -123,6 +124,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  buttonDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const liteAccountActivationStore = useLiteAccountActivationStore();
@@ -130,7 +135,9 @@ const walletLiteStore = useLiteWalletStore();
 const { walletAddress } = storeToRefs(walletLiteStore);
 const { destinations } = storeToRefs(useDestinationsStore());
 const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
-const { status, error, commitTransaction } = useTransaction(() => walletLiteStore.getWalletInstance(true));
+const { status, error, transactionHashes, commitTransaction } = useTransaction(() =>
+  walletLiteStore.getWalletInstance(true)
+);
 
 const computedTransactions = computed(() => props.transactions ?? []);
 
@@ -190,6 +197,11 @@ const makeTransaction = async () => {
 
   if (status.value === "done") {
     lastTransactionAddress.value = computedTransactions.value[0].to;
+  }
+
+  await walletLiteStore.requestBalance({ force: true });
+  if (liteAccountActivationStore.isAccountActivated === false) {
+    liteAccountActivationStore.checkAccountActivation();
   }
 };
 </script>

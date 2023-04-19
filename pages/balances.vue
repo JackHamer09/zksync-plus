@@ -18,7 +18,7 @@
           {{ group.title }}
         </TypographyCategoryLabel>
         <CommonCardWithLineButtons>
-          <TokenBalance v-for="item in group.balances" :key="item.address" v-bind="item" />
+          <TokenBalance v-for="item in group.balances" as="div" :key="item.address" v-bind="item" />
         </CommonCardWithLineButtons>
       </div>
     </template>

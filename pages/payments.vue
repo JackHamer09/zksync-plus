@@ -5,7 +5,7 @@
 
     <CommonContentBlock>
       <CommonButtonsLineGroup class="mb-4">
-        <CommonButton as="RouterLink" :to="{ name: 'transaction-send' }">
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite' }">
           <template #icon>
             <PaperAirplaneIcon aria-hidden="true" />
           </template>

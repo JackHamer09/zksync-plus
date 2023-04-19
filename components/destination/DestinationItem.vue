@@ -33,12 +33,6 @@ defineProps({
 
 <style lang="scss">
 .destination-item {
-  &:enabled:not([aria-disabled="true"]) {
-    &:hover .destination-item-icon {
-      @apply shadow-sm;
-    }
-  }
-
   .destination-item-icon {
     @apply aspect-square h-auto w-full rounded-full border bg-white transition-shadow;
   }

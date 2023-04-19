@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type { RestProvider } from "zksync";
 import type { IncomingTxFeeType } from "zksync/build/types";
 
-import { isTransactionFeePayedSeparately } from "@/utils/zksync/lite";
+import { isTransactionFeePayedSeparately } from "@/utils/zksync/lite/helpers";
 
 export type FeeEstimationParams = {
   type: IncomingTxFeeType;

@@ -21,6 +21,13 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
     getDefaultRestProvider(selectedEthereumNetwork.value.network as ZkSyncNetworkName)
   );
 
+  const blockExplorerUrl = computed(() => {
+    if (selectedEthereumNetwork.value.network === "mainnet") {
+      return "https://zkscan.io";
+    }
+    return `https://${selectedEthereumNetwork.value.network}.zkscan.io`;
+  });
+
   const changeZkSyncNetwork = async (networkName: ZkSyncNetworkName) => {
     console.warn("changeZkSyncNetwork", networkName); // TEMP
     resetProvider();
@@ -37,6 +44,9 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
     providerRequestInProgress: computed(() => providerRequestInProgress.value),
     providerRequestError: computed(() => providerRequestError.value),
     requestProvider,
+
+    blockExplorerUrl,
+
     changeZkSyncNetwork,
   };
 });

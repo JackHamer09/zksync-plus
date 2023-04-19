@@ -30,7 +30,7 @@
         </div>
         <NuxtLink
           v-if="showSendButton"
-          :to="{ name: 'transaction-send', query: { token: address } }"
+          :to="{ name: 'transaction-zksync-lite', query: { token: address } }"
           class="send-button"
         >
           <PaperAirplaneIcon aria-hidden="true" />

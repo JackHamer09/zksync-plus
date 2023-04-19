@@ -18,7 +18,7 @@
           </template>
           <template #default>Add money</template>
         </CommonButton>
-        <CommonButton as="RouterLink" :to="{ name: 'transaction-send' }">
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite' }">
           <template #icon>
             <PaperAirplaneIcon aria-hidden="true" />
           </template>
@@ -38,7 +38,7 @@
             {{ balanceError.message }}
           </CommonErrorBlock>
           <template v-else-if="displayedBalances.length">
-            <TokenBalance v-for="item in displayedBalances" :key="item.address" v-bind="item" />
+            <TokenBalance v-for="item in displayedBalances" as="div" :key="item.address" v-bind="item" />
           </template>
           <template v-else>
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">

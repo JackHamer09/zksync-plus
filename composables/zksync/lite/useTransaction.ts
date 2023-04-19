@@ -6,7 +6,7 @@ import type { BatchBuilder } from "zksync/build/batch-builder";
 import type { ChangePubKey, IncomingTxFeeType } from "zksync/build/types";
 
 import { formatError } from "@/utils/formatters";
-import { isTransactionFeePayedSeparately } from "@/utils/zksync/lite";
+import { isTransactionFeePayedSeparately } from "@/utils/zksync/lite/helpers";
 
 type TransactionParams = {
   type: IncomingTxFeeType;
@@ -18,6 +18,7 @@ type TransactionParams = {
 export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
   const status = ref<"not-started" | "processing" | "waiting-for-signature" | "committing" | "done">("not-started");
   const error = ref<Error | undefined>();
+  const transactionHashes = ref<string[]>([]);
 
   const commitTransaction = async (
     transactions: TransactionParams[],
@@ -67,7 +68,7 @@ export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
         batchTransactionData.txs,
         batchTransactionData.signature ? [batchTransactionData.signature] : undefined
       );
-      console.log("submittedTransactions", submittedTransactions);
+      transactionHashes.value = submittedTransactions.map((tx) => tx.txHash);
       status.value = "done";
     } catch (err) {
       error.value = formatError(err as Error);
@@ -78,6 +79,7 @@ export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
   return {
     status,
     error,
+    transactionHashes,
     commitTransaction,
   };
 };

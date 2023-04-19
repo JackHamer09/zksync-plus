@@ -3,6 +3,17 @@
     <ModalZksyncLiteWalletAuthorization v-model:opened="modalWalletAuthorizationOpened" />
     <ModalZksyncLiteAccountActivation v-model:opened="modalAccountActivationOpened" />
 
+    <!-- Change network -->
+    <transition v-bind="TransitionAlertScaleInOutTransition">
+      <CommonErrorBlock
+        v-if="buttonStep === 'network' && switchingNetworkError"
+        class="mb-2"
+        @try-again="onboardStore.setCorrectNetwork"
+      >
+        Network change error: {{ switchingNetworkError.message }}
+      </CommonErrorBlock>
+    </transition>
+
     <!-- Authorize -->
     <transition v-bind="TransitionAlertScaleInOutTransition">
       <CommonErrorBlock
@@ -39,7 +50,17 @@
       </CommonAlert>
     </transition>
 
-    <div v-if="buttonStep === 'authorize'" class="transaction-footer-row">
+    <div v-if="buttonStep === 'network'" class="transaction-footer-row">
+      <div class="mb-2 text-sm text-gray-secondary">Incorrect network selected in your {{ walletName }} wallet</div>
+      <CommonButton
+        :disabled="switchingNetworkInProgress"
+        variant="primary-solid"
+        @click="onboardStore.setCorrectNetwork"
+      >
+        Change wallet network to {{ selectedEthereumNetwork.name }}
+      </CommonButton>
+    </div>
+    <div v-else-if="buttonStep === 'authorize'" class="transaction-footer-row">
       <button class="link mb-2 text-sm underline-offset-2" @click="modalWalletAuthorizationOpened = true">
         What is authorization?
       </button>
@@ -66,6 +87,16 @@
     <div v-else-if="buttonStep === 'continue'" class="transaction-footer-row">
       <slot name="after-checks" />
     </div>
+
+    <transition v-bind="TransitionHeight()">
+      <div
+        v-if="continueInWalletTipDisplayed"
+        class="h-6 whitespace-nowrap text-center text-sm font-medium text-gray-500"
+      >
+        <div class="pt-1"></div>
+        Continue in your {{ walletName }} wallet
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -75,13 +106,19 @@ import { computed, ref } from "vue";
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
+import { useNetworkStore } from "@/store/network";
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { TransitionAlertScaleInOutTransition } from "@/utils/transitions";
 
+const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 
+const { isCorrectNetworkSet, switchingNetworkInProgress, switchingNetworkError, walletName } =
+  storeToRefs(onboardStore);
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const { isAuthorized, authorizationInProgress, authorizationError } = storeToRefs(walletLiteStore);
 const {
   isAccountActivated,
@@ -96,13 +133,26 @@ const modalWalletAuthorizationOpened = ref(false);
 const modalAccountActivationOpened = ref(false);
 
 const buttonStep = computed(() => {
-  if (!isAuthorized.value || authorizationInProgress.value || accountActivationCheckInProgress.value) {
+  if (!isCorrectNetworkSet.value && !isAuthorized.value) {
+    return "network";
+  } else if (!isAuthorized.value || authorizationInProgress.value || accountActivationCheckInProgress.value) {
     return "authorize";
   } else if (isAccountActivated.value === false && !isAccountActivationSigned.value) {
     return "activate";
   } else {
     return "continue";
   }
+});
+
+const continueInWalletTipDisplayed = computed(() => {
+  if (
+    (buttonStep.value === "network" && switchingNetworkInProgress.value) ||
+    (buttonStep.value === "authorize" && (authorizationInProgress.value || accountActivationCheckInProgress.value)) ||
+    (buttonStep.value === "activate" && accountActivationSigningInProgress.value)
+  ) {
+    return true;
+  }
+  return false;
 });
 
 const authorizeWallet = () => {

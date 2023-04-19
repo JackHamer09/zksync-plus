@@ -22,9 +22,25 @@
       v-model:opened="transactionConfirmModalOpened"
       :fee-token="feeToken"
       :fee="fee"
+      :account-activation="isAccountActivated === false"
       :transactions="transactions"
+      :button-disabled="continueButtonDisabled || !enoughBalanceForTransaction"
       :key="walletAddress"
-    />
+    >
+      <template #alerts>
+        <transition v-bind="TransitionAlertScaleInOutTransition">
+          <div v-if="!enoughBalanceForTransaction" class="mx-4 my-3">
+            <CommonAlert variant="error" :icon="ExclamationTriangleIcon">
+              <p>
+                Insufficient <span class="font-medium">{{ selectedToken?.symbol }}</span> balance to pay for
+                transaction. Go back and adjust the amount to proceed.
+              </p>
+              <button type="button" class="alert-link" @click="transactionConfirmModalOpened = false">Go back</button>
+            </CommonAlert>
+          </div>
+        </transition>
+      </template>
+    </ConfirmTransactionModal>
 
     <CommonBackButton @click="emit('back')" />
     <div class="transaction-header">
@@ -225,6 +241,11 @@ const {
   feeToken,
   enoughBalanceToCoverFee,
 } = useFee(liteProviderStore.requestProvider, tokens, feeTokenAddress, balance);
+watch(enoughBalanceToCoverFee, (isEnough) => {
+  if (!isEnough && transactionConfirmModalOpened.value) {
+    transactionConfirmModalOpened.value = false;
+  }
+});
 const estimate = async () => {
   if (
     !walletAddress.value ||
@@ -308,6 +329,15 @@ const totalComputeAmount = computed(() => {
   } catch (error) {
     return BigNumber.from("0");
   }
+});
+const enoughBalanceForTransaction = computed(() => {
+  if (!fee.value || !selectedToken.value) {
+    return true;
+  }
+  const totalToPay = totalComputeAmount.value.add(
+    selectedToken.value.address === feeToken.value?.address ? fee.value : "0"
+  );
+  return BigNumber.from(selectedToken.value.amount).gte(totalToPay);
 });
 
 const transactions = computed<ConfirmationModalTransaction[]>(() => {

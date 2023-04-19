@@ -20,12 +20,12 @@ export interface Balance extends ZkSyncLiteToken {
 }
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
+  const ethWalletStore = useEthWalletStore();
   const liteProviderStore = useLiteProviderStore();
   const liteTokensStore = useLiteTokensStore();
   const { tokens } = storeToRefs(liteTokensStore);
   const { account, network } = storeToRefs(useOnboardStore());
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
-  const { getEthWalletSigner } = useEthWalletStore();
 
   let wallet: Wallet | undefined = undefined;
   const walletAddress = ref<string | undefined>(undefined);
@@ -40,7 +40,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
       const voidSigner = new VoidSigner(account.value.address!, new InfuraProviderEx(selectedEthereumNetwork.value.id));
       wallet = await Wallet.fromEthSignerNoKeys(voidSigner, provider);
     } else {
-      const ethWalletSigner = await getEthWalletSigner();
+      const ethWalletSigner = await ethWalletStore.getEthWalletSigner();
       wallet = await Wallet.fromEthSignerNoKeys(ethWalletSigner, provider);
     }
     return wallet;
@@ -60,7 +60,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
 
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
-    const ethWalletSigner = await getEthWalletSigner();
+    const ethWalletSigner = await ethWalletStore.getEthWalletSigner();
     wallet = await Wallet.fromEthSigner(ethWalletSigner, provider);
     return wallet;
   });

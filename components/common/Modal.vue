@@ -36,7 +36,7 @@
             >
               <div class="mb-4 flex items-center justify-between">
                 <DialogTitle as="div" class="h2 py-0">{{ title }}</DialogTitle>
-                <button @click="closeModal">
+                <button v-if="closable" @click="closeModal">
                   <XMarkIcon class="h-6 w-6 text-neutral-700" aria-hidden="true" />
                 </button>
               </div>
@@ -64,6 +64,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  closable: {
+    type: Boolean,
+    default: true,
+  },
   closeOnBackgroundClick: {
     type: Boolean,
     default: true,
@@ -85,6 +89,9 @@ const closeOnBackgroundClick = () => {
   }
 };
 const closeModal = () => {
+  if (!props.closable) {
+    return;
+  }
   isModalOpened.value = false;
 };
 const afterLeave = () => {

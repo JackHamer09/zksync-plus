@@ -24,16 +24,19 @@
             <template #icon v-if="item.icon">
               <component :is="item.icon" class="mr-3 text-gray-secondary" aria-hidden="true" />
             </template>
+            <template #address-icon v-if="destination">
+              <img v-tooltip="destinationTooltip" :src="destination!.iconUrl" :alt="destination!.label" />
+            </template>
           </AddressCard>
         </CommonCardWithLineButtons>
       </template>
     </div>
     <div v-else-if="!search">
       <CommonEmptyBlock class="search-empty-block">
-        You don't have any contacts yet
+        Enter address in the search bar
         <br />
         <span class="mt-1.5 inline-block">
-          You can add contact <NuxtLink class="link" :to="{ name: 'contacts' }">here</NuxtLink>
+          Or <NuxtLink class="link" :to="{ name: 'contacts' }">create a contact</NuxtLink>
         </span>
       </CommonEmptyBlock>
     </div>
@@ -55,6 +58,8 @@ import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
 import type { Contact } from "@/store/contacts";
+import type { TransactionDestination } from "@/store/destinations";
+import type { PropType } from "vue";
 import type { Component } from "vue";
 
 import { useContactsStore } from "@/store/contacts";
@@ -66,6 +71,12 @@ type ContactWithIcon = Contact & { icon?: Component };
 type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
 
 const props = defineProps({
+  destination: {
+    type: Object as PropType<TransactionDestination>,
+  },
+  destinationTooltip: {
+    type: String,
+  },
   ownAddressDisplayed: {
     type: Boolean,
   },

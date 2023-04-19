@@ -1,7 +1,11 @@
 import { BigNumber } from "ethers";
 
 export function isBigNumber(value: unknown): boolean {
-  return BigNumber.isBigNumber(value);
+  try {
+    return BigNumber.isBigNumber(BigNumber.from(value));
+  } catch (error) {
+    return false;
+  }
 }
 
 export const isValidAmount = (value: BigNumber) => {

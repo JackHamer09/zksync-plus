@@ -6,10 +6,14 @@
       </div>
     </template>
     <template #default>
-      <div class="token-info">
-        <div class="token-symbol">{{ type }}</div>
-        <div class="token-address hidden xs:block" :title="to">{{ shortenAddress(to, 5) }}</div>
-        <div class="token-address xs:hidden" :title="to">{{ shortenAddress(to, 2) }}</div>
+      <div class="transaction-line-info">
+        <div class="transaction-line-label">{{ label }}</div>
+        <div class="transaction-line-label-underline hidden xs:block" :title="transactionHash">
+          {{ shortenAddress(transactionHash, 5) }}
+        </div>
+        <div class="transaction-line-label-underline xs:hidden" :title="transactionHash">
+          {{ shortenAddress(transactionHash, 2) }}
+        </div>
       </div>
     </template>
     <template #right>
@@ -38,7 +42,12 @@
             </template>
           </div>
         </div>
-        <a v-tooltip="'Click to view on explorer'" href="#" target="_blank" class="view-on-explorer-button">
+        <a
+          v-tooltip="'Click to view on explorer'"
+          :href="`${blockExplorerUrl}/tx/${transactionHash}`"
+          target="_blank"
+          class="view-on-explorer-button"
+        >
           <ArrowUpRightIcon aria-hidden="true" />
         </a>
       </div>
@@ -49,10 +58,11 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-import { ArrowLeftIcon, ArrowRightIcon, ArrowsRightLeftIcon, ArrowUpRightIcon } from "@heroicons/vue/24/outline";
+import { ArrowUpRightIcon } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 
-import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/lite/ConfirmTransactionModal.vue";
+import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { BigNumberish } from "ethers";
 import type { Component, PropType } from "vue";
 
 import { parseTokenAmount, shortenAddress } from "@/utils/formatters";
@@ -62,24 +72,30 @@ const props = defineProps({
     type: [String, Object] as PropType<string | Component>,
     default: "div",
   },
-  walletAddress: {
+  icon: {
+    type: [String, Object, Function] as PropType<string | Component>,
+  },
+  direction: {
+    type: String as PropType<"in" | "out" | undefined>,
+  },
+  transactionHash: {
     type: String,
     required: true,
   },
-  type: {
-    type: [String, Object] as PropType<ConfirmationModalTransaction["type"]>,
+  blockExplorerUrl: {
+    type: String,
     required: true,
   },
-  to: {
-    type: String as PropType<ConfirmationModalTransaction["to"]>,
+  label: {
+    type: String,
     required: true,
   },
   token: {
-    type: Object as PropType<ConfirmationModalTransaction["token"]>,
+    type: Object as PropType<ZkSyncLiteToken>,
     required: true,
   },
   amount: {
-    type: String as PropType<ConfirmationModalTransaction["amount"]>,
+    type: String as PropType<BigNumberish>,
     required: true,
   },
 });
@@ -88,27 +104,6 @@ const priceLoading = computed(() => props.token.price === "loading");
 const isZeroAmount = computed(() => BigNumber.from(props.amount).eq(0));
 
 const fullAmount = computed(() => parseTokenAmount(props.amount, props.token.decimals));
-const direction = computed(() => {
-  switch (props.type) {
-    case "Transfer":
-      return props.to === props.walletAddress ? "in" : "out";
-    case "Withdraw":
-      return "out";
-    default:
-      return undefined;
-  }
-});
-const icon = computed(() => {
-  if (direction.value) {
-    return direction.value === "in" ? ArrowLeftIcon : ArrowRightIcon;
-  }
-  switch (props.type) {
-    case "Swap":
-      return ArrowsRightLeftIcon;
-    default:
-      return undefined;
-  }
-});
 </script>
 
 <style lang="scss" scoped>
@@ -122,23 +117,23 @@ const icon = computed(() => {
       @apply h-4 w-4 text-primary-500;
     }
   }
-  .token-info,
+  .transaction-line-info,
   .transaction-line-items {
     @apply flex flex-col justify-between whitespace-nowrap;
 
-    .token-symbol,
+    .transaction-line-label,
     .transaction-line-item-amount {
       @apply leading-relaxed;
     }
-    .token-address,
+    .transaction-line-label-underline,
     .transaction-line-item-price {
       @apply text-sm leading-tight text-gray-secondary;
     }
   }
-  .token-info {
+  .transaction-line-info {
     @apply w-full;
 
-    .token-symbol {
+    .transaction-line-label {
       @apply font-medium;
     }
   }

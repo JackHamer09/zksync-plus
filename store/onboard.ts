@@ -7,6 +7,7 @@ import type { Client, Provider } from "@wagmi/core";
 
 import { useRuntimeConfig } from "#imports";
 import { chains, useNetworkStore } from "@/store/network";
+import { formatError } from "@/utils/formatters";
 
 const { public: env } = useRuntimeConfig();
 
@@ -45,13 +46,41 @@ export const useOnboardStore = defineStore("onboard", () => {
     }
   });
 
+  const walletName = computed(() => account.value.connector?.name);
+
   const openModal = () => web3modal.openModal();
   const disconnect = () => ethereumClient.disconnect();
+
+  const isCorrectNetworkSet = computed(() => {
+    const walletNetworkId = network.value.chain?.id;
+    return walletNetworkId === selectedEthereumNetwork.value.id;
+  });
+  const {
+    inProgress: switchingNetworkInProgress,
+    error: switchingNetworkError,
+    execute: switchNetwork,
+  } = usePromise(async () => {
+    try {
+      await ethereumClient.switchNetwork({ chainId: selectedEthereumNetwork.value.id });
+    } catch (err) {
+      const error = formatError(err as Error);
+      if (error) throw error;
+    }
+  });
+  const setCorrectNetwork = async () => {
+    await switchNetwork({ force: true }).catch(() => undefined);
+  };
 
   return {
     account: computed(() => account.value),
     network: computed(() => network.value),
+    walletName,
     openModal,
     disconnect,
+
+    isCorrectNetworkSet,
+    switchingNetworkInProgress,
+    switchingNetworkError,
+    setCorrectNetwork,
   };
 });
