@@ -23,6 +23,8 @@
         </CommonCardWithLineButtons>
       </template>
 
+      <slot name="after-transactions" />
+
       <div class="sticky bottom-0 z-[1] mt-auto flex w-full flex-col items-center">
         <NuxtLink :to="{ name: 'transaction-zksync-lite' }" class="link mb-2 mt-8 text-sm underline-offset-2">
           Make another transaction

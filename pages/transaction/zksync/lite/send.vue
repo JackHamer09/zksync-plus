@@ -6,7 +6,7 @@
     @selected="address = $event"
     @back="back()"
   />
-  <LiteTransferForm v-else-if="step === 'transaction-form'" :address="address!" @back="back()" />
+  <LiteTransferForm v-else-if="step === 'transaction-form'" type="Transfer" :address="address!" @back="back()" />
 </template>
 
 <script lang="ts" setup>

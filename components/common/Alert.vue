@@ -15,7 +15,7 @@ import type { PropType } from "vue";
 
 defineProps({
   variant: {
-    type: String as PropType<"info" | "neutral" | "error">,
+    type: String as PropType<"info" | "neutral" | "warning" | "error">,
   },
   icon: {
     type: [Object, Function] as PropType<Component>,
@@ -45,6 +45,15 @@ defineProps({
       .alert-body {
         .alert-link {
           @apply hover:text-gray-500;
+        }
+      }
+    }
+    &warning {
+      @apply bg-orange-100 text-orange-700;
+
+      .alert-body {
+        .alert-link {
+          @apply hover:text-orange-600;
         }
       }
     }

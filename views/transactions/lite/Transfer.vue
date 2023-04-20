@@ -23,8 +23,10 @@
       :fee-token="feeToken"
       :fee="fee"
       :account-activation="isAccountActivated === false"
+      :destination="destination"
       :transactions="transactions"
       :button-disabled="continueButtonDisabled || !enoughBalanceForTransaction"
+      :estimate="estimate"
       :key="walletAddress"
     >
       <template #alerts>
@@ -32,8 +34,9 @@
           <div v-if="!enoughBalanceForTransaction" class="mx-4 my-3">
             <CommonAlert variant="error" :icon="ExclamationTriangleIcon">
               <p>
-                Insufficient <span class="font-medium">{{ selectedToken?.symbol }}</span> balance to pay for
-                transaction. Go back and adjust the amount to proceed.
+                The fee has changed since the last estimation. Insufficient
+                <span class="font-medium">{{ selectedToken?.symbol }}</span> balance to pay for transaction. Please go
+                back and adjust the amount to proceed.
               </p>
               <button type="button" class="alert-link" @click="transactionConfirmModalOpened = false">Go back</button>
             </CommonAlert>
@@ -53,11 +56,7 @@
       </div>
       <AddressAvatar class="transaction-header-avatar" :address="props.address">
         <template #icon>
-          <img
-            v-tooltip="`Sending to ${destinations.zkSyncLite.label} (L2)`"
-            :src="destinations.zkSyncLite.iconUrl"
-            :alt="destinations.zkSyncLite.label"
-          />
+          <img v-tooltip="`Sending to ${destination.label} (L2)`" :src="destination.iconUrl" :alt="destination.label" />
         </template>
       </AddressAvatar>
     </div>
@@ -86,7 +85,7 @@
           :fee-amount="fee"
           :loading="feeLoading"
           :update-duration="60000"
-          @update="estimate"
+          @update="feeAutoUpdateEstimate"
         >
           <button class="change-fee-token-button" type="button" title="Change fee token" @click="openFeeTokenModal">
             Change
@@ -125,6 +124,15 @@
 
     <ZksyncLiteTransactionFooter>
       <template #after-checks>
+        <a
+          v-if="type === 'Withdraw'"
+          class="link mb-2 flex items-center text-sm"
+          href="https://docs.zksync.io/userdocs/faq/#how-long-are-withdrawal-times"
+          target="_blank"
+        >
+          Will arrive in 10 minutes to 7 hours
+          <ArrowUpRightIcon class="ml-1 mt-0.5 h-3.5 w-3.5" />
+        </a>
         <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="openConfirmationModal">
           Continue
         </CommonButton>
@@ -150,6 +158,7 @@ import useFee from "@/composables/zksync/lite/useFee";
 
 import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/lite/ConfirmTransactionModal.vue";
 import type { FeeEstimationParams } from "@/composables/zksync/lite/useFee";
+import type { PropType } from "vue";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
@@ -163,6 +172,10 @@ import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/
 const props = defineProps({
   address: {
     type: String,
+    required: true,
+  },
+  type: {
+    type: String as PropType<"Transfer" | "Withdraw">,
     required: true,
   },
 });
@@ -182,6 +195,10 @@ const { tokens } = storeToRefs(liteTokensStore);
 const { walletAddress, balance, balanceInProgress, allBalancePricesLoaded, balanceError } =
   storeToRefs(walletLiteStore);
 const { isAccountActivated, accountActivationCheckInProgress } = storeToRefs(liteAccountActivationStore);
+
+const destination = computed(() =>
+  props.type === "Transfer" ? destinations.value.zkSyncLite : destinations.value.ethereum
+);
 
 const routeTokenAddress = computed(() => {
   if (!route.query.token || Array.isArray(route.query.token) || !isAddress(route.query.token)) {
@@ -246,63 +263,6 @@ watch(enoughBalanceToCoverFee, (isEnough) => {
     transactionConfirmModalOpened.value = false;
   }
 });
-const estimate = async () => {
-  if (
-    !walletAddress.value ||
-    !selectedToken.value ||
-    !feeToken.value ||
-    accountActivationCheckInProgress.value ||
-    isAccountActivated.value === undefined ||
-    transactionConfirmModalOpened.value
-  ) {
-    return;
-  }
-  const fees: FeeEstimationParams[] = [{ type: "Transfer", symbol: selectedToken.value.symbol, to: props.address }];
-  if (isAccountActivated.value === false) {
-    fees.push({
-      type: {
-        ChangePubKey: { onchainPubkeyAuth: false },
-      },
-      symbol: selectedToken.value.symbol,
-      to: walletAddress.value,
-    });
-  }
-  estimateFee(fees, walletAddress.value, feeToken.value.symbol);
-};
-watch(
-  [
-    () => props.address,
-    () => selectedToken.value?.symbol,
-    () => feeToken.value?.symbol,
-    walletAddress,
-    isAccountActivated,
-  ],
-  () => {
-    estimate();
-  },
-  { immediate: true }
-);
-
-const feeLoading = computed(
-  () =>
-    feeInProgress.value ||
-    (!fee.value && balancesLoading.value) ||
-    (accountActivationCheckInProgress.value && isAccountActivated.value === undefined)
-);
-watch(
-  () => feeToken.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
-  }
-);
-const openFeeTokenModal = () => {
-  selectFeeTokenModalOpened.value = true;
-};
-
-const balancesLoading = computed(() => {
-  return balanceInProgress.value || (!selectedToken.value && !allBalancePricesLoaded.value);
-});
 
 const amount = ref("");
 const maxAmount = computed(() => {
@@ -345,8 +305,75 @@ const transactions = computed<ConfirmationModalTransaction[]>(() => {
     return [];
   }
   return [
-    { type: "Transfer", token: selectedToken.value, to: props.address, amount: totalComputeAmount.value.toString() },
+    { type: props.type, token: selectedToken.value, to: props.address, amount: totalComputeAmount.value.toString() },
   ];
+});
+
+const estimate = async () => {
+  if (
+    !walletAddress.value ||
+    !selectedToken.value ||
+    !feeToken.value ||
+    accountActivationCheckInProgress.value ||
+    isAccountActivated.value === undefined
+  ) {
+    return;
+  }
+  const fees: FeeEstimationParams[] = transactions.value.map((e) => ({
+    type: e.type,
+    to: e.to,
+    symbol: e.token.symbol,
+  }));
+  if (isAccountActivated.value === false) {
+    fees.push({
+      type: {
+        ChangePubKey: { onchainPubkeyAuth: false },
+      },
+      symbol: selectedToken.value.symbol,
+      to: walletAddress.value,
+    });
+  }
+  await estimateFee(fees, walletAddress.value, feeToken.value.symbol);
+};
+const feeAutoUpdateEstimate = async () => {
+  if (transactionConfirmModalOpened.value) {
+    return;
+  }
+  await estimate();
+};
+watch(
+  [
+    () => props.address,
+    () => selectedToken.value?.symbol,
+    () => feeToken.value?.symbol,
+    walletAddress,
+    isAccountActivated,
+  ],
+  () => {
+    estimate();
+  },
+  { immediate: true }
+);
+
+const feeLoading = computed(
+  () =>
+    feeInProgress.value ||
+    (!fee.value && balancesLoading.value) ||
+    (accountActivationCheckInProgress.value && isAccountActivated.value === undefined)
+);
+watch(
+  () => feeToken.value?.symbol,
+  (symbol) => {
+    if (!symbol) return;
+    liteTokensStore.requestTokenPrice(symbol);
+  }
+);
+const openFeeTokenModal = () => {
+  selectFeeTokenModalOpened.value = true;
+};
+
+const balancesLoading = computed(() => {
+  return balanceInProgress.value || (!selectedToken.value && !allBalancePricesLoaded.value);
 });
 
 const continueButtonDisabled = computed(

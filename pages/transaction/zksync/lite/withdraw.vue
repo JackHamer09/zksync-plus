@@ -3,10 +3,11 @@
     v-if="step === 'address'"
     :destination="destinations.ethereum"
     :destination-tooltip="`Withdraw to ${destinations.ethereum.label} (L1)`"
+    own-address-displayed
     @selected="address = $event"
     @back="back()"
   />
-  <LiteTransferForm v-else-if="step === 'transaction-form'" :address="address!" @back="back()" />
+  <LiteTransferForm v-else-if="step === 'transaction-form'" type="Withdraw" :address="address!" @back="back()" />
 </template>
 
 <script lang="ts" setup>

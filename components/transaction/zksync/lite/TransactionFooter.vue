@@ -45,7 +45,9 @@
         <p>
           To activate your account, you need a history of committed balance. Visit
           <NuxtLink class="font-medium underline underline-offset-2" :to="{ name: 'balances' }">balances</NuxtLink> to
-          add balance, and wait for deposited funds to become available.
+          add balance, and wait for deposited funds to become available on
+          <span class="font-medium">{{ destinations.zkSyncLite.label }}</span
+          >.
         </p>
       </CommonAlert>
     </transition>
@@ -106,6 +108,7 @@ import { computed, ref } from "vue";
 import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
+import { useDestinationsStore } from "@/store/destinations";
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
@@ -119,6 +122,7 @@ const liteAccountActivationStore = useLiteAccountActivationStore();
 const { isCorrectNetworkSet, switchingNetworkInProgress, switchingNetworkError, walletName } =
   storeToRefs(onboardStore);
 const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
+const { destinations } = storeToRefs(useDestinationsStore());
 const { isAuthorized, authorizationInProgress, authorizationError } = storeToRefs(walletLiteStore);
 const {
   isAccountActivated,

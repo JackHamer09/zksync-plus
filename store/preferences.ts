@@ -10,16 +10,16 @@ export const usePreferencesStore = defineStore("preferences", () => {
   const { account } = storeToRefs(useOnboardStore());
 
   const version = useStorage<"lite" | "era">("version", "lite");
-  const lastTransactionAddress = useStorage<{ [userAddress: string]: string }>("last-transaction-address", {});
+  const previousTransactionAddress = useStorage<{ [userAddress: string]: string }>("last-transaction-address", {});
 
   return {
     version: computed(() => version.value),
-    lastTransactionAddress: computed({
+    previousTransactionAddress: computed({
       get: () => {
         if (!account.value.address) {
           return undefined;
         }
-        const lastAddress = lastTransactionAddress.value[account.value.address];
+        const lastAddress = previousTransactionAddress.value[account.value.address];
         if (isAddress(lastAddress)) {
           return getAddress(lastAddress) as string;
         }
@@ -33,7 +33,7 @@ export const usePreferencesStore = defineStore("preferences", () => {
         if (address === account.value.address) {
           return;
         }
-        lastTransactionAddress.value[account.value.address] = address;
+        previousTransactionAddress.value[account.value.address] = address;
       },
     }),
   };

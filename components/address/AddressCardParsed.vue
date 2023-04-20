@@ -37,7 +37,7 @@ const props = defineProps({
 
 const { account } = storeToRefs(useOnboardStore());
 const { userContacts } = storeToRefs(useContactsStore());
-const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
+const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const addressCard = computed(() => {
   if (props.address === account.value.address) {
@@ -47,10 +47,10 @@ const addressCard = computed(() => {
       icon: UserIcon,
     };
   }
-  const contact = userContacts.value.find((e) => e.address === lastTransactionAddress.value);
-  if (props.address === lastTransactionAddress.value) {
+  const contact = userContacts.value.find((e) => e.address === props.address);
+  if (props.address === previousTransactionAddress.value) {
     return {
-      name: contact?.name ?? "Last transaction address",
+      name: contact?.name ?? "Previous transaction address",
       icon: ClockIcon,
       address: props.address,
     };

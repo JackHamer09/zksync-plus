@@ -49,6 +49,8 @@ export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
       for (const transaction of transactions) {
         if (transaction.type === "Transfer") {
           addTransferToBatch(batchBuilder, transaction, feePaidSeparately ? 0 : totalFee);
+        } else if (transaction.type === "Withdraw") {
+          addWithdrawToBatch(batchBuilder, transaction, feePaidSeparately ? 0 : totalFee);
         }
       }
       if (feePaidSeparately) {
@@ -87,4 +89,9 @@ export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
 function addTransferToBatch(batchBuilder: BatchBuilder, transaction: TransactionParams, fee: BigNumberish) {
   const { to, amount, symbol } = transaction;
   batchBuilder.addTransfer({ to, amount, token: symbol, fee });
+}
+
+function addWithdrawToBatch(batchBuilder: BatchBuilder, transaction: TransactionParams, fee: BigNumberish) {
+  const { to, amount, symbol } = transaction;
+  batchBuilder.addWithdraw({ ethAddress: to, amount, token: symbol, fee });
 }

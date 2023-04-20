@@ -84,7 +84,7 @@ export function formatError(error?: Error) {
       message.includes('"Request rejected"')
     ) {
       return undefined;
-    } else if (message.includes("Fee is to low")) {
+    } else if (message.toLowerCase().includes("fee is to low")) {
       return new Error("Transaction fee was to low. Try again.");
     }
   }

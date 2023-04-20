@@ -90,7 +90,7 @@ const emit = defineEmits<{
 const contactsStore = useContactsStore();
 const { account } = storeToRefs(useOnboardStore());
 const { userContacts, userContactsByFirstCharacter } = storeToRefs(contactsStore);
-const { lastTransactionAddress } = storeToRefs(usePreferencesStore());
+const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const search = ref("");
 const isAddressValid = computed(() => isAddress(search.value));
@@ -119,10 +119,10 @@ const ownAccount = computed<ContactWithIcon>(() => ({
   icon: UserIcon,
 }));
 const lastAddressAccount = computed<ContactWithIcon | null>(() => {
-  if (!lastTransactionAddress.value) {
+  if (!previousTransactionAddress.value) {
     return null;
   }
-  const contact = userContacts.value.find((e) => e.address === lastTransactionAddress.value);
+  const contact = userContacts.value.find((e) => e.address === previousTransactionAddress.value);
   if (contact) {
     return {
       ...contact,
@@ -130,8 +130,8 @@ const lastAddressAccount = computed<ContactWithIcon | null>(() => {
     };
   } else {
     return {
-      name: "Last transaction address",
-      address: lastTransactionAddress.value,
+      name: "Previous transaction address",
+      address: previousTransactionAddress.value,
       icon: ClockIcon,
     };
   }
