@@ -115,11 +115,14 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     error: balanceError,
     execute: requestBalance,
     reset: resetBalance,
-  } = usePromise<void>(async () => {
-    await Promise.all([requestAccountState({ force: true }), liteTokensStore.requestTokens()]);
-    if (!accountState.value) throw new Error("Account state is not available");
-    if (!tokens.value) throw new Error("Tokens are not available");
-  });
+  } = usePromise<void>(
+    async () => {
+      await Promise.all([requestAccountState({ force: true }), liteTokensStore.requestTokens()]);
+      if (!accountState.value) throw new Error("Account state is not available");
+      if (!tokens.value) throw new Error("Tokens are not available");
+    },
+    { cache: 30000 }
+  );
   watch(
     balance,
     (balances) => {

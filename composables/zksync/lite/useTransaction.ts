@@ -72,6 +72,7 @@ export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
       );
       transactionHashes.value = submittedTransactions.map((tx) => tx.txHash);
       status.value = "done";
+      return submittedTransactions;
     } catch (err) {
       error.value = formatError(err as Error);
       status.value = "not-started";

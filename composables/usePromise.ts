@@ -1,25 +1,35 @@
 const defaultOptions: {
+  cache?: number | boolean;
+} = {
+  cache: true,
+};
+type UsePromiseOptions = typeof defaultOptions;
+
+const defaultExecuteOptions: {
   force?: boolean;
 } = {
   force: false,
 };
-type UsePromiseOptions = typeof defaultOptions;
+type UsePromiseExecuteOptions = typeof defaultExecuteOptions;
 
-export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) => {
+export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>, options?: UsePromiseOptions) => {
+  const opts = Object.assign({}, defaultExecuteOptions, options);
+
   let promise: Promise<ResultType> | undefined = undefined;
   const result = ref<ResultType | undefined>();
   const inProgress = ref(false);
   const error = ref<ErrorType | undefined>();
-
-  const defaultOptions: {
-    force?: boolean;
-  } = {
-    force: false,
+  let removeCacheTimeout: ReturnType<typeof setTimeout> | undefined;
+  const removeCacheTimeoutClear = () => {
+    clearTimeout(removeCacheTimeout);
+    removeCacheTimeout = undefined;
   };
-  const execute = async (options?: UsePromiseOptions): Promise<ResultType | undefined> => {
-    const { force } = Object.assign({}, defaultOptions, options);
+
+  const execute = async (options?: UsePromiseExecuteOptions): Promise<ResultType | undefined> => {
+    const { force } = Object.assign({}, defaultExecuteOptions, options);
     if (!promise || force) {
       promise = fn();
+      removeCacheTimeoutClear();
       inProgress.value = true;
       error.value = undefined;
     }
@@ -32,6 +42,16 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
       throw e;
     } finally {
       inProgress.value = false;
+      if (opts.cache === false) {
+        promise = undefined;
+      } else if (typeof opts.cache === "number") {
+        if (!removeCacheTimeout) {
+          removeCacheTimeout = setTimeout(() => {
+            promise = undefined;
+            removeCacheTimeoutClear();
+          }, opts.cache);
+        }
+      }
     }
     return result.value;
   };
@@ -41,6 +61,7 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>) =>
     error.value = undefined;
     result.value = undefined;
     inProgress.value = false;
+    removeCacheTimeoutClear();
   };
 
   // Reloads the promise if it is already in progress or has already been executed

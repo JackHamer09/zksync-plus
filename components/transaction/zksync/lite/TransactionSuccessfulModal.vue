@@ -14,12 +14,7 @@
       </CommonCardWithLineButtons>
       <template v-else>
         <CommonCardWithLineButtons>
-          <ZkSyncLiteTransactionLineItem
-            v-for="(item, index) in transactions"
-            :key="index"
-            :transaction="item"
-            :wallet-address="walletAddress!"
-          />
+          <ZkSyncLiteTransactionLineItem v-for="(item, index) in transactions" :key="index" :transaction="item" />
         </CommonCardWithLineButtons>
       </template>
 
@@ -45,7 +40,7 @@ import { storeToRefs } from "pinia";
 
 import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
 
-import useTransactions from "@/composables/zksync/lite/useTransactions";
+import useTransactionsReceipt from "@/composables/zksync/lite/useTransactionsReceipts";
 
 import SuccessConfetti from "@/assets/lottie/success-confetti.json";
 
@@ -53,7 +48,6 @@ import type { PropType } from "vue";
 
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 
 const props = defineProps({
   transactionHashes: {
@@ -65,11 +59,10 @@ const props = defineProps({
 const liteProviderStore = useLiteProviderStore();
 const liteTokensStore = useLiteTokensStore();
 const { tokens } = storeToRefs(liteTokensStore);
-const { walletAddress } = storeToRefs(useLiteWalletStore());
-const { transactions, transactionsRequestInProgress, transactionsRequestError, requestTransactions } = useTransactions(
-  liteProviderStore.requestProvider,
-  () => liteTokensStore.requestTokens().then(() => (tokens.value ? Object.values(tokens.value) : undefined))
-);
+const { transactions, transactionsRequestInProgress, transactionsRequestError, requestTransactions } =
+  useTransactionsReceipt(liteProviderStore.requestProvider, () =>
+    liteTokensStore.requestTokens().then(() => (tokens.value ? Object.values(tokens.value) : []))
+  );
 
 const fetch = () => {
   requestTransactions(props.transactionHashes);

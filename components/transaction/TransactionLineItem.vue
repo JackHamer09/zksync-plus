@@ -19,28 +19,30 @@
     <template #right>
       <div class="transaction-line-item-side">
         <div class="transaction-line-items">
-          <div class="transaction-line-item-amount" :title="fullAmount">
-            <div class="flex items-center justify-end">
-              <span v-if="direction">{{ direction === "in" ? "+" : "-" }}</span>
-              <span>{{ fullAmount }}</span>
-              <TokenImage
-                class="ml-1 mr-0.5 h-3.5 w-3.5"
-                :symbol="token.symbol"
-                :address="token.address"
-                :icon-url="token.iconUrl"
-              />
-              <span class="text-sm font-medium">{{ token.symbol }}</span>
+          <template v-if="token">
+            <div class="transaction-line-item-amount" :title="fullAmount">
+              <div class="flex items-center justify-end">
+                <span v-if="direction">{{ direction === "in" ? "+" : "-" }}</span>
+                <span class="text-sm">{{ fullAmount }}</span>
+                <TokenImage
+                  class="ml-1 mr-0.5 h-3.5 w-3.5"
+                  :symbol="token.symbol"
+                  :address="token.address"
+                  :icon-url="token.iconUrl"
+                />
+                <span class="text-sm font-medium">{{ token.symbol }}</span>
+              </div>
             </div>
-          </div>
-          <div class="transaction-line-item-price">
-            <template v-if="priceLoading">
-              <CommonContentLoader :length="12" />
-            </template>
-            <template v-else-if="token.price && !isZeroAmount">
-              <span v-if="direction">{{ direction === "in" ? "+" : "-" }}</span
-              >{{ formatTokenPrice(amount, token.decimals, token.price as number) }}
-            </template>
-          </div>
+            <div class="transaction-line-item-price">
+              <template v-if="priceLoading">
+                <CommonContentLoader :length="12" />
+              </template>
+              <template v-else-if="token.price && !isZeroAmount">
+                <span v-if="direction">{{ direction === "in" ? "+" : "-" }}</span
+                >{{ formatTokenPrice(amount, token.decimals, token.price as number) }}
+              </template>
+            </div>
+          </template>
         </div>
         <a
           v-tooltip="'Click to view on explorer'"
@@ -92,7 +94,6 @@ const props = defineProps({
   },
   token: {
     type: Object as PropType<ZkSyncLiteToken>,
-    required: true,
   },
   amount: {
     type: String as PropType<BigNumberish>,
@@ -100,10 +101,10 @@ const props = defineProps({
   },
 });
 
-const priceLoading = computed(() => props.token.price === "loading");
+const priceLoading = computed(() => props.token?.price === "loading");
 const isZeroAmount = computed(() => BigNumber.from(props.amount).eq(0));
 
-const fullAmount = computed(() => parseTokenAmount(props.amount, props.token.decimals));
+const fullAmount = computed(() => (props.token ? parseTokenAmount(props.amount, props.token.decimals) : undefined));
 </script>
 
 <style lang="scss" scoped>

@@ -34,9 +34,11 @@
           <template v-if="balanceInProgress || !allBalancePricesLoaded">
             <TokenBalanceLoader v-for="index in 2" :key="index" />
           </template>
-          <CommonErrorBlock v-else-if="balanceError" class="m-3 mb-2.5 -mt-1" @try-again="fetch">
-            {{ balanceError.message }}
-          </CommonErrorBlock>
+          <div v-else-if="balanceError" class="m-3 mb-2.5 -mt-1">
+            <CommonErrorBlock @try-again="fetch">
+              {{ balanceError.message }}
+            </CommonErrorBlock>
+          </div>
           <template v-else-if="displayedBalances.length">
             <TokenBalance v-for="item in displayedBalances" as="div" :key="item.address" v-bind="item" />
           </template>

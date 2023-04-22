@@ -14,7 +14,14 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-import { ArrowLeftIcon, ArrowRightIcon, ArrowsRightLeftIcon, ShieldCheckIcon } from "@heroicons/vue/24/outline";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowsRightLeftIcon,
+  PhotoIcon,
+  PlusIcon,
+  ShieldCheckIcon,
+} from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 import { storeToRefs } from "pinia";
 
@@ -22,6 +29,7 @@ import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { Component, PropType } from "vue";
 
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
+import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { isBigNumber } from "@/utils/validators";
 
 const props = defineProps({
@@ -29,16 +37,13 @@ const props = defineProps({
     type: [String, Object] as PropType<string | Component>,
     default: "div",
   },
-  walletAddress: {
-    type: String,
-    required: true,
-  },
   transaction: {
     type: Object as PropType<ZkSyncLiteTransaction>,
     required: true,
   },
 });
 
+const { walletAddress } = storeToRefs(useLiteWalletStore());
 const { blockExplorerUrl } = storeToRefs(useLiteProviderStore());
 
 const label = computed(() => {
@@ -46,6 +51,12 @@ const label = computed(() => {
     return "Fee payment";
   } else if (props.transaction.type === "ChangePubKey") {
     return "Account activation";
+  } else if (props.transaction.type === "MintNFT") {
+    return "Mint NFT";
+  } else if (props.transaction.type === "TransferNFT") {
+    return "Transfer";
+  } else if (props.transaction.type === "WithdrawNFT") {
+    return "Withdraw";
   }
   return props.transaction.type;
 });
@@ -76,24 +87,43 @@ const direction = computed(() => {
   }
   switch (props.transaction.type) {
     case "Transfer":
-      return props.transaction.to === props.walletAddress ? "in" : "out";
+    case "TransferNFT":
+      if (props.transaction.to === props.transaction.from) {
+        return undefined;
+      }
+      return props.transaction.to === walletAddress.value ? "in" : "out";
+
+    case "Deposit":
+      return props.transaction.to === walletAddress.value ? "in" : "out";
+
     case "Withdraw":
+    case "WithdrawNFT":
+    case "ChangePubKey":
       return "out";
+
     default:
       return undefined;
   }
 });
 const icon = computed(() => {
-  if (direction.value) {
-    return direction.value === "in" ? ArrowLeftIcon : ArrowRightIcon;
-  }
   switch (props.transaction.type) {
+    case "Transfer":
+      if (!direction.value) {
+        return ArrowRightIcon;
+      }
+      break;
     case "ChangePubKey":
       return ShieldCheckIcon;
     case "Swap":
       return ArrowsRightLeftIcon;
-    default:
-      return undefined;
+    case "Deposit":
+      return PlusIcon;
+    case "MintNFT":
+      return PhotoIcon;
   }
+  if (direction.value) {
+    return direction.value === "in" ? ArrowRightIcon : ArrowLeftIcon;
+  }
+  return undefined;
 });
 </script>

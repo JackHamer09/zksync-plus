@@ -59,16 +59,19 @@ export const useOnboardStore = defineStore("onboard", () => {
     inProgress: switchingNetworkInProgress,
     error: switchingNetworkError,
     execute: switchNetwork,
-  } = usePromise(async () => {
-    try {
-      await ethereumClient.switchNetwork({ chainId: selectedEthereumNetwork.value.id });
-    } catch (err) {
-      const error = formatError(err as Error);
-      if (error) throw error;
-    }
-  });
+  } = usePromise(
+    async () => {
+      try {
+        await ethereumClient.switchNetwork({ chainId: selectedEthereumNetwork.value.id });
+      } catch (err) {
+        const error = formatError(err as Error);
+        if (error) throw error;
+      }
+    },
+    { cache: false }
+  );
   const setCorrectNetwork = async () => {
-    await switchNetwork({ force: true }).catch(() => undefined);
+    await switchNetwork().catch(() => undefined);
   };
 
   return {

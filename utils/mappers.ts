@@ -1,6 +1,7 @@
 import { computed } from "vue";
 
 import type { Balance } from "@/store/zksync/lite/wallet";
+import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { Ref } from "vue";
 
 export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
@@ -33,4 +34,21 @@ export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
       }
     }
     return [groups.default, groups.small, groups.zero].filter((group) => group.balances.length);
+  });
+
+export const groupTransactionsByDate = (transactions: Ref<ZkSyncLiteTransaction[]>) =>
+  computed(() => {
+    const groups: Record<string, { title: string | null; transactions: ZkSyncLiteTransaction[] }> = {};
+    for (const transaction of transactions.value) {
+      const date = new Date(transaction.createdAt!);
+      const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+      if (!groups[dateKey]) {
+        groups[dateKey] = {
+          title: date.toLocaleDateString(),
+          transactions: [],
+        };
+      }
+      groups[dateKey].transactions.push(transaction);
+    }
+    return groups;
   });

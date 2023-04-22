@@ -12,16 +12,16 @@
         {{ balanceError!.message }}
       </CommonErrorBlock>
     </CommonCardWithLineButtons>
-    <template v-else>
-      <div v-for="(group, index) in balanceGroups" :key="index" class="category">
-        <TypographyCategoryLabel v-if="group.title" class="group-category-label">
+    <div v-else>
+      <div v-for="(group, index) in balanceGroups" :key="index">
+        <TypographyCategoryLabel v-if="group.title">
           {{ group.title }}
         </TypographyCategoryLabel>
         <CommonCardWithLineButtons>
           <TokenBalance v-for="item in group.balances" as="div" :key="item.address" v-bind="item" />
         </CommonCardWithLineButtons>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
@@ -34,16 +34,12 @@ import { groupBalancesByAmount } from "@/utils/mappers";
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
 
+const balanceGroups = groupBalancesByAmount(balance);
+
 const fetch = () => {
   walletLiteStore.requestBalance();
 };
 fetch();
-
-const balanceGroups = groupBalancesByAmount(balance);
 </script>
 
-<style lang="scss" scoped>
-.category:first-child .group-category-label {
-  @apply pt-0;
-}
-</style>
+<style lang="scss" scoped></style>

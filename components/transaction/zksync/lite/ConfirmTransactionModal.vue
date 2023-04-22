@@ -144,6 +144,7 @@ import type { IncomingTxFeeType } from "zksync/build/types";
 import { useDestinationsStore } from "@/store/destinations";
 import { usePreferencesStore } from "@/store/preferences";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
+import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { TransitionHeight, TransitionPrimaryButtonText } from "@/utils/transitions";
 
@@ -182,6 +183,7 @@ const props = defineProps({
   },
 });
 
+const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 const walletLiteStore = useLiteWalletStore();
 const { walletAddress } = storeToRefs(walletLiteStore);
@@ -255,7 +257,7 @@ const makeTransaction = async () => {
 
   if (newFeeAlert.value || props.buttonDisabled) return;
 
-  await commitTransaction(
+  const tx = await commitTransaction(
     computedTransactions.value.map((e) => ({
       type: e.type,
       to: e.to,
@@ -273,9 +275,18 @@ const makeTransaction = async () => {
     previousTransactionAddress.value = computedTransactions.value[0].to;
   }
 
-  await walletLiteStore.requestBalance({ force: true });
-  if (liteAccountActivationStore.isAccountActivated === false) {
-    liteAccountActivationStore.checkAccountActivation();
+  if (tx) {
+    /* Have to wait because for further transactions account needs to be activated, otherwise do it async */
+    if (liteAccountActivationStore.isAccountActivated === false) {
+      await tx[0].awaitReceipt();
+    }
+    tx[0].awaitReceipt().then(async () => {
+      liteTransactionsHistoryStore.reloadRecentTransactions();
+      walletLiteStore.requestBalance({ force: true });
+      if (liteAccountActivationStore.isAccountActivated === false) {
+        liteAccountActivationStore.checkAccountActivation();
+      }
+    });
   }
 };
 </script>
