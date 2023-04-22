@@ -95,9 +95,12 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     execute: requestAccountState,
     reset: resetAccountState,
   } = usePromise<AccountState>(async () => {
-    const wallet = await getWalletInstance();
-    if (!wallet) throw new Error("Wallet is not available");
-    return await wallet.getAccountState();
+    const provider = await liteProviderStore.requestProvider();
+    if (!provider) throw new Error("Provider is not available");
+
+    if (!account.value.address) throw new Error("Account is not available");
+
+    return await provider.getState(account.value.address);
   });
 
   const balance = computed<Balance[]>(() => {

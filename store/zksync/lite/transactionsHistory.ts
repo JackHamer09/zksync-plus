@@ -27,7 +27,7 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
     }
 
     if (!account.value.address) {
-      throw new Error("Wallet address is not available");
+      throw new Error("Account is not available");
     }
 
     const response = await provider.accountTxsDetailed(account.value.address, pagination);
