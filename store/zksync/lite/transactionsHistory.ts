@@ -66,8 +66,11 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
   } = usePromise(
     async () => {
       const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
+      const mostRecentTransactionInTheList = transactions.value[0];
       const txs = await transactionsRequest({
-        from: transactions.value.length ? transactions.value[0].txHash : "latest",
+        from: mostRecentTransactionInTheList
+          ? mostRecentTransactionInTheList.ethTxHash ?? mostRecentTransactionInTheList.txHash
+          : "latest",
         limit: 25,
         direction: transactions.value.length ? "newer" : "older",
       });
@@ -91,8 +94,12 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
     reset: resetPreviousTransactionsRequest,
   } = usePromise(
     async () => {
+      const oldestTransactionInTheList = transactions.value[transactions.value.length - 1];
+      if (!oldestTransactionInTheList) {
+        return requestRecentTransactions();
+      }
       const txs = await transactionsRequest({
-        from: transactions.value.length ? transactions.value[transactions.value.length - 1].txHash : "latest",
+        from: oldestTransactionInTheList.ethTxHash ?? oldestTransactionInTheList.txHash,
         limit: 50,
         direction: "older",
       });

@@ -14,7 +14,7 @@
     </div>
     <CommonCardWithLineButtons v-else-if="recentTransactionsRequestError">
       <CommonErrorBlock class="m-2" @try-again="fetch">
-        {{ recentTransactionsRequestError!.message }}
+        Loading transactions error: {{ recentTransactionsRequestError!.message }}
       </CommonErrorBlock>
     </CommonCardWithLineButtons>
     <div v-else-if="transactions.length">
@@ -36,8 +36,8 @@
           </CommonCardWithLineButtons>
         </div>
         <CommonCardWithLineButtons v-else-if="previousTransactionsRequestError">
-          <CommonErrorBlock class="m-2" @try-again="fetch">
-            {{ previousTransactionsRequestError!.message }}
+          <CommonErrorBlock class="m-2" @try-again="fetchMore">
+            Loading transactions error: {{ previousTransactionsRequestError!.message }}
           </CommonErrorBlock>
         </CommonCardWithLineButtons>
         <CommonButton v-else ref="loadMoreEl" class="mx-auto mt-4">Load more</CommonButton>
@@ -87,9 +87,12 @@ const unsubscribe = liteTransactionsHistoryStore.subscribeOnAccountChange(() => 
 });
 
 const loadMoreEl = ref(null);
+const fetchMore = () => {
+  liteTransactionsHistoryStore.requestPreviousTransactions();
+};
 const { stop: stopLoadMoreObserver } = useIntersectionObserver(loadMoreEl, ([{ isIntersecting }]) => {
   if (isIntersecting) {
-    liteTransactionsHistoryStore.requestPreviousTransactions();
+    fetchMore();
   }
 });
 

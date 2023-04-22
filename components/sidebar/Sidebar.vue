@@ -26,14 +26,10 @@ import { ArrowsRightLeftIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/
 
 <style lang="scss" scoped>
 .navbar-container {
-  @apply pointer-events-none sticky bottom-0 top-auto z-[3] overflow-y-hidden;
+  @apply pointer-events-none sticky bottom-0 top-auto z-[3];
   grid-area: menu / menu / menu / menu;
 
-  @media (hover: hover) and (pointer: fine) {
-    overflow: hidden overlay;
-  }
   @media screen and (min-width: 720px) {
-    overflow-y: overlay;
     @apply pointer-events-auto top-0 bottom-auto max-h-screen px-4 py-8;
   }
   @media screen and (min-width: 1024px) {

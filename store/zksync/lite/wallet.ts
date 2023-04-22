@@ -12,7 +12,6 @@ import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
-import { InfuraProviderEx } from "@/utils/InfuraProviderEx";
 import { checksumAddress, formatError } from "@/utils/formatters";
 
 export interface Balance extends ZkSyncLiteToken {
@@ -20,11 +19,12 @@ export interface Balance extends ZkSyncLiteToken {
 }
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
+  const onboardStore = useOnboardStore();
   const ethWalletStore = useEthWalletStore();
   const liteProviderStore = useLiteProviderStore();
   const liteTokensStore = useLiteTokensStore();
   const { tokens } = storeToRefs(liteTokensStore);
-  const { account, network } = storeToRefs(useOnboardStore());
+  const { account, network } = storeToRefs(onboardStore);
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
   let wallet: Wallet | undefined = undefined;
@@ -37,7 +37,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     if (!provider) throw new Error("Provider is not available");
     const walletNetworkId = network.value.chain?.id;
     if (walletNetworkId !== selectedEthereumNetwork.value.id) {
-      const voidSigner = new VoidSigner(account.value.address!, new InfuraProviderEx(selectedEthereumNetwork.value.id));
+      const voidSigner = new VoidSigner(account.value.address!, onboardStore.getEthereumProvider());
       wallet = await Wallet.fromEthSignerNoKeys(voidSigner, provider);
     } else {
       const ethWalletSigner = await ethWalletStore.getEthWalletSigner();
@@ -60,6 +60,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
 
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
+
     const ethWalletSigner = await ethWalletStore.getEthWalletSigner();
     wallet = await Wallet.fromEthSigner(ethWalletSigner, provider);
     return wallet;

@@ -85,5 +85,8 @@ export const useOnboardStore = defineStore("onboard", () => {
     switchingNetworkInProgress,
     switchingNetworkError,
     setCorrectNetwork,
+
+    ethereumClient,
+    getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
   };
 });
