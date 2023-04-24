@@ -32,7 +32,7 @@
         class="mb-2"
         @try-again="signAccountActivation"
       >
-        Account activation error: {{ accountActivationSigningError.message }}
+        Signing account activation error: {{ accountActivationSigningError.message }}
       </CommonErrorBlock>
     </transition>
     <transition v-bind="TransitionAlertScaleInOutTransition">
@@ -151,7 +151,7 @@ const buttonStep = computed(() => {
 const continueInWalletTipDisplayed = computed(() => {
   if (
     (buttonStep.value === "network" && switchingNetworkInProgress.value) ||
-    (buttonStep.value === "authorize" && (authorizationInProgress.value || accountActivationCheckInProgress.value)) ||
+    (buttonStep.value === "authorize" && authorizationInProgress.value) ||
     (buttonStep.value === "activate" && accountActivationSigningInProgress.value)
   ) {
     return true;

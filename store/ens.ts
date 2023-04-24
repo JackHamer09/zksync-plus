@@ -6,7 +6,7 @@ import { useOnboardStore } from "@/store/onboard";
 
 export const useEnsStore = defineStore("ens", () => {
   const onboardStore = useOnboardStore();
-  const { ethereumClient } = onboardStore;
+  const { ens } = onboardStore;
   const { account } = storeToRefs(onboardStore);
 
   const ensName = ref<string | null>(null);
@@ -22,8 +22,8 @@ export const useEnsStore = defineStore("ens", () => {
 
     const initialAddress = account.value.address;
     const [name, avatar] = await Promise.all([
-      ethereumClient.fetchEnsName({ address: account.value.address, chainId: 1 }),
-      ethereumClient.fetchEnsAvatar({ address: account.value.address, chainId: 1 }),
+      ens.fetchEnsName({ address: account.value.address, chainId: 1 }),
+      ens.fetchEnsAvatar({ address: account.value.address, chainId: 1 }),
     ]);
     if (account.value.address === initialAddress) {
       ensName.value = name;

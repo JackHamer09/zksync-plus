@@ -1,6 +1,6 @@
 import { defineStore, storeToRefs } from "pinia";
 
-import { connector, useOnboardStore } from "@/store/onboard";
+import { useOnboardStore } from "@/store/onboard";
 
 export const useEthWalletStore = defineStore("ethWallet", () => {
   const onboardStore = useOnboardStore();
@@ -8,8 +8,7 @@ export const useEthWalletStore = defineStore("ethWallet", () => {
 
   const getEthWalletSigner = async () => {
     if (!account.value) throw new Error("Account is not available");
-    if (!connector) throw new Error("Connector is not available");
-    return await connector.getSigner();
+    return await onboardStore.getSigner();
   };
 
   return {

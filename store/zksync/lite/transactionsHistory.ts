@@ -65,7 +65,6 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
     reload: reloadRecentTransactions,
   } = usePromise(
     async () => {
-      const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
       const mostRecentTransactionInTheList = transactions.value[0];
       const txs = await transactionsRequest({
         from: mostRecentTransactionInTheList
@@ -81,6 +80,7 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
           canLoadMore.value = false;
         }
       }
+      const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
       transactions.value.unshift(...txs.filter((tx) => !currentTransactionHashes.has(tx.txHash)));
       getTransactionTokenPrices(txs);
     },
@@ -103,11 +103,12 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
         limit: 50,
         direction: "older",
       });
-      transactions.value.push(...txs);
+      const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
+      transactions.value.push(...txs.filter((tx) => !currentTransactionHashes.has(tx.txHash)));
+      getTransactionTokenPrices(txs);
       if (txs.length < 50) {
         canLoadMore.value = false;
       }
-      getTransactionTokenPrices(txs);
     },
     { cache: false }
   );

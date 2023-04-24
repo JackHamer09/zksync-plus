@@ -81,6 +81,7 @@ export function formatError(error?: Error) {
     if (
       message.includes("User denied") ||
       message.includes("User rejected") ||
+      message.includes("Rejected by user") ||
       message.includes('"Request rejected"')
     ) {
       return undefined;

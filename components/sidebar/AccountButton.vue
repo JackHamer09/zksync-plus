@@ -1,8 +1,9 @@
 <template>
-  <Menu as="div" class="account-button-container">
-    <MenuButton as="template">
+  <Popover as="div" class="account-button-container">
+    <PopoverButton as="template">
       <SidebarAccountAvatarName hide-name-on-mobile class="main-account-button" />
-    </MenuButton>
+    </PopoverButton>
+
     <transition
       enter-active-class="transition ease-out duration-100"
       enter-from-class="transform opacity-0"
@@ -11,28 +12,29 @@
       leave-from-class="transform opacity-100"
       leave-to-class="transform opacity-0"
     >
-      <MenuItems
-        class="absolute left-0 top-0 z-10 w-56 rounded-lg bg-white pb-2 shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
+      <PopoverPanel
+        class="absolute -left-px -top-px z-10 w-56 rounded-lg bg-white p-px shadow-lg ring-1 ring-gray-900/5 focus:outline-none"
       >
-        <MenuButton as="template">
-          <SidebarAccountAvatarName title="Click to close popup" />
-        </MenuButton>
+        <PopoverButton as="template">
+          <SidebarAccountAvatarName tabindex="-1" title="Click to close popup" />
+        </PopoverButton>
 
-        <div class="mb-1.5 border-t"></div>
+        <div class="border-t"></div>
 
-        <MenuItem v-slot="{ active }">
-          <button class="account-menu-item" :class="{ active }" @click="onboardStore.disconnect">
-            <PowerIcon aria-hidden="true" />
+        <div class="p-1">
+          <SidebarNetworkSelect />
+          <button class="account-menu-item has-hover" @click="onboardStore.disconnect">
+            <PowerIcon class="account-menu-item-icon p-2" aria-hidden="true" />
             Logout
           </button>
-        </MenuItem>
-      </MenuItems>
+        </div>
+      </PopoverPanel>
     </transition>
-  </Menu>
+  </Popover>
 </template>
 
 <script lang="ts" setup>
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
 import { PowerIcon } from "@heroicons/vue/24/solid";
 
 import { useOnboardStore } from "@/store/onboard";
@@ -40,7 +42,7 @@ import { useOnboardStore } from "@/store/onboard";
 const onboardStore = useOnboardStore();
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .account-button-container {
   @apply relative;
 
@@ -48,17 +50,19 @@ const onboardStore = useOnboardStore();
     @apply transition-colors hover:bg-gray-200;
   }
   .account-menu-item {
-    @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 px-3 py-2 text-left leading-6 text-gray-900 transition-colors xl:px-4;
-    &.active {
-      @apply bg-gray-50 text-primary-400;
+    @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 rounded-lg px-2 py-2 text-left leading-6 text-gray-900 transition-colors xl:px-4;
+    &.has-hover:hover {
+      @apply bg-gray-100 text-primary-400;
 
-      svg {
+      .account-menu-item-icon {
         @apply bg-white text-primary-400;
       }
     }
-
-    svg {
-      @apply h-auto w-8 rounded-full bg-gray-50 p-2 text-gray-500;
+  }
+  .account-menu-item-icon {
+    @apply flex aspect-square h-auto w-8 items-center justify-center rounded-full bg-gray-50 text-center text-gray-500;
+    &.small {
+      @apply w-6;
     }
   }
 }

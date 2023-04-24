@@ -28,8 +28,8 @@ import { storeToRefs } from "pinia";
 import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { Component, PropType } from "vue";
 
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { isBigNumber } from "@/utils/validators";
 
 const props = defineProps({
@@ -43,7 +43,7 @@ const props = defineProps({
   },
 });
 
-const { walletAddress } = storeToRefs(useLiteWalletStore());
+const { account } = storeToRefs(useOnboardStore());
 const { blockExplorerUrl } = storeToRefs(useLiteProviderStore());
 
 const label = computed(() => {
@@ -91,10 +91,10 @@ const direction = computed(() => {
       if (props.transaction.to === props.transaction.from) {
         return undefined;
       }
-      return props.transaction.to === walletAddress.value ? "in" : "out";
+      return props.transaction.to === account.value.address ? "in" : "out";
 
     case "Deposit":
-      return props.transaction.to === walletAddress.value ? "in" : "out";
+      return props.transaction.to === account.value.address ? "in" : "out";
 
     case "Withdraw":
     case "WithdrawNFT":
