@@ -36,6 +36,11 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
   } = usePromise<boolean>(async () => {
     const wallet = await liteWalletStore.getWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
+
+    if (isRemoteWallet.value) {
+      return true;
+    }
+
     const accountState = await liteWalletStore.requestAccountState();
     if (!accountState) throw new Error("Account state is not available");
 

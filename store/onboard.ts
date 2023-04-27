@@ -22,7 +22,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     connectors: modalConnectors({
       projectId: env.walletConnectProjectID,
       version: "1",
-      appName: "web3Modal",
+      appName: "zkSync Plus",
       chains: chains,
     }),
     provider,
@@ -103,14 +103,6 @@ export const useOnboardStore = defineStore("onboard", () => {
     switchingNetworkError,
     setCorrectNetwork,
 
-    ens: {
-      fetchEnsName: ethereumClient.fetchEnsName,
-      fetchEnsAvatar: ethereumClient.fetchEnsAvatar,
-    },
-    getSigner: () => {
-      if (!wagmiClient.connector) throw new Error("Connector is not available");
-      return wagmiClient.connector?.getSigner();
-    },
     getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
   };
 });

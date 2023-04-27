@@ -1,12 +1,12 @@
 import { computed } from "vue";
 
+import { fetchEnsAvatar, fetchEnsName } from "@wagmi/core";
 import { defineStore, storeToRefs } from "pinia";
 
 import { useOnboardStore } from "@/store/onboard";
 
 export const useEnsStore = defineStore("ens", () => {
   const onboardStore = useOnboardStore();
-  const { ens } = onboardStore;
   const { account } = storeToRefs(onboardStore);
 
   const ensName = ref<string | null>(null);
@@ -22,8 +22,8 @@ export const useEnsStore = defineStore("ens", () => {
 
     const initialAddress = account.value.address;
     const [name, avatar] = await Promise.all([
-      ens.fetchEnsName({ address: account.value.address, chainId: 1 }),
-      ens.fetchEnsAvatar({ address: account.value.address, chainId: 1 }),
+      fetchEnsName({ address: account.value.address, chainId: 1 }),
+      fetchEnsAvatar({ address: account.value.address, chainId: 1 }),
     ]);
     if (account.value.address === initialAddress) {
       ensName.value = name;
