@@ -4,6 +4,8 @@ import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3mod
 import { Web3Modal } from "@web3modal/html";
 import { defineStore, storeToRefs } from "pinia";
 
+import useObservable from "@/composables/useObservable";
+
 import { useRuntimeConfig } from "#imports";
 import { chains, useNetworkStore } from "@/store/network";
 import { formatError } from "@/utils/formatters";
@@ -91,6 +93,14 @@ export const useOnboardStore = defineStore("onboard", () => {
     await switchNetwork().catch(() => undefined);
   };
 
+  const { subscribe: subscribeOnAccountChange, notify: notifyOnAccountChange } = useObservable<string | undefined>();
+  watch(
+    () => account.value.address,
+    () => {
+      notifyOnAccountChange(account.value.address);
+    }
+  );
+
   return {
     account: computed(() => account.value),
     network: computed(() => network.value),
@@ -104,5 +114,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     setCorrectNetwork,
 
     getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
+
+    subscribeOnAccountChange,
   };
 });

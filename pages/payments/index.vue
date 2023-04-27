@@ -59,8 +59,10 @@ import { storeToRefs } from "pinia";
 import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
 
+const onboardStore = useOnboardStore();
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const { transactions, recentTransactionsRequestInProgress, recentTransactionsRequestError } =
   storeToRefs(liteTransactionsHistoryStore);
@@ -71,7 +73,8 @@ const fetch = () => {
 };
 fetch();
 
-const unsubscribe = liteTransactionsHistoryStore.subscribeOnAccountChange(() => {
+const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
+  if (!newAddress) return;
   fetch();
 });
 

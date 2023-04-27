@@ -27,7 +27,7 @@
       :transactions="transactions"
       :button-disabled="continueButtonDisabled || !enoughBalanceForTransaction"
       :estimate="estimate"
-      :key="walletAddress"
+      :key="account.address"
     >
       <template #alerts>
         <transition v-bind="TransitionAlertScaleInOutTransition">
@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 
 import { ArrowUpRightIcon, ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
 import { PencilIcon } from "@heroicons/vue/24/solid";
@@ -162,6 +162,7 @@ import type { PropType } from "vue";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
@@ -186,14 +187,15 @@ const emit = defineEmits<{
 
 const route = useRoute();
 
+const onboardStore = useOnboardStore();
 const liteProviderStore = useLiteProviderStore();
 const walletLiteStore = useLiteWalletStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 const liteTokensStore = useLiteTokensStore();
+const { account } = storeToRefs(onboardStore);
 const { destinations } = storeToRefs(useDestinationsStore());
 const { tokens } = storeToRefs(liteTokensStore);
-const { walletAddress, balance, balanceInProgress, allBalancePricesLoaded, balanceError } =
-  storeToRefs(walletLiteStore);
+const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(walletLiteStore);
 const { isAccountActivated, accountActivationCheckInProgress } = storeToRefs(liteAccountActivationStore);
 
 const destination = computed(() =>
@@ -235,7 +237,7 @@ watch(allBalancePricesLoaded, (loaded) => {
 });
 
 const transactionConfirmModalOpened = ref(false);
-watch(walletAddress, () => {
+const unsubscribe = onboardStore.subscribeOnAccountChange(() => {
   transactionConfirmModalOpened.value = false;
 });
 const openConfirmationModal = () => {
@@ -311,7 +313,7 @@ const transactions = computed<ConfirmationModalTransaction[]>(() => {
 
 const estimate = async () => {
   if (
-    !walletAddress.value ||
+    !account.value.address ||
     !selectedToken.value ||
     !feeToken.value ||
     accountActivationCheckInProgress.value ||
@@ -330,10 +332,10 @@ const estimate = async () => {
         ChangePubKey: { onchainPubkeyAuth: false },
       },
       symbol: selectedToken.value.symbol,
-      to: walletAddress.value,
+      to: account.value.address,
     });
   }
-  await estimateFee(fees, walletAddress.value, feeToken.value.symbol);
+  await estimateFee(fees, account.value.address, feeToken.value.symbol);
 };
 const feeAutoUpdateEstimate = async () => {
   if (transactionConfirmModalOpened.value) {
@@ -346,7 +348,7 @@ watch(
     () => props.address,
     () => selectedToken.value?.symbol,
     () => feeToken.value?.symbol,
-    walletAddress,
+    () => account.value.address,
     isAccountActivated,
   ],
   () => {
@@ -396,6 +398,16 @@ const fetchBalances = () => {
 fetchBalances();
 
 liteAccountActivationStore.checkAccountActivation();
+
+const unsubscribeFetchBalance = onboardStore.subscribeOnAccountChange((newAddress) => {
+  if (!newAddress) return;
+  fetchBalances();
+});
+
+onBeforeUnmount(() => {
+  unsubscribe();
+  unsubscribeFetchBalance();
+});
 </script>
 
 <style lang="scss" scoped>

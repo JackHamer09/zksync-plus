@@ -32,7 +32,10 @@ export const useEnsStore = defineStore("ens", () => {
   };
 
   fetchName();
-  watch(() => account.value.address, fetchName);
+
+  onboardStore.subscribeOnAccountChange(() => {
+    fetchName();
+  });
 
   return {
     name: computed(() => ensName.value),

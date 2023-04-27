@@ -4,6 +4,7 @@ import { getChangePubkeyLegacyMessage, MAX_TIMESTAMP } from "zksync/build/utils"
 
 import type { PubKeyHash } from "zksync/build/types";
 
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { formatError } from "@/utils/formatters";
 
@@ -21,8 +22,10 @@ type AccountActivationTx = {
 };
 
 export const useLiteAccountActivationStore = defineStore("liteAccountActivation", () => {
+  const onboardStore = useOnboardStore();
   const liteWalletStore = useLiteWalletStore();
-  const { walletAddress, isAuthorized, isRemoteWallet, accountState } = storeToRefs(liteWalletStore);
+  const { account } = storeToRefs(onboardStore);
+  const { isAuthorized, isRemoteWallet, accountState } = storeToRefs(liteWalletStore);
   const storageAccountActivations = useStorage<{ [userAddress: string]: AccountActivationTx }>(
     "account-activations",
     {}
@@ -33,6 +36,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     inProgress: accountActivationCheckInProgress,
     execute: checkAccountActivation,
     reset: resetAccountActivation,
+    reload: reloadAccountActivation,
   } = usePromise<boolean>(async () => {
     const wallet = await liteWalletStore.getWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
@@ -58,7 +62,8 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
   });
 
   const isAccountActivationSigned = computed(() => {
-    const signedActivation = storageAccountActivations.value[walletAddress.value!];
+    if (!account.value.address) return false;
+    const signedActivation = storageAccountActivations.value[account.value.address];
     if (signedActivation && !accountState.value) {
       return true;
     } else if (signedActivation && accountState.value) {
@@ -109,7 +114,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
       accountState.id!
     );
     const ethSignature = (await wallet.ethMessageSigner().getEthMessageSignature(changePubKeyMessage)).signature;
-    storageAccountActivations.value[walletAddress.value!] = {
+    storageAccountActivations.value[account.value.address!] = {
       accountId: accountState.id!,
       account: wallet.address(),
       newPkHash: newPubKeyHash,
@@ -126,7 +131,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     const wallet = await liteWalletStore.getWalletInstance(true);
     if (!wallet) throw new Error("Wallet is not available");
 
-    const signedActivation = storageAccountActivations.value[walletAddress.value!];
+    const signedActivation = storageAccountActivations.value[account.value.address!];
     return await wallet.signer!.signSyncChangePubKey({
       ...signedActivation,
       fee: "0",
@@ -134,17 +139,13 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
     });
   };
 
-  watch(walletAddress, (address, oldAddress) => {
-    if (address) {
-      if (oldAddress) {
-        checkAccountActivation({ force: true });
-      } else {
-        checkAccountActivation();
-      }
+  onboardStore.subscribeOnAccountChange((newAddress) => {
+    resetAccountActivationSign();
+    if (newAddress) {
+      reloadAccountActivation();
     } else {
       resetAccountActivation();
     }
-    resetAccountActivationSign();
   });
 
   return {

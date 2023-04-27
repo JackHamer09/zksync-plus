@@ -13,7 +13,7 @@ import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
-import { checksumAddress, formatError } from "@/utils/formatters";
+import { formatError } from "@/utils/formatters";
 
 export interface Balance extends ZkSyncLiteToken {
   amount: BigNumberish;
@@ -28,7 +28,6 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
   let wallet: Wallet | undefined = undefined;
-  const walletAddress = ref<string | undefined>(undefined);
   const isAuthorized = ref(false);
   const isRemoteWallet = ref(false);
 
@@ -99,10 +98,8 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     }
     if (wallet) {
       isAuthorized.value = isRemoteWallet.value || wallet.syncSignerConnected();
-      walletAddress.value = checksumAddress(wallet.address());
     } else {
       isAuthorized.value = false;
-      walletAddress.value = undefined;
     }
     return wallet;
   };
@@ -164,31 +161,15 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     { immediate: true }
   );
 
-  const reset = () => {
-    wallet = undefined;
-    walletAddress.value = undefined;
+  onboardStore.subscribeOnAccountChange(() => {
     isAuthorized.value = false;
     isRemoteWallet.value = false;
     resetWalletInstance();
     resetAccountState();
     resetBalance();
-  };
-
-  watch(account, async () => {
-    if (
-      (account.value.isConnected && !wallet) ||
-      (wallet && account.value.address && wallet.address() !== account.value.address)
-    ) {
-      reset();
-      await requestBalance();
-    } else if (account.value.isDisconnected) {
-      reset();
-    }
   });
 
   return {
-    walletAddress,
-
     isAuthorized,
     authorizationInProgress,
     authorizationError: computed(() => formatError(authorizationError.value)),

@@ -22,7 +22,7 @@
       <template v-for="(item, index) in computedTransactions" :key="index">
         <CommonCardWithLineButtons>
           <AddressCardParsed
-            :address="walletAddress!"
+            :address="account.address!"
             :destination="destinations.zkSyncLite"
             :tooltip="`${getActionName(item.type)} from ${destinations.zkSyncLite.label} (L2)`"
           />
@@ -142,6 +142,7 @@ import type { PropType } from "vue";
 import type { IncomingTxFeeType } from "zksync/build/types";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { usePreferencesStore } from "@/store/preferences";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
@@ -186,7 +187,7 @@ const props = defineProps({
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 const walletLiteStore = useLiteWalletStore();
-const { walletAddress } = storeToRefs(walletLiteStore);
+const { account } = storeToRefs(useOnboardStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 const { status, error, transactionHashes, commitTransaction } = useTransaction(() =>

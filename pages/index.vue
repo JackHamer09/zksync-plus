@@ -59,16 +59,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onBeforeUnmount } from "vue";
 
 import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
+const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
 const { destinations } = storeToRefs(useDestinationsStore());
@@ -106,6 +108,15 @@ const displayedBalances = computed(() => {
     }
     return false;
   });
+});
+
+const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
+  if (!newAddress) return;
+  fetch();
+});
+
+onBeforeUnmount(() => {
+  unsubscribe();
 });
 </script>
 
