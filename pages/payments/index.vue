@@ -31,6 +31,7 @@
               v-for="(item, index) in transactions.slice(0, 5)"
               :key="index"
               :transaction="item"
+              display-date
             />
           </template>
           <template v-else>

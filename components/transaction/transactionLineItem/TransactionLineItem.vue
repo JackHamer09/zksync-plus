@@ -9,12 +9,6 @@
       <div class="transaction-line-info">
         <slot name="top-left" />
         <slot name="bottom-left" />
-        <!-- <div class="transaction-line-label-underline hidden xs:block" :title="transactionHash">
-          {{ shortenAddress(transactionHash, 5) }}
-        </div>
-        <div class="transaction-line-label-underline xs:hidden" :title="transactionHash">
-          {{ shortenAddress(transactionHash, 2) }}
-        </div> -->
       </div>
     </template>
     <template #right>
