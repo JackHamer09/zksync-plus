@@ -148,7 +148,7 @@ const amountError = computed(() => {
     return;
   }
   if (props.maxAmount && totalComputeAmount.value.gt(props.maxAmount)) {
-    if (BigNumber.from(props.maxAmount).eq("0")) {
+    if (BigNumber.from(props.maxAmount).isZero()) {
       return "insufficient_balance";
     }
     return "exceeds_max_amount";

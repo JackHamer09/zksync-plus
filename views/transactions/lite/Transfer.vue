@@ -383,7 +383,7 @@ const continueButtonDisabled = computed(
     !fee.value ||
     !transactions.value.length ||
     feeLoading.value ||
-    totalComputeAmount.value.eq(0)
+    totalComputeAmount.value.isZero()
 );
 
 const fetchBalances = () => {

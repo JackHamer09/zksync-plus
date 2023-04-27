@@ -1,14 +1,31 @@
 <template>
-  <TransactionLineItem
-    :icon="icon"
-    :direction="direction"
-    :to="transaction.to"
-    :label="label"
-    :transaction-hash="transaction.txHash"
-    :block-explorer-url="blockExplorerUrl"
-    :token="token"
-    :amount="computeAmount.toString()"
-  />
+  <TransactionLineItem :icon="icon" :transaction-url="`${blockExplorerUrl}/tx/${transaction.txHash}`">
+    <template #top-left>
+      <div class="transaction-line-label">{{ label }}</div>
+    </template>
+    <template #top-right>
+      <TokenAmount v-if="token?.isNFT === false" :token="token" :amount="computeAmount" :direction="direction" />
+      <TokenNft v-else-if="token?.isNFT === true" :symbol="token.symbol" :direction="direction" />
+    </template>
+    <template #bottom-right>
+      <template v-if="transaction.type === 'Swap'">
+        <TokenAmount
+          v-if="!props.transaction.swap.sending.token.isNFT"
+          :token="props.transaction.swap.sending.token"
+          :amount="props.transaction.swap.sending.amount"
+          direction="out"
+        />
+        <TokenNft v-else :symbol="props.transaction.swap.sending.token.symbol" direction="out" />
+      </template>
+      <TotalPrice
+        v-else-if="token?.isNFT === false"
+        :token="token"
+        :amount="computeAmount"
+        :direction="direction"
+        :loading="priceLoading"
+      />
+    </template>
+  </TransactionLineItem>
 </template>
 
 <script lang="ts" setup>
@@ -24,6 +41,10 @@ import {
 } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 import { storeToRefs } from "pinia";
+
+import TokenAmount from "@/components/transaction/transactionLineItem/TokenAmount.vue";
+import TokenNft from "@/components/transaction/transactionLineItem/TokenNft.vue";
+import TotalPrice from "@/components/transaction/transactionLineItem/TotalPrice.vue";
 
 import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { Component, PropType } from "vue";
@@ -60,30 +81,46 @@ const label = computed(() => {
   }
   return props.transaction.type;
 });
+const amount = computed(() => {
+  if (props.transaction.type === "Swap") {
+    return props.transaction.swap.receiving.amount;
+  }
+  if (props.transaction.isFeeTransaction) {
+    return props.transaction.feeAmount;
+  }
+  return props.transaction.amount;
+});
 const hasAmount = computed(() => {
-  return isBigNumber(props.transaction.amount);
+  return isBigNumber(amount.value);
 });
 const computeAmount = computed(() => {
-  if (props.transaction.isFeeTransaction || !hasAmount.value) {
-    return BigNumber.from(props.transaction.feeAmount);
+  if (!hasAmount.value) {
+    return BigNumber.from(props.transaction.feeAmount).toString();
   }
-  if (props.transaction.token?.isNFT === false) {
-    if (hasAmount.value) {
-      return BigNumber.from(props.transaction.amount);
-    }
-  }
-  return BigNumber.from("0");
+  return amount.value;
 });
 const token = computed(() => {
+  if (props.transaction.type === "Swap") {
+    return props.transaction.swap.receiving.token;
+  }
   if (props.transaction.isFeeTransaction || !hasAmount.value) {
     return props.transaction.feeToken;
   }
   return props.transaction.token;
 });
+const priceLoading = computed(() => {
+  if (token.value?.isNFT === false) {
+    return token.value?.price === "loading";
+  }
+  return false;
+});
 
 const direction = computed(() => {
   if (props.transaction.isFeeTransaction) {
     return "out";
+  }
+  if (props.transaction.type === "Swap") {
+    return props.transaction.swap.receiving.address !== account.value.address ? "in" : "out";
   }
   switch (props.transaction.type) {
     case "Transfer":

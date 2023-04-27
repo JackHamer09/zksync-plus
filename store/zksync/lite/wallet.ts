@@ -131,7 +131,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     balance,
     (balances) => {
       balances.map(({ symbol, amount }) => {
-        if (BigNumber.from(amount).eq("0")) return;
+        if (BigNumber.from(amount).isZero()) return;
         liteTokensStore.requestTokenPrice(symbol);
       });
     },
