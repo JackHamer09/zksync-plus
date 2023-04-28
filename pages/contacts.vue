@@ -1,11 +1,12 @@
 <template>
-  <CommonModal v-model:opened="isModalOpened" class="token-select-modal" :title="title">
-    <CommonSmallInput title="Name"></CommonSmallInput>
-    <CommonSmallInput title="Adress"></CommonSmallInput>
+  <CommonModal v-model:opened="AddContactModalOpened" class="token-select-modal" :title="title">
+    <CommonSmallInput v-model="name" title="Name" class="mb-4" placeholder="Name of the contact"></CommonSmallInput>
+    <CommonSmallInput v-model="address" title="Adress" placeholder="Address of the contact"></CommonSmallInput>
+    <CommonButton @click="addContact" variant="primary-solid" class="add-contact-button">Add contact</CommonButton>
   </CommonModal>
   <div class="flex items-center justify-between">
     <h1 class="h1">Contacts</h1>
-    <CommonButton>Add contact</CommonButton>
+    <CommonButton variant="primary" @click="openAddContactsModal">{{ props.title }}</CommonButton>
   </div>
   <div>
     <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
@@ -58,27 +59,17 @@ import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
 
 import { useContactsStore } from "@/store/contacts";
-import { checksumAddress } from "@/utils/formatters";
+import { capitalize, checksumAddress } from "@/utils/formatters";
 
 const props = defineProps({
   title: {
     type: String,
     default: "Add contact",
   },
-  opened: {
-    type: Boolean,
-    default: true,
-  },
   error: {
     type: Error,
   },
 });
-
-const emit = defineEmits<{
-  (eventName: "update:opened", value: boolean): void;
-  (eventName: "update:tokenAddress", tokenAddress?: string): void;
-  (eventName: "try-again"): void;
-}>();
 
 type ContactWithIcon = Contact & { icon?: Component };
 type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
@@ -87,7 +78,12 @@ const contactsStore = useContactsStore();
 const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
 const search = ref("");
+//Refactor to newContact = {name: ref(""), address: ref("")}
+const name = ref("");
+const address = ref("");
+
 const isAddressValid = computed(() => isAddress(search.value));
+const isNewAddressValid = computed(() => isAddress(address.value));
 
 function findContactsByText(contacts: ContactWithIcon[], text: string) {
   const lowercaseSearch = text.toLowerCase();
@@ -107,6 +103,24 @@ const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
   }
   return null;
 });
+const inputtedNewAddressAccount = computed<ContactWithIcon | null>(() => {
+  if (isNewAddressValid.value) {
+    return {
+      name: "",
+      address: checksumAddress(address.value),
+    };
+  }
+  return null;
+});
+
+const addContact = () => {
+  if (inputtedNewAddressAccount.value && name.value) {
+    contactsStore.saveContact({ name: capitalize(name.value), address: inputtedNewAddressAccount.value.address });
+    name.value = "";
+    address.value = "";
+    closeModal();
+  }
+};
 
 const displayedAddresses = computed<AddressesGroup[]>(() => {
   const groups: Record<string, AddressesGroup> = {
@@ -146,16 +160,20 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
   return result.filter((group) => group.addresses.length);
 });
 
-const isModalOpened = computed({
-  get: () => props.opened,
-  set: (value) => emit("update:opened", value),
-});
+const AddContactModalOpened = ref(false);
+const openAddContactsModal = () => {
+  AddContactModalOpened.value = true;
+};
+
 const closeModal = () => {
-  isModalOpened.value = false;
+  AddContactModalOpened.value = false;
 };
 </script>
 
 <style lang="scss" scoped>
+.add-contact-button {
+  @apply mx-auto mt-4;
+}
 .group-category-label:first-child {
   @apply pt-0;
 }
