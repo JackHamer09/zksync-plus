@@ -1,4 +1,8 @@
 <template>
+  <CommonModal v-model:opened="isModalOpened" class="token-select-modal" :title="title">
+    <CommonSmallInput title="Name"></CommonSmallInput>
+    <CommonSmallInput title="Adress"></CommonSmallInput>
+  </CommonModal>
   <div class="flex items-center justify-between">
     <h1 class="h1">Contacts</h1>
     <CommonButton>Add contact</CommonButton>
@@ -55,6 +59,26 @@ import type { Component } from "vue";
 
 import { useContactsStore } from "@/store/contacts";
 import { checksumAddress } from "@/utils/formatters";
+
+const props = defineProps({
+  title: {
+    type: String,
+    default: "Add contact",
+  },
+  opened: {
+    type: Boolean,
+    default: true,
+  },
+  error: {
+    type: Error,
+  },
+});
+
+const emit = defineEmits<{
+  (eventName: "update:opened", value: boolean): void;
+  (eventName: "update:tokenAddress", tokenAddress?: string): void;
+  (eventName: "try-again"): void;
+}>();
 
 type ContactWithIcon = Contact & { icon?: Component };
 type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
@@ -121,6 +145,14 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
   }
   return result.filter((group) => group.addresses.length);
 });
+
+const isModalOpened = computed({
+  get: () => props.opened,
+  set: (value) => emit("update:opened", value),
+});
+const closeModal = () => {
+  isModalOpened.value = false;
+};
 </script>
 
 <style lang="scss" scoped>
