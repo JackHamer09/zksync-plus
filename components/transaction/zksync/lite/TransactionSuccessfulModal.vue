@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watchEffect } from "vue";
+import { watch } from "vue";
 import { Vue3Lottie } from "vue3-lottie";
 
 import { storeToRefs } from "pinia";
@@ -68,9 +68,13 @@ const fetch = () => {
   requestTransactions(props.transactionHashes);
 };
 
-watchEffect(() => {
-  fetch();
-});
+watch(
+  () => props.transactionHashes,
+  () => {
+    fetch();
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss">

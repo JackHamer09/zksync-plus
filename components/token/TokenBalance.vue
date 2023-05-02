@@ -90,7 +90,7 @@ const props = defineProps({
 });
 
 const priceLoading = computed(() => props.price === "loading");
-const isZeroAmount = computed(() => BigNumber.from(props.amount).eq(0));
+const isZeroAmount = computed(() => BigNumber.from(props.amount).isZero());
 
 const fullAmount = computed(() => parseTokenAmount(props.amount, props.decimals));
 const displayedAmount = computed(() => {

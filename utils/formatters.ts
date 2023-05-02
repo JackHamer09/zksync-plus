@@ -81,7 +81,9 @@ export function formatError(error?: Error) {
     if (
       message.includes("User denied") ||
       message.includes("User rejected") ||
-      message.includes('"Request rejected"')
+      message.includes("Rejected by user") ||
+      message.includes('"Request rejected"') ||
+      message.includes("user rejected transaction")
     ) {
       return undefined;
     } else if (message.toLowerCase().includes("fee is to low")) {

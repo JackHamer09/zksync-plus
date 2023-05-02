@@ -25,20 +25,23 @@ defineProps({
 <style lang="scss">
 .default-button {
   @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] px-4 text-sm font-medium backdrop-blur-sm transition-colors;
-  &:enabled:not([aria-disabled="true"]) {
-    @apply hover:bg-primary-100/75;
-  }
   &.variant- {
     &primary {
       @apply bg-primary-100/50 text-primary-400;
-      &:enabled:not([aria-disabled="true"]) {
-        @apply hover:bg-primary-100/75;
+      &:enabled,
+      &:is(a) {
+        &:not([aria-disabled="true"]) {
+          @apply hover:bg-primary-100/75;
+        }
       }
     }
     &primary-solid {
       @apply h-12 w-full max-w-sm rounded-2xl bg-primary-400 text-base text-white;
-      &:enabled:not([aria-disabled="true"]) {
-        @apply hover:bg-primary-400;
+      &:enabled,
+      &:is(a) {
+        &:not([aria-disabled="true"]) {
+          @apply hover:bg-primary-400;
+        }
       }
       &:disabled {
         @apply bg-opacity-50;
@@ -46,8 +49,11 @@ defineProps({
     }
     &error {
       @apply bg-red-100/50 text-red-400;
-      &:enabled:not([aria-disabled="true"]) {
-        @apply hover:bg-red-100/75;
+      &:enabled,
+      &:is(a) {
+        &:not([aria-disabled="true"]) {
+          @apply hover:bg-red-100/75;
+        }
       }
     }
   }

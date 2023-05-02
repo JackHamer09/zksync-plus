@@ -26,11 +26,15 @@
 </template>
 
 <script lang="ts" setup>
+import { onBeforeUnmount } from "vue";
+
 import { storeToRefs } from "pinia";
 
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { groupBalancesByAmount } from "@/utils/mappers";
 
+const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
 
@@ -40,6 +44,15 @@ const fetch = () => {
   walletLiteStore.requestBalance();
 };
 fetch();
+
+const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
+  if (!newAddress) return;
+  fetch();
+});
+
+onBeforeUnmount(() => {
+  unsubscribe();
+});
 </script>
 
 <style lang="scss" scoped></style>

@@ -5,28 +5,54 @@ import { defineStore } from "pinia";
 import type { Chain } from "@wagmi/core/chains";
 export type EthereumNetworkName = "goerli" | "mainnet";
 
-export const chains: Chain[] = [
-  goerli,
+export type ExtendedChain = Chain & { network: EthereumNetworkName; iconUrl?: string; hostnames: string[] };
+export const chains: ExtendedChain[] = [
   {
     ...mainnet,
+    name: "Mainnet",
     network: "mainnet",
+    iconUrl: "/img/ethereum.svg",
+    hostnames: [],
+  },
+  {
+    ...goerli,
+    name: "Goerli Testnet",
+    hostnames: [],
   },
 ];
 
 export const useNetworkStore = defineStore("network", () => {
   const selectedEthereumNetworkName = useStorage<EthereumNetworkName>(
     "selectedEthereumNetwork",
-    chains[0].network as EthereumNetworkName
+    chains[0].network,
+    sessionStorage
   );
-  const selectedEthereumNetwork = computed<Chain>(() => {
+  const selectedEthereumNetwork = computed<ExtendedChain>(() => {
     return chains.find((network) => network.network === selectedEthereumNetworkName.value) ?? chains[0];
   });
-  const changeEthereumNetwork = (networkName: EthereumNetworkName) => {
-    selectedEthereumNetworkName.value = networkName;
+  const blockExplorerUrl = computed<string | undefined>(
+    () => selectedEthereumNetwork.value.blockExplorers?.default.url
+  );
+
+  const identifyNetwork = () => {
+    const windowLocation = window.location;
+    const networkFromQueryParam = new URLSearchParams(windowLocation.search).get("network");
+    const networkOnDomain = chains.find((e) => e.hostnames.includes(windowLocation.origin));
+    const defaultNetwork = chains[0];
+    if (networkFromQueryParam && chains.some((e) => e.network === networkFromQueryParam)) {
+      selectedEthereumNetworkName.value = networkFromQueryParam as EthereumNetworkName;
+    } else if (selectedEthereumNetworkName.value === defaultNetwork.name) {
+      if (networkOnDomain) {
+        selectedEthereumNetworkName.value = networkOnDomain.network;
+      } else {
+        selectedEthereumNetworkName.value = defaultNetwork.network;
+      }
+    }
   };
+  identifyNetwork();
 
   return {
     selectedEthereumNetwork,
-    changeEthereumNetwork,
+    blockExplorerUrl,
   };
 });
