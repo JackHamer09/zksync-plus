@@ -1,7 +1,18 @@
 <template>
+  <transition v-bind="TransitionAlertScaleInOutTransition">
+    <CommonAlert v-if="clicked && !isNewAddressValid" variant="error" :icon="ExclamationCircleIcon" class="z-20">
+      <p>Enter valid contact info.</p>
+    </CommonAlert>
+  </transition>
   <CommonModal v-model:opened="AddContactModalOpened" class="token-select-modal" :title="title">
-    <CommonSmallInput v-model="name" title="Name" class="mb-4" placeholder="Name of the contact"></CommonSmallInput>
-    <CommonSmallInput v-model="address" title="Adress" placeholder="Address of the contact"></CommonSmallInput>
+    <CommonSmallInput v-model="newContact.name" title="Name" class="mb-4" placeholder="Name of the contact">
+      <template #icon>
+        <UserIcon />
+      </template>
+    </CommonSmallInput>
+    <CommonSmallInput v-model="newContact.address" title="Adress" placeholder="Address of the contact">
+      <template #icon> <CreditCardIcon /> </template
+    ></CommonSmallInput>
     <CommonButton @click="addContact" variant="primary-solid" class="add-contact-button">Add contact</CommonButton>
   </CommonModal>
   <div class="flex items-center justify-between">
@@ -49,9 +60,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
-import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
+import { CreditCardIcon, ExclamationCircleIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
@@ -77,13 +88,42 @@ type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
 const contactsStore = useContactsStore();
 const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
+const AddContactModalOpened = ref(false);
 const search = ref("");
-//Refactor to newContact = {name: ref(""), address: ref("")}
-const name = ref("");
-const address = ref("");
+const newContact = ref({
+  name: "",
+  address: "",
+});
+
+const clicked = ref(false);
+
+const resetClicked = () => {
+  clicked.value = false;
+};
+
+watch(clicked, (newValue) => {
+  if (newValue) {
+    setTimeout(() => {
+      if (resetClicked) {
+        resetClicked();
+      }
+    }, 3000);
+  }
+});
+
+const handleClick = () => {
+  clicked.value = true;
+};
 
 const isAddressValid = computed(() => isAddress(search.value));
-const isNewAddressValid = computed(() => isAddress(address.value));
+const isNewAddressValid = computed(() => isAddress(newContact.value.address));
+
+const openAddContactsModal = () => {
+  AddContactModalOpened.value = true;
+};
+const closeModal = () => {
+  AddContactModalOpened.value = false;
+};
 
 function findContactsByText(contacts: ContactWithIcon[], text: string) {
   const lowercaseSearch = text.toLowerCase();
@@ -107,18 +147,23 @@ const inputtedNewAddressAccount = computed<ContactWithIcon | null>(() => {
   if (isNewAddressValid.value) {
     return {
       name: "",
-      address: checksumAddress(address.value),
+      address: checksumAddress(newContact.value.address),
     };
   }
   return null;
 });
 
 const addContact = () => {
-  if (inputtedNewAddressAccount.value && name.value) {
-    contactsStore.saveContact({ name: capitalize(name.value), address: inputtedNewAddressAccount.value.address });
-    name.value = "";
-    address.value = "";
+  if (inputtedNewAddressAccount.value && newContact.value.name) {
+    contactsStore.saveContact({
+      name: capitalize(newContact.value.name),
+      address: inputtedNewAddressAccount.value.address,
+    });
+    newContact.value.name = "";
+    newContact.value.address = "";
     closeModal();
+  } else {
+    handleClick();
   }
 };
 
@@ -159,15 +204,6 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
   }
   return result.filter((group) => group.addresses.length);
 });
-
-const AddContactModalOpened = ref(false);
-const openAddContactsModal = () => {
-  AddContactModalOpened.value = true;
-};
-
-const closeModal = () => {
-  AddContactModalOpened.value = false;
-};
 </script>
 
 <style lang="scss" scoped>
