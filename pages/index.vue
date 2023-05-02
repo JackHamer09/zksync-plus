@@ -12,11 +12,11 @@
         <span class="total-dec">.{{ total.dec }}</span>
       </div>
       <CommonButtonsLineGroup class="my-4">
-        <CommonButton>
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite-deposit' }">
           <template #icon>
             <PlusIcon aria-hidden="true" />
           </template>
-          <template #default>Add money</template>
+          <template #default>Add funds</template>
         </CommonButton>
         <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite' }">
           <template #icon>

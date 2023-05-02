@@ -50,6 +50,7 @@
     "@wagmi/core": "^0.9.7",
     "@web3modal/ethereum": "^2.1.1",
     "@web3modal/html": "^2.1.1",
+    "alchemy-sdk": "^2.8.1",
     "date-fns": "^2.29.3",
     "ethers": "^5.7.2",
     "focus-trap": "^7.2.0",

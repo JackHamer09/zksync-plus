@@ -27,6 +27,12 @@ export const useNetworkStore = defineStore("network", () => {
     chains[0].network,
     sessionStorage
   );
+  const selectedEthereumNetwork = computed<ExtendedChain>(() => {
+    return chains.find((network) => network.network === selectedEthereumNetworkName.value) ?? chains[0];
+  });
+  const blockExplorerUrl = computed<string | undefined>(
+    () => selectedEthereumNetwork.value.blockExplorers?.default.url
+  );
 
   const identifyNetwork = () => {
     const windowLocation = window.location;
@@ -45,11 +51,8 @@ export const useNetworkStore = defineStore("network", () => {
   };
   identifyNetwork();
 
-  const selectedEthereumNetwork = computed<ExtendedChain>(() => {
-    return chains.find((network) => network.network === selectedEthereumNetworkName.value) ?? chains[0];
-  });
-
   return {
     selectedEthereumNetwork,
+    blockExplorerUrl,
   };
 });

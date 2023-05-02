@@ -4,13 +4,13 @@
       <DestinationItem
         v-bind="destinations.zkSyncLite"
         as="RouterLink"
-        :to="{ name: 'transaction-zksync-lite-send', query: { ...$route.query } }"
+        :to="{ name: 'transaction-zksync-lite-send', query: $route.query }"
         description="Send inside zkSync Lite (L2) network"
       />
       <DestinationItem
         v-bind="destinations.ethereum"
         as="RouterLink"
-        :to="{ name: 'transaction-zksync-lite-withdraw', query: { ...$route.query } }"
+        :to="{ name: 'transaction-zksync-lite-withdraw', query: $route.query }"
         description="Withdraw to Ethereum (L1)"
       />
     </CommonCardWithLineButtons>

@@ -115,6 +115,17 @@ import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActiva
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { TransitionAlertScaleInOutTransition } from "@/utils/transitions";
 
+const props = defineProps({
+  authorization: {
+    type: Boolean,
+    default: true,
+  },
+  accountActivation: {
+    type: Boolean,
+    default: true,
+  },
+});
+
 const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
@@ -139,9 +150,12 @@ const modalAccountActivationOpened = ref(false);
 const buttonStep = computed(() => {
   if (!isCorrectNetworkSet.value && !isAuthorized.value) {
     return "network";
-  } else if (!isAuthorized.value || authorizationInProgress.value || accountActivationCheckInProgress.value) {
+  } else if (
+    props.authorization &&
+    (!isAuthorized.value || authorizationInProgress.value || accountActivationCheckInProgress.value)
+  ) {
     return "authorize";
-  } else if (isAccountActivated.value === false && !isAccountActivationSigned.value) {
+  } else if (props.accountActivation && isAccountActivated.value === false && !isAccountActivationSigned.value) {
     return "activate";
   } else {
     return "continue";

@@ -1,7 +1,7 @@
 <template>
   <div>
     <CommonBackButton @click="emit('back')" />
-    <h1 class="h1">Who to pay</h1>
+    <h1 class="h1">{{ title }}</h1>
     <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
       <template #icon>
         <MagnifyingGlassIcon aria-hidden="true" />
@@ -71,6 +71,10 @@ type ContactWithIcon = Contact & { icon?: Component };
 type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
 
 const props = defineProps({
+  title: {
+    type: String,
+    default: "Who to pay",
+  },
   destination: {
     type: Object as PropType<TransactionDestination>,
   },

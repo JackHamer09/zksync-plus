@@ -254,10 +254,10 @@ const recalculateInputWidth = () => {
   .amount-input-select-asset,
   .amount-input-note,
   .amount-input-error {
-    @apply mt-1 text-sm text-gray-secondary xs:w-max;
+    @apply mt-1 text-sm text-gray-secondary;
   }
   .amount-input-select-asset {
-    @apply flex cursor-pointer items-center whitespace-pre-line transition-colors hover:text-gray-400;
+    @apply flex cursor-pointer items-center whitespace-pre-line transition-colors hover:text-gray-400 xs:w-max;
     grid-area: c / c / c / c;
   }
   .amount-input-note {
