@@ -1,8 +1,8 @@
-type CallbackFunction = () => void;
-class Observable {
-  private subscribers: CallbackFunction[] = [];
+type CallbackFunction<T> = (param: T) => void;
+class Observable<T> {
+  private subscribers: CallbackFunction<T>[] = [];
 
-  public subscribe(callback: CallbackFunction) {
+  public subscribe(callback: CallbackFunction<T>) {
     this.subscribers.push(callback);
     const unsubscribe = () => {
       this.unsubscribe(callback);
@@ -10,22 +10,22 @@ class Observable {
     return unsubscribe;
   }
 
-  public unsubscribe(callback: CallbackFunction) {
+  public unsubscribe(callback: CallbackFunction<T>) {
     const index = this.subscribers.indexOf(callback);
     if (index !== -1) {
       this.subscribers.splice(index, 1);
     }
   }
 
-  public notify() {
+  public notify(param: T) {
     this.subscribers.forEach((callback) => {
-      callback();
+      callback(param);
     });
   }
 }
 
-export default () => {
-  const observable = new Observable();
+export default <T>() => {
+  const observable = new Observable<T>();
 
   return {
     subscribe: observable.subscribe.bind(observable),

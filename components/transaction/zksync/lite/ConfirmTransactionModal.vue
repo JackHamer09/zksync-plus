@@ -22,7 +22,7 @@
       <template v-for="(item, index) in computedTransactions" :key="index">
         <CommonCardWithLineButtons>
           <AddressCardParsed
-            :address="walletAddress!"
+            :address="account.address!"
             :destination="destinations.zkSyncLite"
             :tooltip="`${getActionName(item.type)} from ${destinations.zkSyncLite.label} (L2)`"
           />
@@ -34,7 +34,7 @@
           <AddressCardParsed
             :address="item.to"
             :destination="destination"
-            :tooltip="`${getActionName(item.type)} to ${destination.label} (L2)`"
+            :tooltip="`${getActionName(item.type)} to ${destination.label}`"
           />
         </CommonCardWithLineButtons>
         <TransactionItemIcon v-if="index !== computedTransactions.length - 1" :icon="PlusIcon" />
@@ -91,7 +91,7 @@
         <transition v-bind="TransitionHeight()">
           <div v-if="status === 'waiting-for-signature'" class="h-6 text-center text-sm font-medium text-gray-500">
             <div class="pt-1"></div>
-            Confirm this transaction in your wallet
+            Confirm this transaction in your {{ walletName }} wallet
           </div>
         </transition>
       </div>
@@ -99,12 +99,7 @@
   </CommonModal>
   <TransactionSuccessfulModal v-else v-bind="$attrs" :transaction-hashes="transactionHashes">
     <template #after-transactions>
-      <CommonAlert
-        v-if="destination.key === 'ethereum'"
-        class="sticky bottom-0 mt-3"
-        variant="neutral"
-        :icon="InformationCircleIcon"
-      >
+      <CommonAlert v-if="destination.key === 'ethereum'" class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
           It can take <span class="font-medium">up to 7 hours</span> until funds arrive on
           <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
@@ -142,6 +137,7 @@ import type { PropType } from "vue";
 import type { IncomingTxFeeType } from "zksync/build/types";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { usePreferencesStore } from "@/store/preferences";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
@@ -186,7 +182,7 @@ const props = defineProps({
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
 const walletLiteStore = useLiteWalletStore();
-const { walletAddress } = storeToRefs(walletLiteStore);
+const { account, walletName } = storeToRefs(useOnboardStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 const { status, error, transactionHashes, commitTransaction } = useTransaction(() =>

@@ -5,7 +5,7 @@ import type { ApiTransaction } from "zksync/build/types";
 
 import { checksumAddress } from "@/utils/formatters";
 
-type ZkSyncLiteApiTransaction =
+type ZkSyncLiteTransactionToken =
   | {
       id: number;
       symbol: string;
@@ -89,7 +89,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLit
         nonce: order1.nonce,
         pubKey: order1.signature?.pubKey,
       },
-      token: <ZkSyncLiteApiTransaction>(isOrder1TokenNFT
+      token: <ZkSyncLiteTransactionToken>(isOrder1TokenNFT
         ? {
             ...getTokenBySymbolOrID(order1Token)!,
             contentHash: order1.contentHash,
@@ -99,7 +99,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLit
             },
           }
         : getTokenBySymbolOrID(order1Token)),
-      amountRaw: isOrder1TokenNFT ? 1 : order1.amount,
+      amount: isOrder1TokenNFT ? 1 : order1.amount,
       signature: order1.signature?.signature,
       swapOrderETHSignatureType: order1.ethSignature?.type,
       swapOrderETHSignature: order1.ethSignature?.signature,
@@ -113,7 +113,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLit
         nonce: order2.nonce,
         pubKey: order2.signature?.pubKey,
       },
-      token: <ZkSyncLiteApiTransaction>(isOrder2TokenNFT
+      token: <ZkSyncLiteTransactionToken>(isOrder2TokenNFT
         ? {
             ...getTokenBySymbolOrID(order2Token)!,
             contentHash: order2.contentHash,
@@ -123,7 +123,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLit
             },
           }
         : getTokenBySymbolOrID(order2Token)),
-      amountRaw: isOrder2TokenNFT ? 1 : order2.amount,
+      amount: isOrder2TokenNFT ? 1 : order2.amount,
       signature: order2.signature?.signature,
       swapOrderETHSignatureType: order2.ethSignature?.type,
       swapOrderETHSignature: order2.ethSignature?.signature,
@@ -159,7 +159,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLit
     },
     from: from ? checksumAddress(from) : undefined,
     to: to ? checksumAddress(to) : undefined,
-    token: <ZkSyncLiteApiTransaction | undefined>(isTokenNFT
+    token: <ZkSyncLiteTransactionToken | undefined>(isTokenNFT
       ? {
           ...getTokenBySymbolOrID(tokenIDorSymbol)!,
           contentHash: tx.op.contentHash,
@@ -170,11 +170,11 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLit
         }
       : getTokenBySymbolOrID(tokenIDorSymbol)),
     amount: isTokenNFT || tx.op.type === "MintNFT" ? 1 : tx.op.amount,
-    feeToken: getTokenBySymbolOrID(feeToken) as ZkSyncLiteToken,
+    feeToken: <ZkSyncLiteTransactionToken>getTokenBySymbolOrID(feeToken),
     feeAmount: feeAmount,
     swap: {
-      receiving: swapOrder1,
-      sending: swapOrder2,
+      sending: swapOrder1,
+      receiving: swapOrder2,
       submitter: {
         id: tx.op.submitterId,
         address: tx.op.submitterAddress,

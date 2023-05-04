@@ -1,9 +1,6 @@
 <template>
-  <component :is="as" type="button" class="default-button" :class="`variant-${variant}`">
-    <span v-if="$slots.icon" class="icon-container">
-      <slot name="icon" />
-    </span>
-    <slot />
+  <component :is="as" type="button" class="icon-button" :class="`variant-${variant}`">
+    <component :is="icon" class="icon" aria-hidden="true" />
   </component>
 </template>
 
@@ -15,6 +12,10 @@ defineProps({
     type: [String, Object] as PropType<string | Component>,
     default: "button",
   },
+  icon: {
+    type: [Object, Function] as PropType<Component>,
+    required: true,
+  },
   variant: {
     type: String as PropType<"primary" | "primary-solid" | "error">,
     default: "primary",
@@ -23,8 +24,8 @@ defineProps({
 </script>
 
 <style lang="scss">
-.default-button {
-  @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] px-4 text-sm font-medium backdrop-blur-sm transition-colors;
+.icon-button {
+  @apply flex aspect-square h-9 w-auto items-center justify-center rounded-full transition-colors;
   &.variant- {
     &primary {
       @apply bg-primary-100/50 text-primary-400;
@@ -36,7 +37,7 @@ defineProps({
       }
     }
     &primary-solid {
-      @apply h-12 w-full max-w-sm rounded-2xl bg-primary-400 text-base text-white;
+      @apply bg-primary-400 text-base text-white;
       &:enabled,
       &:is(a) {
         &:not([aria-disabled="true"]) {
@@ -57,12 +58,9 @@ defineProps({
       }
     }
   }
-  .icon-container {
-    @apply -ml-0.5 mr-2 inline-flex items-center;
 
-    svg {
-      @apply block h-4 w-4;
-    }
+  .icon {
+    @apply h-4 w-4;
   }
 }
 </style>

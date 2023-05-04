@@ -44,7 +44,7 @@ export const groupTransactionsByDate = (transactions: Ref<ZkSyncLiteTransaction[
       const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       if (!groups[dateKey]) {
         groups[dateKey] = {
-          title: date.toLocaleDateString(),
+          title: date.toLocaleDateString([], { day: "numeric", month: "long", year: "numeric" }),
           transactions: [],
         };
       }

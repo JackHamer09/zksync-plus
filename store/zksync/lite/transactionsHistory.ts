@@ -1,7 +1,5 @@
 import { defineStore, storeToRefs } from "pinia";
 
-import useObservable from "@/composables/useObservable";
-
 import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { PaginationQuery } from "zksync/build/types";
 
@@ -11,10 +9,11 @@ import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { mapApiTransaction } from "@/utils/zksync/lite/mappers";
 
 export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHistory", () => {
+  const onboardStore = useOnboardStore();
   const liteProviderStore = useLiteProviderStore();
   const liteTokensStore = useLiteTokensStore();
   const { tokens } = storeToRefs(liteTokensStore);
-  const { account } = storeToRefs(useOnboardStore());
+  const { account } = storeToRefs(onboardStore);
 
   const transactionsRequest = async (pagination: PaginationQuery<string>): Promise<ZkSyncLiteTransaction[]> => {
     const provider = await liteProviderStore.requestProvider();
@@ -65,7 +64,6 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
     reload: reloadRecentTransactions,
   } = usePromise(
     async () => {
-      const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
       const mostRecentTransactionInTheList = transactions.value[0];
       const txs = await transactionsRequest({
         from: mostRecentTransactionInTheList
@@ -81,6 +79,7 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
           canLoadMore.value = false;
         }
       }
+      const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
       transactions.value.unshift(...txs.filter((tx) => !currentTransactionHashes.has(tx.txHash)));
       getTransactionTokenPrices(txs);
     },
@@ -103,27 +102,21 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
         limit: 50,
         direction: "older",
       });
-      transactions.value.push(...txs);
+      const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
+      transactions.value.push(...txs.filter((tx) => !currentTransactionHashes.has(tx.txHash)));
+      getTransactionTokenPrices(txs);
       if (txs.length < 50) {
         canLoadMore.value = false;
       }
-      getTransactionTokenPrices(txs);
     },
     { cache: false }
   );
 
-  const { subscribe: subscribeOnAccountChange, notify: notifyOnAccountChange } = useObservable();
-  subscribeOnAccountChange(() => {
+  onboardStore.subscribeOnAccountChange(() => {
     transactions.value = [];
     resetRecentTransactionsRequest();
     resetPreviousTransactionsRequest();
   });
-  watch(
-    () => account.value.address,
-    () => {
-      notifyOnAccountChange();
-    }
-  );
 
   return {
     transactions: computed<ZkSyncLiteTransaction[]>(() =>
@@ -149,7 +142,5 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
     previousTransactionsRequestInProgress,
     previousTransactionsRequestError,
     requestPreviousTransactions,
-
-    subscribeOnAccountChange,
   };
 });

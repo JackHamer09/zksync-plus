@@ -71,7 +71,13 @@
 import { computed, ref, watch, watchEffect } from "vue";
 import { Vue3Lottie } from "vue3-lottie";
 
-import { CreditCardIcon, ExclamationCircleIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
+import {
+  CreditCardIcon,
+  ExclamationCircleIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  UserIcon,
+} from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 

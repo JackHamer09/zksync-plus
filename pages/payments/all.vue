@@ -61,9 +61,11 @@ import { storeToRefs } from "pinia";
 import TransactionsGroupedByBatch from "@/components/transaction/zksync/lite/TransactionsGroupedByBatch.vue";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
 import { groupTransactionsByDate } from "@/utils/mappers";
 
+const onboardStore = useOnboardStore();
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const {
   transactions,
@@ -82,7 +84,8 @@ const fetch = () => {
 };
 fetch();
 
-const unsubscribe = liteTransactionsHistoryStore.subscribeOnAccountChange(() => {
+const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
+  if (!newAddress) return;
   fetch();
 });
 

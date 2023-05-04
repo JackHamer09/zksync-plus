@@ -28,13 +28,13 @@
             </template>
           </div>
         </div>
-        <NuxtLink
+        <CommonIconButton
           v-if="showSendButton"
+          as="RouterLink"
+          :icon="PaperAirplaneIcon"
           :to="{ name: 'transaction-zksync-lite', query: { token: address } }"
           class="send-button"
-        >
-          <PaperAirplaneIcon aria-hidden="true" />
-        </NuxtLink>
+        />
       </div>
     </template>
   </CommonButtonLineWithImg>
@@ -90,7 +90,7 @@ const props = defineProps({
 });
 
 const priceLoading = computed(() => props.price === "loading");
-const isZeroAmount = computed(() => BigNumber.from(props.amount).eq(0));
+const isZeroAmount = computed(() => BigNumber.from(props.amount).isZero());
 
 const fullAmount = computed(() => parseTokenAmount(props.amount, props.decimals));
 const displayedAmount = computed(() => {
@@ -153,11 +153,7 @@ const displayedAmount = computed(() => {
       @apply w-max text-right;
     }
     .send-button {
-      @apply ml-4 hidden aspect-square h-9 w-auto items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75 xs:flex;
-
-      svg {
-        @apply h-4 w-4 text-primary-400;
-      }
+      @apply ml-4 hidden xs:flex;
     }
   }
 }

@@ -1,3 +1,7 @@
+import { BigNumber } from "ethers";
+
+import type { BigNumberish } from "ethers";
+
 export function generateAvatarColors(address: string) {
   const seedArr = address.match(/.{1,7}/g)?.splice(0, 5);
   const colors: string[] = [];
@@ -21,4 +25,8 @@ export function generateAvatarColors(address: string) {
 
 export function isOnlyZeroes(value: string) {
   return value.replace(/0/g, "").replace(/\./g, "").length === 0;
+}
+
+export function calculateFee(gasLimit: BigNumberish, gasPrice: BigNumberish) {
+  return BigNumber.from(gasLimit).mul(gasPrice);
 }

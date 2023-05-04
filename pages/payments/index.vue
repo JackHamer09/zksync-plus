@@ -31,6 +31,7 @@
               v-for="(item, index) in transactions.slice(0, 5)"
               :key="index"
               :transaction="item"
+              display-date
             />
           </template>
           <template v-else>
@@ -58,8 +59,10 @@ import { storeToRefs } from "pinia";
 import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
 
+const onboardStore = useOnboardStore();
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const { transactions, recentTransactionsRequestInProgress, recentTransactionsRequestError } =
   storeToRefs(liteTransactionsHistoryStore);
@@ -70,7 +73,8 @@ const fetch = () => {
 };
 fetch();
 
-const unsubscribe = liteTransactionsHistoryStore.subscribeOnAccountChange(() => {
+const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
+  if (!newAddress) return;
   fetch();
 });
 
