@@ -1,9 +1,4 @@
 <template>
-  <transition v-bind="TransitionAlertScaleInOutTransition">
-    <CommonAlert v-if="clicked && !isNewAddressValid" variant="error" :icon="ExclamationCircleIcon" class="z-20">
-      <p>Enter valid contact info.</p>
-    </CommonAlert>
-  </transition>
   <CommonModal v-model:opened="AddContactModalOpened" class="token-select-modal" :title="title">
     <CommonSmallInput v-model="newContact.name" title="Name" class="mb-4" placeholder="Name of the contact">
       <template #icon>
@@ -13,10 +8,23 @@
     <CommonSmallInput v-model="newContact.address" title="Adress" placeholder="Address of the contact">
       <template #icon> <CreditCardIcon /> </template
     ></CommonSmallInput>
+    <transition v-bind="TransitionAlertScaleInOutTransition">
+      <CommonAlert v-if="newContact.invalid" variant="error" :icon="ExclamationCircleIcon" class="z-20 mt-4">
+        <p>Enter valid contact info.</p>
+      </CommonAlert>
+    </transition>
     <CommonButton @click="addContact" variant="primary-solid" class="add-contact-button">Add contact</CommonButton>
   </CommonModal>
   <div class="flex items-center justify-between">
     <h1 class="h1">Contacts</h1>
+    <transition v-bind="TransitionAlertScaleInOutTransition">
+      <Vue3Lottie
+        v-if="newContact.success"
+        class="flex max-h-16 w-20 items-center justify-center sm:w-32"
+        :animation-data="SuccessConfetti"
+        :loop="false"
+      />
+    </transition>
     <CommonButton variant="primary" @click="openAddContactsModal">{{ props.title }}</CommonButton>
   </div>
   <div>
@@ -61,10 +69,13 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch, watchEffect } from "vue";
+import { Vue3Lottie } from "vue3-lottie";
 
 import { CreditCardIcon, ExclamationCircleIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
+
+import SuccessConfetti from "@/assets/lottie/success-confetti.json";
 
 import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
@@ -93,30 +104,39 @@ const search = ref("");
 const newContact = ref({
   name: "",
   address: "",
+  invalid: false,
+  success: false,
 });
 
-const clicked = ref(false);
+const isAddressValid = computed(() => isAddress(search.value));
+const isNewAddressValid = computed(() => isAddress(newContact.value.address));
 
-const resetClicked = () => {
-  clicked.value = false;
+const resetInvalidStatus = () => {
+  newContact.value.invalid = false;
+};
+const resetSuccessStatus = () => {
+  newContact.value.success = false;
 };
 
-watch(clicked, (newValue) => {
-  if (newValue) {
+watch(newContact.value, (newValue) => {
+  if (newValue && (newContact.value.invalid || newContact.value.success)) {
     setTimeout(() => {
-      if (resetClicked) {
-        resetClicked();
+      if (newContact.value.invalid) {
+        resetInvalidStatus();
+      } else if (newContact.value.success) {
+        resetSuccessStatus();
       }
     }, 3000);
   }
 });
 
-const handleClick = () => {
-  clicked.value = true;
+const setInvalidStatus = () => {
+  newContact.value.invalid = true;
 };
 
-const isAddressValid = computed(() => isAddress(search.value));
-const isNewAddressValid = computed(() => isAddress(newContact.value.address));
+const setSuccessStatus = () => {
+  newContact.value.success = true;
+};
 
 const openAddContactsModal = () => {
   AddContactModalOpened.value = true;
@@ -154,7 +174,7 @@ const inputtedNewAddressAccount = computed<ContactWithIcon | null>(() => {
 });
 
 const addContact = () => {
-  if (inputtedNewAddressAccount.value && newContact.value.name) {
+  if (inputtedNewAddressAccount.value && newContact.value.name !== "") {
     contactsStore.saveContact({
       name: capitalize(newContact.value.name),
       address: inputtedNewAddressAccount.value.address,
@@ -162,8 +182,9 @@ const addContact = () => {
     newContact.value.name = "";
     newContact.value.address = "";
     closeModal();
+    setSuccessStatus();
   } else {
-    handleClick();
+    setInvalidStatus();
   }
 };
 
