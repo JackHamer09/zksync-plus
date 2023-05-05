@@ -62,7 +62,14 @@
     </div>
   </CommonModal>
 
-  <CommonModal v-else v-bind="$attrs" :closable="false" class="allowance-transaction-successful-modal" title="">
+  <CommonModal
+    v-else
+    v-bind="$attrs"
+    :closable="transactionCommitted"
+    :close-on-background-click="false"
+    class="allowance-transaction-successful-modal"
+    title=""
+  >
     <div class="flex h-36 w-full items-center justify-center overflow-visible">
       <Vue3Lottie v-if="!transactionCommitted" class="mt-4 w-64" :animation-data="ProgressBlocks" loop />
       <Vue3Lottie v-else class="w-32" :animation-data="SuccessUnlock" :loop="false" />
