@@ -1,5 +1,5 @@
 <template>
-  <CommonModal v-model:opened="AddContactModalOpened" class="token-select-modal" :title="title">
+  <CommonModal v-model:opened="AddContactModalOpened" class="token-select-modal" title="Add contact">
     <CommonSmallInput v-model="newContact.name" title="Name" class="mb-4" placeholder="Name of the contact">
       <template #icon>
         <UserIcon />
@@ -25,7 +25,7 @@
         :loop="false"
       />
     </transition>
-    <CommonButton variant="primary" @click="openAddContactsModal">{{ props.title }}</CommonButton>
+    <CommonButton variant="primary" @click="openAddContactsModal">Add contact</CommonButton>
   </div>
   <div>
     <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
@@ -93,16 +93,6 @@ import type { Component } from "vue";
 import { useContactsStore } from "@/store/contacts";
 import { useOnboardStore } from "@/store/onboard";
 import { capitalize, checksumAddress } from "@/utils/formatters";
-
-const props = defineProps({
-  title: {
-    type: String,
-    default: "Add contact",
-  },
-  error: {
-    type: Error,
-  },
-});
 
 type ContactWithIcon = Contact & { icon?: Component };
 type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
