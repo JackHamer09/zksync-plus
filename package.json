@@ -11,7 +11,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "prepare": "husky install",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --no-error-on-unmatched-pattern --max-warnings=0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",
@@ -35,7 +35,7 @@
   },
   "prettier": "@matterlabs/prettier-config",
   "lint-staged": {
-    "*.{vue,js,ts}": "npm run lint"
+    "*.{vue,js,ts,html,json}": "npm run lint"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.7",

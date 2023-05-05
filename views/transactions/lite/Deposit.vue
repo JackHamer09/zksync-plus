@@ -1,5 +1,14 @@
 <template>
   <div class="flex h-full flex-col">
+    <TransactionAllowanceModal
+      v-model:opened="allowanceModalOpened"
+      :transaction="transaction"
+      :destination="destinations.zkSyncLite"
+      :get-allowance="requestAllowance"
+      :set-allowance="setTokenAllowance"
+      :fetch-balance="() => fetchBalances(true)"
+      @continue="allowanceModalContinue"
+    />
     <ConfirmTransactionModal
       v-model:opened="transactionConfirmModalOpened"
       :fee-token="feeToken"
@@ -80,6 +89,25 @@
           </p>
         </CommonAlert>
       </transition>
+      <transition v-bind="TransitionAlertScaleInOutTransition">
+        <CommonAlert
+          v-if="!enoughAllowance && !allowance?.isZero()"
+          class="mt-1"
+          variant="info"
+          :icon="InformationCircleIcon"
+        >
+          <p>
+            Your current allowance for <span class="font-medium">{{ selectedToken!.symbol }}</span> is
+            <button type="button" class="link underline underline-offset-2" @click="amount = allowance!.toString()">
+              {{ parseTokenAmount(allowance!, selectedToken!.decimals) }}</button
+            >. Depositing more than that will require you to approve a new allowance.
+          </p>
+          <a href="https://cryptotesters.com/blog/token-allowances" target="_blank" class="alert-link">
+            Learn more
+            <ArrowUpRightIcon class="ml-1 h-3 w-3" />
+          </a>
+        </CommonAlert>
+      </transition>
     </form>
 
     <ZksyncLiteTransactionFooter :authorization="false" :account-activation="false">
@@ -95,7 +123,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
-import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
+import { ArrowUpRightIcon, ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
@@ -103,6 +131,7 @@ import { storeToRefs } from "pinia";
 import ZksyncLiteTransactionFooter from "@/components/transaction/zksync/lite/TransactionFooter.vue";
 import ConfirmTransactionModal from "@/components/transaction/zksync/lite/deposit/ConfirmTransactionModal.vue";
 
+import useAllowance from "@/composables/transaction/useAllowance";
 import useFee from "@/composables/zksync/lite/deposit/useFee";
 
 import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/lite/deposit/ConfirmTransactionModal.vue";
@@ -111,6 +140,7 @@ import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteEthereumBalanceStore } from "@/store/zksync/lite/ethereumBalance";
+import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
@@ -132,6 +162,7 @@ const route = useRoute();
 const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const liteTokensStore = useLiteTokensStore();
+const liteProviderStore = useLiteProviderStore();
 const liteEthereumBalance = useLiteEthereumBalanceStore();
 const { account } = storeToRefs(onboardStore);
 const { destinations } = storeToRefs(useDestinationsStore());
@@ -174,6 +205,34 @@ watch(allBalancePricesLoaded, (loaded) => {
   }
 });
 
+const allowanceModalOpened = ref(false);
+const {
+  result: allowance,
+  inProgress: allowanceRequestInProgress,
+  error: allowanceRequestError,
+  requestAllowance,
+
+  setAllowance,
+} = useAllowance(
+  computed(() => account.value.address),
+  computed(() => selectedToken.value?.address),
+  async () => (await liteProviderStore.requestProvider())?.contractAddress.mainContract,
+  onboardStore.getEthereumProvider
+);
+const enoughAllowance = computed(() => {
+  if (!allowance.value || !selectedToken.value) {
+    return true;
+  }
+  return BigNumber.from(allowance.value).gte(totalComputeAmount.value);
+});
+const setTokenAllowance = async () => await setAllowance(totalComputeAmount.value);
+const allowanceModalContinue = () => {
+  allowanceModalOpened.value = false;
+  if (enoughAllowance.value) {
+    transactionConfirmModalOpened.value = true;
+  }
+};
+
 const transactionConfirmModalOpened = ref(false);
 const unsubscribe = onboardStore.subscribeOnAccountChange(() => {
   transactionConfirmModalOpened.value = false;
@@ -182,7 +241,11 @@ const openConfirmationModal = () => {
   if (continueButtonDisabled.value) {
     return;
   }
-  transactionConfirmModalOpened.value = true;
+  if (!enoughAllowance.value) {
+    allowanceModalOpened.value = true;
+  } else {
+    transactionConfirmModalOpened.value = true;
+  }
 };
 
 const {
@@ -260,7 +323,7 @@ const estimate = async () => {
   await estimateFee(account.value.address, selectedToken.value.address);
 };
 const feeAutoUpdateEstimate = async () => {
-  if (transactionConfirmModalOpened.value) {
+  if (transactionConfirmModalOpened.value || allowanceModalOpened.value) {
     return;
   }
   await estimate();
@@ -285,11 +348,13 @@ const continueButtonDisabled = computed(
     !enoughBalanceToCoverFee.value ||
     !fee.value ||
     feeLoading.value ||
+    allowanceRequestInProgress.value ||
+    !!allowanceRequestError.value ||
     totalComputeAmount.value.isZero()
 );
 
-const fetchBalances = () => {
-  liteEthereumBalance.requestBalance().then(() => {
+const fetchBalances = async (force = false) => {
+  await liteEthereumBalance.requestBalance({ force }).then(() => {
     if (allBalancePricesLoaded.value && !selectedToken.value) {
       selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
     }
