@@ -63,13 +63,10 @@
   </CommonModal>
 
   <CommonModal v-else v-bind="$attrs" :closable="false" class="allowance-transaction-successful-modal" title="">
-    <Vue3Lottie
-      v-if="!transactionCommitted"
-      class="mx-auto mt-6 mb-14 w-72 pt-1.5"
-      :animation-data="ProgressBlocks"
-      loop
-    />
-    <Vue3Lottie v-else class="mx-auto -mt-14 -mb-16 w-72" :animation-data="SuccessUnlock" :loop="false" />
+    <div class="flex h-36 w-full items-center justify-center overflow-visible">
+      <Vue3Lottie v-if="!transactionCommitted" class="mt-4 w-64" :animation-data="ProgressBlocks" loop />
+      <Vue3Lottie v-else class="w-32" :animation-data="SuccessUnlock" :loop="false" />
+    </div>
 
     <div class="flex h-full flex-col overflow-auto">
       <div class="h2 text-center sm:h1">
