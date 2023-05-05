@@ -124,14 +124,20 @@ const resetSuccessStatus = () => {
   newContact.value.success = false;
 };
 
+let timerId: ReturnType<typeof setTimeout> | null = null;
+
 watch(newContact.value, (newValue) => {
   if (newValue && (newContact.value.invalid || newContact.value.success)) {
-    setTimeout(() => {
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
       if (newContact.value.invalid) {
         resetInvalidStatus();
       } else if (newContact.value.success) {
         resetSuccessStatus();
       }
+      timerId = null;
     }, 3000);
   }
 });
