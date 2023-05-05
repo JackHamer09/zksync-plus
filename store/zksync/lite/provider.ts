@@ -9,7 +9,7 @@ import { useNetworkStore } from "@/store/network";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 
 export const useLiteProviderStore = defineStore("liteProvider", () => {
-  const liteTokens = useLiteTokensStore();
+  const liteTokensStore = useLiteTokensStore();
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
   const {
@@ -32,8 +32,8 @@ export const useLiteProviderStore = defineStore("liteProvider", () => {
     console.warn("changeZkSyncNetwork", networkName); // TEMP
     resetProvider();
     await requestProvider();
-    liteTokens.resetTokens();
-    await liteTokens.requestTokens();
+    liteTokensStore.resetTokens();
+    await liteTokensStore.requestTokens();
   };
 
   watch(selectedEthereumNetwork, async (network) => {

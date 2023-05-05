@@ -5,7 +5,7 @@ import type { TokenBalance } from "alchemy-sdk";
 
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
-import { ETH_ADDRESS } from "@/utils/contstants";
+import { ETH_ADDRESS } from "@/utils/constants";
 import { checksumAddress } from "@/utils/formatters";
 
 export const useEthereumBalanceStore = defineStore("ethereumBalance", () => {
