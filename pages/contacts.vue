@@ -9,7 +9,7 @@
       <template #icon> <CreditCardIcon /> </template
     ></CommonSmallInput>
     <transition v-bind="TransitionAlertScaleInOutTransition">
-      <CommonAlert v-if="newContact.invalid" variant="error" :icon="ExclamationCircleIcon" class="z-20 mt-4">
+      <CommonAlert v-if="newContact.error" variant="error" :icon="ExclamationCircleIcon" class="z-20 mt-4">
         <p>Enter valid contact info.</p>
       </CommonAlert>
     </transition>
@@ -41,8 +41,12 @@
         </TypographyCategoryLabel>
         <CommonCardWithLineButtons>
           <AddressCard v-for="item in group.addresses" :name="item.name" :address="item.address" :key="item.address">
-            <template #icon v-if="item.icon">
-              <component :is="item.icon" class="mr-3 text-gray-secondary" aria-hidden="true" />
+            <template #right>
+              <CommonIconButton
+                v-if="!isContact.length && isAddressValid"
+                @click="openAddContactsModalFromList"
+                :icon="PlusIcon"
+              />
             </template>
           </AddressCard>
         </CommonCardWithLineButtons>
@@ -53,7 +57,7 @@
         Enter address in the search bar
         <br />
         <span class="mt-1.5 inline-block">
-          Or <NuxtLink class="link" :to="{ name: 'contacts' }">create a contact</NuxtLink>
+          Or <span class="link cursor-pointer" @click="openAddContactsModal">create a contact</span>
         </span>
       </CommonEmptyBlock>
     </div>
@@ -87,6 +91,7 @@ import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
 
 import { useContactsStore } from "@/store/contacts";
+import { useOnboardStore } from "@/store/onboard";
 import { capitalize, checksumAddress } from "@/utils/formatters";
 
 const props = defineProps({
@@ -103,6 +108,8 @@ type ContactWithIcon = Contact & { icon?: Component };
 type AddressesGroup = { title: string | null; addresses: ContactWithIcon[] };
 
 const contactsStore = useContactsStore();
+const onboardStore = useOnboardStore();
+const { account } = storeToRefs(onboardStore);
 const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
 const AddContactModalOpened = ref(false);
@@ -110,15 +117,24 @@ const search = ref("");
 const newContact = ref({
   name: "",
   address: "",
-  invalid: false,
+  error: false,
   success: false,
 });
 
 const isAddressValid = computed(() => isAddress(search.value));
 const isNewAddressValid = computed(() => isAddress(newContact.value.address));
-
-const resetInvalidStatus = () => {
-  newContact.value.invalid = false;
+const isContact = computed(() => {
+  if (account.value.address != search.value) {
+    return contactsStore.userContacts.filter((contact) => {
+      return contact.address === search.value;
+    });
+  } else {
+    return [{ searchInfo: "Your own account" }];
+  }
+});
+console.log(account.value.address, "???", search.value);
+const resetErrorStatus = () => {
+  newContact.value.error = false;
 };
 const resetSuccessStatus = () => {
   newContact.value.success = false;
@@ -127,13 +143,13 @@ const resetSuccessStatus = () => {
 let timerId: ReturnType<typeof setTimeout> | null = null;
 
 watch(newContact.value, (newValue) => {
-  if (newValue && (newContact.value.invalid || newContact.value.success)) {
+  if (newValue && (newContact.value.error || newContact.value.success)) {
     if (timerId) {
       clearTimeout(timerId);
     }
     timerId = setTimeout(() => {
-      if (newContact.value.invalid) {
-        resetInvalidStatus();
+      if (newContact.value.error) {
+        resetErrorStatus();
       } else if (newContact.value.success) {
         resetSuccessStatus();
       }
@@ -142,8 +158,8 @@ watch(newContact.value, (newValue) => {
   }
 });
 
-const setInvalidStatus = () => {
-  newContact.value.invalid = true;
+const setErrorStatus = () => {
+  newContact.value.error = true;
 };
 
 const setSuccessStatus = () => {
@@ -152,7 +168,15 @@ const setSuccessStatus = () => {
 
 const openAddContactsModal = () => {
   AddContactModalOpened.value = true;
+  newContact.value.address = "";
 };
+const openAddContactsModalFromList = () => {
+  AddContactModalOpened.value = true;
+  if (inputtedAddressAccount.value && isContact.value.length === 0 && isAddressValid.value) {
+    newContact.value.address = inputtedAddressAccount.value.address;
+  }
+};
+
 const closeModal = () => {
   AddContactModalOpened.value = false;
 };
@@ -193,10 +217,11 @@ const addContact = () => {
     });
     newContact.value.name = "";
     newContact.value.address = "";
+    search.value = "";
     closeModal();
     setSuccessStatus();
   } else {
-    setInvalidStatus();
+    setErrorStatus();
   }
 };
 
@@ -237,6 +262,10 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
   }
   return result.filter((group) => group.addresses.length);
 });
+console.log("heh", userContactsByFirstCharacter.value);
+console.log("match", isContact.value);
+console.log(contactsStore.userContacts);
+console.log(displayedAddresses.value);
 </script>
 
 <style lang="scss" scoped>
