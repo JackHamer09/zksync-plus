@@ -216,8 +216,7 @@ const {
 } = useAllowance(
   computed(() => account.value.address),
   computed(() => selectedToken.value?.address),
-  async () => (await liteProviderStore.requestProvider())?.contractAddress.mainContract,
-  onboardStore.getEthereumProvider
+  async () => (await liteProviderStore.requestProvider())?.contractAddress.mainContract
 );
 const enoughAllowance = computed(() => {
   if (!allowance.value || !selectedToken.value) {
