@@ -342,16 +342,13 @@ const balancesLoading = computed(() => {
   return balanceInProgress.value || (!selectedToken.value && !allBalancePricesLoaded.value);
 });
 
-const continueButtonDisabled = computed(
-  () =>
-    !selectedToken.value ||
-    !enoughBalanceToCoverFee.value ||
-    !fee.value ||
-    feeLoading.value ||
-    allowanceRequestInProgress.value ||
-    !!allowanceRequestError.value ||
-    totalComputeAmount.value.isZero()
-);
+const continueButtonDisabled = computed(() => {
+  if (!selectedToken.value || !enoughBalanceToCoverFee.value || totalComputeAmount.value.isZero()) return true;
+  if (allowanceRequestInProgress.value || allowanceRequestError.value) return true;
+  if (!enoughAllowance.value) return false; // We can proceed to allowance modal even if fee is not loaded
+  if (feeLoading.value || !fee.value) return true;
+  return false;
+});
 
 const fetchBalances = async (force = false) => {
   await liteEthereumBalance.requestBalance({ force }).then(() => {

@@ -75,10 +75,10 @@
   </CommonModal>
 
   <CommonModal v-else v-bind="$attrs" :closable="false" class="deposit-transaction-successful-modal" title="">
-    <div class="flex h-36 w-full items-center justify-center overflow-visible">
+    <template #animation>
       <Vue3Lottie v-if="!transactionCommitted" class="w-72" :animation-data="ProgressPlane" loop />
       <Vue3Lottie v-else class="w-72" :animation-data="SuccessConfetti" :loop="false" />
-    </div>
+    </template>
 
     <div class="flex h-full flex-col overflow-auto">
       <div class="h2 text-center sm:h1">
