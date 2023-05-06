@@ -70,10 +70,10 @@
     class="allowance-transaction-successful-modal"
     title=""
   >
-    <div class="flex h-36 w-full items-center justify-center overflow-visible">
+    <template #animation>
       <Vue3Lottie v-if="!transactionCommitted" class="mt-4 w-64" :animation-data="ProgressBlocks" loop />
       <Vue3Lottie v-else class="w-32" :animation-data="SuccessUnlock" :loop="false" />
-    </div>
+    </template>
 
     <div class="flex h-full flex-col overflow-auto">
       <div class="h2 text-center sm:h1">
