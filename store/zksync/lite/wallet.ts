@@ -6,18 +6,14 @@ import { ethers } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
 import { RemoteWallet, Wallet } from "zksync";
 
-import type { BigNumberish } from "ethers";
+import type { TokenAmount } from "@/types";
 import type { AccountState } from "zksync/build/types";
 
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
-import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { formatError } from "@/utils/formatters";
-
-export interface Balance extends ZkSyncLiteToken {
-  amount: BigNumberish;
-}
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
   const onboardStore = useOnboardStore();
@@ -130,7 +126,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     return await provider.getState(account.value.address);
   });
 
-  const balance = computed<Balance[]>(() => {
+  const balance = computed<TokenAmount[]>(() => {
     if (!accountState.value) {
       return [];
     }

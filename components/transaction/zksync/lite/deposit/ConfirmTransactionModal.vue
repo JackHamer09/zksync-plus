@@ -159,7 +159,7 @@ import useTransaction from "@/composables/zksync/lite/deposit/useTransaction";
 import ProgressPlane from "@/assets/lottie/progress-plane.json";
 import SuccessConfetti from "@/assets/lottie/success-confetti.json";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { Token } from "@/types";
 import type { BigNumberish, ContractTransaction } from "ethers";
 import type { PropType } from "vue";
 
@@ -175,7 +175,7 @@ import { TransitionHeight, TransitionPrimaryButtonText } from "@/utils/transitio
 
 export type ConfirmationModalTransaction = {
   to: string;
-  token: ZkSyncLiteToken;
+  token: Token;
   amount: BigNumberish;
 };
 
@@ -184,7 +184,7 @@ const props = defineProps({
     type: Object as PropType<ConfirmationModalTransaction>,
   },
   feeToken: {
-    type: Object as PropType<ZkSyncLiteToken>,
+    type: Object as PropType<Token>,
   },
   fee: {
     type: Object as PropType<{
@@ -226,8 +226,8 @@ watch(fee, (newFee) => {
 
 const newFeeAlert = ref(false);
 
-const totalOfEachToken = computed<{ token: ZkSyncLiteToken; amount: BigNumberish }[]>(() => {
-  const tokenBySymbol: { [symbol: string]: ZkSyncLiteToken } = {};
+const totalOfEachToken = computed<{ token: Token; amount: BigNumberish }[]>(() => {
+  const tokenBySymbol: { [symbol: string]: Token } = {};
   if (props.transaction) {
     tokenBySymbol[props.transaction.token.symbol] = props.transaction.token;
   }

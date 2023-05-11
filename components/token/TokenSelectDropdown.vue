@@ -51,7 +51,7 @@ import { MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 
 import CommonCardWithLineButtons from "@/components/common/CardWithLineButtons.vue";
 
-import type { Balance } from "@/store/zksync/lite/wallet";
+import type { TokenAmount } from "@/types";
 import type { PropType } from "vue";
 
 import { groupBalancesByAmount } from "@/utils/mappers";
@@ -76,7 +76,7 @@ const props = defineProps({
     type: Error,
   },
   balances: {
-    type: Array as PropType<Balance[]>,
+    type: Array as PropType<TokenAmount[]>,
     default: () => [],
   },
 });

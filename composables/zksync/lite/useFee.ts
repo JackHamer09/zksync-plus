@@ -3,8 +3,7 @@ import { ref } from "vue";
 import { BigNumber } from "ethers";
 import { closestPackableTransactionFee } from "zksync";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
-import type { Balance } from "@/store/zksync/lite/wallet";
+import type { Token, TokenAmount } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { Ref } from "vue";
 import type { RestProvider } from "zksync";
@@ -20,9 +19,9 @@ export type FeeEstimationParams = {
 
 export default (
   requestProvider: () => Promise<RestProvider | undefined>,
-  tokens: Ref<{ [tokenSymbol: string]: ZkSyncLiteToken } | undefined>,
+  tokens: Ref<{ [tokenSymbol: string]: Token } | undefined>,
   feeTokenAddress: Ref<string | undefined>,
-  balances: Ref<Balance[]>
+  balances: Ref<TokenAmount[]>
 ) => {
   let estimationPromise: Promise<void> | undefined;
   const result = ref<BigNumberish | undefined>();

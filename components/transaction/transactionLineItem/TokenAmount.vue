@@ -17,7 +17,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { Token } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
@@ -25,7 +25,7 @@ import { parseTokenAmount } from "@/utils/formatters";
 
 const props = defineProps({
   token: {
-    type: Object as PropType<ZkSyncLiteToken>,
+    type: Object as PropType<Token>,
     required: true,
   },
   amount: {

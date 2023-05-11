@@ -93,7 +93,7 @@ import { ChevronDownIcon } from "@heroicons/vue/24/outline";
 import { useFocus } from "@vueuse/core";
 import { BigNumber } from "ethers";
 
-import type { Balance } from "@/store/zksync/lite/wallet";
+import type { TokenAmount } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
@@ -106,7 +106,7 @@ const props = defineProps({
     default: "",
   },
   balances: {
-    type: Array as PropType<Balance[]>,
+    type: Array as PropType<TokenAmount[]>,
     default: () => [],
     required: true,
   },

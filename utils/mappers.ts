@@ -1,12 +1,12 @@
 import { computed } from "vue";
 
-import type { Balance } from "@/store/zksync/lite/wallet";
+import type { TokenAmount } from "@/types";
 import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { Ref } from "vue";
 
-export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
+export const groupBalancesByAmount = (balances: Ref<TokenAmount[]>) =>
   computed(() => {
-    const groups: Record<string, { title: string | null; balances: Balance[] }> = {
+    const groups: Record<string, { title: string | null; balances: TokenAmount[] }> = {
       default: {
         title: null,
         balances: [],

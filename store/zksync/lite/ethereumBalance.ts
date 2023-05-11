@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
 
-import type { Balance } from "@/store/zksync/lite/wallet";
+import type { TokenAmount } from "@/types";
 
 import { useEthereumBalanceStore } from "@/store/ethereumBalance";
 import { useOnboardStore } from "@/store/onboard";
@@ -28,7 +28,7 @@ export const useLiteEthereumBalanceStore = defineStore("liteEthereumBalances", (
     },
     { cache: 30000 }
   );
-  const balance = computed<Balance[]>(() => {
+  const balance = computed<TokenAmount[]>(() => {
     if (!tokens.value || !ethereumBalance.value) {
       return [];
     }

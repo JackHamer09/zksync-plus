@@ -56,7 +56,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { Token } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
@@ -71,7 +71,7 @@ const props = defineProps({
     type: String as PropType<BigNumberish>,
   },
   feeToken: {
-    type: Object as PropType<ZkSyncLiteToken>,
+    type: Object as PropType<Token>,
   },
   loading: {
     type: Boolean,

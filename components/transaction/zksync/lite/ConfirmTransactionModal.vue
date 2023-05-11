@@ -131,7 +131,7 @@ import TransactionSuccessfulModal from "@/components/transaction/zksync/lite/Tra
 import useTransaction from "@/composables/zksync/lite/useTransaction";
 
 import type { TransactionDestination } from "@/store/destinations";
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { Token } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 import type { IncomingTxFeeType } from "zksync/build/types";
@@ -147,7 +147,7 @@ import { TransitionHeight, TransitionPrimaryButtonText } from "@/utils/transitio
 export type ConfirmationModalTransaction = {
   type: IncomingTxFeeType;
   to: string;
-  token: ZkSyncLiteToken;
+  token: Token;
   amount: BigNumberish;
 };
 
@@ -156,7 +156,7 @@ const props = defineProps({
     type: Array as PropType<ConfirmationModalTransaction[]>,
   },
   feeToken: {
-    type: Object as PropType<ZkSyncLiteToken>,
+    type: Object as PropType<Token>,
   },
   fee: {
     type: String as PropType<BigNumberish>,
@@ -203,8 +203,8 @@ const newFeeAlert = ref(false);
 
 const computedTransactions = computed(() => props.transactions ?? []);
 
-const totalOfEachToken = computed<{ token: ZkSyncLiteToken; amount: BigNumberish }[]>(() => {
-  const tokenBySymbol: { [symbol: string]: ZkSyncLiteToken } = Object.fromEntries(
+const totalOfEachToken = computed<{ token: Token; amount: BigNumberish }[]>(() => {
+  const tokenBySymbol: { [symbol: string]: Token } = Object.fromEntries(
     computedTransactions.value.map((e) => [e.token.symbol, e.token])
   );
   if (props.feeToken) {

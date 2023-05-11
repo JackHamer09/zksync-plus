@@ -146,7 +146,7 @@ import ProgressBlocks from "@/assets/lottie/progress-blocks.json";
 import SuccessUnlock from "@/assets/lottie/success-unlock.json";
 
 import type { TransactionDestination } from "@/store/destinations";
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { Token } from "@/types";
 import type { TransactionResponse } from "@ethersproject/abstract-provider";
 import type { BigNumberish, ContractTransaction } from "ethers";
 import type { PropType } from "vue";
@@ -163,7 +163,7 @@ import {
 
 export type ConfirmationModalTransaction = {
   to: string;
-  token: ZkSyncLiteToken;
+  token: Token;
   amount: BigNumberish;
 };
 
