@@ -24,7 +24,7 @@
             </CommonErrorBlock>
           </div>
           <template v-else-if="transactions.length">
-            <ZkSyncLiteTransactionLineItem
+            <EraTransactionLineItem
               v-for="(item, index) in transactions.slice(0, 5)"
               :key="index"
               :transaction="item"
@@ -34,11 +34,7 @@
           <template v-else>
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">
               You currently don't have any transactions on
-              <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
-              <!-- <br />
-              <span class="mt-1.5 inline-block">
-                If you are looking for your deposit transaction then you should find it
-              </span> -->
+              <span class="font-medium">{{ destinations.era.label }}</span> (L2)
             </CommonEmptyBlock>
           </template>
         </div>
@@ -53,20 +49,20 @@ import { onBeforeUnmount } from "vue";
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
-import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
+import EraTransactionLineItem from "@/components/transaction/zksync/era/EraTransactionLineItem.vue";
 
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
-import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
+import { useEraTransactionsHistoryStore } from "@/store/zksync/era/transactionsHistory";
 
 const onboardStore = useOnboardStore();
-const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
+const eraTransactionsHistoryStore = useEraTransactionsHistoryStore();
 const { transactions, recentTransactionsRequestInProgress, recentTransactionsRequestError } =
-  storeToRefs(liteTransactionsHistoryStore);
+  storeToRefs(eraTransactionsHistoryStore);
 const { destinations } = storeToRefs(useDestinationsStore());
 
 const fetch = () => {
-  liteTransactionsHistoryStore.requestRecentTransactions();
+  eraTransactionsHistoryStore.requestRecentTransactions();
 };
 fetch();
 

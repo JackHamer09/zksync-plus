@@ -8,6 +8,16 @@
           </template>
           <template #default>Send</template>
         </CommonButton>
+        <CommonButton
+          as="a"
+          target="_blank"
+          :href="`https://zkexport.netlify.app/export/account/transactions?address=${account.address}`"
+        >
+          <template #icon>
+            <DocumentArrowDownIcon aria-hidden="true" />
+          </template>
+          <template #default>Export history</template>
+        </CommonButton>
       </CommonButtonsLineGroup>
       <div class="transactions-block-container">
         <div class="flex items-center justify-between py-4">
@@ -37,7 +47,7 @@
               <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
               <!-- <br />
               <span class="mt-1.5 inline-block">
-                If you are looking for your deposit transaction then you should find it
+                If you are looking for your deposit transaction then you should find it on etherscan
               </span> -->
             </CommonEmptyBlock>
           </template>
@@ -50,7 +60,7 @@
 <script lang="ts" setup>
 import { onBeforeUnmount } from "vue";
 
-import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
+import { DocumentArrowDownIcon, PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
@@ -61,6 +71,7 @@ import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transaction
 
 const onboardStore = useOnboardStore();
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
+const { account } = storeToRefs(onboardStore);
 const { transactions, recentTransactionsRequestInProgress, recentTransactionsRequestError } =
   storeToRefs(liteTransactionsHistoryStore);
 const { destinations } = storeToRefs(useDestinationsStore());

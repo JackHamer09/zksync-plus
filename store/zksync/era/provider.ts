@@ -5,14 +5,16 @@ import type { EthereumNetworkName } from "@/store/network";
 
 import { useNetworkStore } from "@/store/network";
 
-const eraNetworks: Record<EthereumNetworkName, { chainId: 324 | 280; rpcUrl: string }> = {
+const eraNetworks: Record<EthereumNetworkName, { chainId: 324 | 280; rpcUrl: string; blockExplorerApi: string }> = {
   mainnet: {
     chainId: 324,
     rpcUrl: "https://mainnet.era.zksync.dev",
+    blockExplorerApi: "https://zksync2-mainnet-explorer.zksync.io",
   },
   goerli: {
     chainId: 280,
     rpcUrl: "https://testnet.era.zksync.dev",
+    blockExplorerApi: "https://zksync2-testnet-explorer.zksync.dev",
   },
 } as const;
 

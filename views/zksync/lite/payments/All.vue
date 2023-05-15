@@ -32,7 +32,7 @@
           </CommonCardWithLineButtons>
         </div>
         <CommonCardWithLineButtons v-else-if="previousTransactionsRequestError">
-          <CommonErrorBlock class="m-2" @try-again="fetchMore">
+          <CommonErrorBlock @try-again="fetchMore">
             Loading transactions error: {{ previousTransactionsRequestError!.message }}
           </CommonErrorBlock>
         </CommonCardWithLineButtons>
@@ -73,7 +73,7 @@ const {
 } = storeToRefs(liteTransactionsHistoryStore);
 const { destinations } = storeToRefs(useDestinationsStore());
 
-const transactionsGroups = groupTransactionsByDate(transactions);
+const transactionsGroups = groupTransactionsByDate(transactions, (transaction) => new Date(transaction.createdAt!));
 
 const fetch = () => {
   liteTransactionsHistoryStore.requestRecentTransactions();

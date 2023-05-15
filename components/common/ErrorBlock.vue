@@ -31,7 +31,8 @@ const emit = defineEmits<{
     @apply mr-3 block h-7 w-7;
   }
   .error-block-text-container {
-    @apply whitespace-pre-line;
+    @apply whitespace-pre-line break-words;
+    word-break: break-word;
   }
 }
 </style>

@@ -2,13 +2,15 @@
   <CommonButtonLineWithImg class="transaction-line-item" :as="as">
     <template #image>
       <div class="transaction-line-item-icon-container">
-        <component v-if="icon" :is="icon" class="transaction-line-item-icon" />
+        <XMarkIcon v-if="failed" class="transaction-line-item-icon failed-badge-icon" aria-hidden="true" />
+        <component v-else-if="icon" :is="icon" class="transaction-line-item-icon" aria-hidden="true" />
       </div>
     </template>
     <template #default>
       <div class="transaction-line-info">
         <slot name="top-left" />
-        <slot name="bottom-left" />
+        <div v-if="failed" class="transaction-line-label-underline failed">Failed</div>
+        <slot v-else name="bottom-left" />
       </div>
     </template>
     <template #right>
@@ -31,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowUpRightIcon } from "@heroicons/vue/24/outline";
+import { ArrowUpRightIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 import type { Component, PropType } from "vue";
 
@@ -47,6 +49,10 @@ defineProps({
     type: String,
     required: true,
   },
+  failed: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 
@@ -55,10 +61,13 @@ defineProps({
   @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
 
   .transaction-line-item-icon-container {
-    @apply flex aspect-square h-auto w-full items-center justify-center rounded-full border border-primary-100 bg-primary-100/10;
+    @apply relative flex aspect-square h-auto w-full items-center justify-center rounded-full border border-primary-100 bg-primary-100/10;
 
     .transaction-line-item-icon {
       @apply h-4 w-4 text-primary-500;
+      &.failed-badge-icon {
+        @apply h-5 w-5 text-red-500;
+      }
     }
   }
   .transaction-line-info,
@@ -72,6 +81,10 @@ defineProps({
     .transaction-line-label-underline,
     .transaction-line-item-price {
       @apply text-sm leading-tight text-gray-secondary;
+    }
+
+    .transaction-line-label-underline.failed {
+      @apply text-red-500;
     }
   }
   .transaction-line-info {

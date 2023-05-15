@@ -18,7 +18,9 @@
         <TypographyCategoryLabel>
           {{ group.title }}
         </TypographyCategoryLabel>
-        <TransactionsGroupedByBatch :transactions="group.transactions" />
+        <CommonCardWithLineButtons>
+          <EraTransactionLineItem v-for="(item, index) in group.transactions" :key="index" :transaction="item" />
+        </CommonCardWithLineButtons>
       </div>
 
       <!-- Load more -->
@@ -32,7 +34,7 @@
           </CommonCardWithLineButtons>
         </div>
         <CommonCardWithLineButtons v-else-if="previousTransactionsRequestError">
-          <CommonErrorBlock class="m-2" @try-again="fetchMore">
+          <CommonErrorBlock @try-again="fetchMore">
             Loading transactions error: {{ previousTransactionsRequestError!.message }}
           </CommonErrorBlock>
         </CommonCardWithLineButtons>
@@ -42,7 +44,7 @@
     <CommonCardWithLineButtons v-else>
       <CommonEmptyBlock>
         At the moment you don't have any transactions on
-        <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
+        <span class="font-medium">{{ destinations.era.label }}</span> (L2)
       </CommonEmptyBlock>
     </CommonCardWithLineButtons>
   </div>
@@ -54,15 +56,15 @@ import { onBeforeUnmount, ref } from "vue";
 import { useIntersectionObserver } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
-import TransactionsGroupedByBatch from "@/components/transaction/zksync/lite/TransactionsGroupedByBatch.vue";
+import EraTransactionLineItem from "@/components/transaction/zksync/era/EraTransactionLineItem.vue";
 
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
-import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
+import { useEraTransactionsHistoryStore } from "@/store/zksync/era/transactionsHistory";
 import { groupTransactionsByDate } from "@/utils/mappers";
 
 const onboardStore = useOnboardStore();
-const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
+const eraTransactionsHistoryStore = useEraTransactionsHistoryStore();
 const {
   transactions,
   recentTransactionsRequestInProgress,
@@ -70,13 +72,13 @@ const {
   canLoadMore,
   previousTransactionsRequestInProgress,
   previousTransactionsRequestError,
-} = storeToRefs(liteTransactionsHistoryStore);
+} = storeToRefs(eraTransactionsHistoryStore);
 const { destinations } = storeToRefs(useDestinationsStore());
 
-const transactionsGroups = groupTransactionsByDate(transactions);
+const transactionsGroups = groupTransactionsByDate(transactions, (transaction) => new Date(transaction.receivedAt));
 
 const fetch = () => {
-  liteTransactionsHistoryStore.requestRecentTransactions();
+  eraTransactionsHistoryStore.requestRecentTransactions();
 };
 fetch();
 
@@ -87,7 +89,7 @@ const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
 
 const loadMoreEl = ref(null);
 const fetchMore = () => {
-  liteTransactionsHistoryStore.requestPreviousTransactions();
+  eraTransactionsHistoryStore.requestPreviousTransactions();
 };
 const { stop: stopLoadMoreObserver } = useIntersectionObserver(loadMoreEl, ([{ isIntersecting }]) => {
   if (isIntersecting) {

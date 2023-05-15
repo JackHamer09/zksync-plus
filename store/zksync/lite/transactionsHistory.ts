@@ -8,6 +8,8 @@ import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { mapApiTransaction } from "@/utils/zksync/lite/mappers";
 
+const TRANSACTIONS_FETCH_LIMIT = 25;
+
 export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHistory", () => {
   const onboardStore = useOnboardStore();
   const liteProviderStore = useLiteProviderStore();
@@ -37,9 +39,8 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
       throw new Error("No result");
     }
 
-    return response.result.list.map((transaction) =>
-      mapApiTransaction(transaction, tokens.value ? Object.values(tokens.value) : [])
-    );
+    const allTokens = tokens.value ? Object.values(tokens.value) : [];
+    return response.result.list.map((transaction) => mapApiTransaction(transaction, allTokens));
   };
 
   const transactions = ref<ZkSyncLiteTransaction[]>([]);
@@ -69,11 +70,11 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
         from: mostRecentTransactionInTheList
           ? mostRecentTransactionInTheList.ethTxHash ?? mostRecentTransactionInTheList.txHash
           : "latest",
-        limit: 25,
+        limit: TRANSACTIONS_FETCH_LIMIT,
         direction: transactions.value.length ? "newer" : "older",
       });
       if (!transactions.value.length) {
-        if (txs.length === 25) {
+        if (txs.length === TRANSACTIONS_FETCH_LIMIT) {
           canLoadMore.value = true;
         } else {
           canLoadMore.value = false;
@@ -82,6 +83,9 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
       const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
       transactions.value.unshift(...txs.filter((tx) => !currentTransactionHashes.has(tx.txHash)));
       getTransactionTokenPrices(txs);
+      if (txs.length < TRANSACTIONS_FETCH_LIMIT) {
+        canLoadMore.value = false;
+      }
     },
     { cache: 30000 }
   );
@@ -99,13 +103,13 @@ export const useLiteTransactionsHistoryStore = defineStore("liteTransactionsHist
       }
       const txs = await transactionsRequest({
         from: oldestTransactionInTheList.ethTxHash ?? oldestTransactionInTheList.txHash,
-        limit: 50,
+        limit: TRANSACTIONS_FETCH_LIMIT,
         direction: "older",
       });
       const currentTransactionHashes = new Set(transactions.value.map((transaction) => transaction.txHash));
       transactions.value.push(...txs.filter((tx) => !currentTransactionHashes.has(tx.txHash)));
       getTransactionTokenPrices(txs);
-      if (txs.length < 50) {
+      if (txs.length < TRANSACTIONS_FETCH_LIMIT) {
         canLoadMore.value = false;
       }
     },

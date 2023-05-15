@@ -1,7 +1,6 @@
 import { computed } from "vue";
 
 import type { TokenAmount } from "@/types";
-import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
 import type { Ref } from "vue";
 
 export const groupBalancesByAmount = (balances: Ref<TokenAmount[]>) =>
@@ -36,11 +35,11 @@ export const groupBalancesByAmount = (balances: Ref<TokenAmount[]>) =>
     return [groups.default, groups.small, groups.zero].filter((group) => group.balances.length);
   });
 
-export const groupTransactionsByDate = (transactions: Ref<ZkSyncLiteTransaction[]>) =>
+export const groupTransactionsByDate = <T>(transactions: Ref<T[]>, getDate: (transaction: T) => Date) =>
   computed(() => {
-    const groups: Record<string, { title: string | null; transactions: ZkSyncLiteTransaction[] }> = {};
+    const groups: Record<string, { title: string | null; transactions: T[] }> = {};
     for (const transaction of transactions.value) {
-      const date = new Date(transaction.createdAt!);
+      const date = getDate(transaction);
       const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       if (!groups[dateKey]) {
         groups[dateKey] = {
