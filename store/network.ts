@@ -25,7 +25,7 @@ export const useNetworkStore = defineStore("network", () => {
   const selectedEthereumNetworkName = useStorage<EthereumNetworkName>(
     "selectedEthereumNetwork",
     chains[0].network,
-    sessionStorage
+    window.sessionStorage
   );
   const selectedEthereumNetwork = computed<ExtendedChain>(() => {
     return chains.find((network) => network.network === selectedEthereumNetworkName.value) ?? chains[0];
@@ -33,6 +33,22 @@ export const useNetworkStore = defineStore("network", () => {
   const blockExplorerUrl = computed<string | undefined>(
     () => selectedEthereumNetwork.value.blockExplorers?.default.url
   );
+
+  const lastSelectedEthereumNetworkName = useStorage<EthereumNetworkName | undefined>(
+    "lastSelectedEthereumNetwork",
+    undefined
+  );
+  const lastSelectedEthereumNetwork = computed<ExtendedChain | undefined>(() => {
+    return chains.find((network) => network.network === lastSelectedEthereumNetworkName.value);
+  });
+  const ethereumNetworkChangedWarning = computed(
+    () =>
+      !!lastSelectedEthereumNetworkName.value &&
+      lastSelectedEthereumNetwork.value?.network !== selectedEthereumNetwork.value.network
+  );
+  watch(selectedEthereumNetworkName, (val) => {
+    lastSelectedEthereumNetworkName.value = val;
+  });
 
   const identifyNetwork = () => {
     const windowLocation = window.location;
@@ -54,5 +70,14 @@ export const useNetworkStore = defineStore("network", () => {
   return {
     selectedEthereumNetwork,
     blockExplorerUrl,
+
+    ethereumNetworkChangedWarning,
+    lastSelectedEthereumNetworkName: computed(
+      () => lastSelectedEthereumNetwork.value?.name ?? lastSelectedEthereumNetworkName.value
+    ),
+    lastSelectedEthereumNetwork,
+    resetNetworkChangeWarning: () => {
+      lastSelectedEthereumNetworkName.value = selectedEthereumNetwork.value.network;
+    },
   };
 });

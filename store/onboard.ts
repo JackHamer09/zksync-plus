@@ -104,6 +104,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   return {
     account: computed(() => account.value),
     network: computed(() => network.value),
+    isConnectingWallet: computed(() => account.value.isReconnecting || account.value.isConnecting),
     walletName,
     openModal,
     disconnect,

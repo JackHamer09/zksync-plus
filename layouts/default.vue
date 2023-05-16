@@ -1,5 +1,6 @@
 <template>
   <LoadersConnecting />
+  <ModalNetworkChangedWarning v-if="!isConnectingWallet" />
   <LoginLayout v-if="!account.isConnected">
     <LoginPage />
   </LoginLayout>
@@ -18,7 +19,7 @@ import LoginLayout from "@/layouts/login.vue";
 import { useOnboardStore } from "@/store/onboard";
 import LoginPage from "@/views/Login.vue";
 
-const { account } = storeToRefs(useOnboardStore());
+const { account, isConnectingWallet } = storeToRefs(useOnboardStore());
 </script>
 
 <style lang="scss" scoped>
