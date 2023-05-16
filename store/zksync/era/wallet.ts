@@ -63,6 +63,8 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
         })
       );
 
+      console.log(123);
+
       return balances.reduce((accumulator: { [tokenAddress: string]: BigNumberish }, { address, amount }) => {
         accumulator[address] = amount;
         return accumulator;
@@ -93,10 +95,6 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
     resetSigner();
     resetBalance();
   });
-
-  setTimeout(() => {
-    getSigner();
-  }, 2000);
 
   return {
     getSigner,

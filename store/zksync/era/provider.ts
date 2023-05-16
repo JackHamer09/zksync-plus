@@ -8,7 +8,7 @@ import { useNetworkStore } from "@/store/network";
 const eraNetworks: Record<EthereumNetworkName, { chainId: 324 | 280; rpcUrl: string; blockExplorerApi: string }> = {
   mainnet: {
     chainId: 324,
-    rpcUrl: "https://mainnet.era.zksync.dev",
+    rpcUrl: "https://mainnet.era.zksync.io",
     blockExplorerApi: "https://zksync2-mainnet-explorer.zksync.io",
   },
   goerli: {
