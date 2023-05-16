@@ -13,10 +13,7 @@ export const usePreferencesStore = defineStore("preferences", () => {
   const previousTransactionAddress = useStorage<{ [userAddress: string]: string }>("last-transaction-address", {});
 
   return {
-    version: computed(() => version.value),
-    setVersion: (newVersion: Version) => {
-      version.value = newVersion;
-    },
+    version,
 
     previousTransactionAddress: computed({
       get: () => {

@@ -9,7 +9,7 @@
       </CommonCardWithLineButtons>
     </div>
     <CommonCardWithLineButtons v-else-if="recentTransactionsRequestError">
-      <CommonErrorBlock class="m-2" @try-again="fetch">
+      <CommonErrorBlock @try-again="fetch">
         Loading transactions error: {{ recentTransactionsRequestError!.message }}
       </CommonErrorBlock>
     </CommonCardWithLineButtons>
