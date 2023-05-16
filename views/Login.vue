@@ -148,6 +148,9 @@ const useAnotherAccount = async () => {
   }
   .login-footer {
     @apply absolute left-0 bottom-0 grid w-full items-center justify-items-center gap-3 px-6 pb-5 sm:grid-cols-[1.75rem_1fr_1.75rem];
+    @media screen and (max-height: 480px) {
+      @apply static mt-8 px-0;
+    }
 
     .made-with-love {
       @apply whitespace-pre-line text-center text-sm text-gray-400;
