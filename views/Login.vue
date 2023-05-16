@@ -84,9 +84,14 @@
         Made with ❤️ by
         <a class="link" href="https://github.com/JackHamer09" target="_blank" rel="noopener">JackHamer</a>
         and
-        <a class="link" href="https://github.com/JackHamer09/zksync-plus" target="_blank" rel="noopener"
-          >contributors</a
+        <a
+          class="link"
+          href="https://github.com/JackHamer09/zksync-plus/graphs/contributors"
+          target="_blank"
+          rel="noopener"
         >
+          contributors
+        </a>
       </div>
       <a
         href="https://github.com/JackHamer09/zksync-plus"
