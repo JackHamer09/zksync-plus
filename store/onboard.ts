@@ -19,7 +19,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     w3mProvider({ projectId: env.walletConnectProjectID }),
     publicProvider(),
   ]);
-  const wagmiConfig = createClient({
+  const wagmiClient = createClient({
     autoConnect: true,
     connectors: w3mConnectors({
       projectId: env.walletConnectProjectID,
@@ -28,21 +28,21 @@ export const useOnboardStore = defineStore("onboard", () => {
     }),
     provider,
   });
-  const ethereumClient = new EthereumClient(wagmiConfig, chains);
+  const ethereumClient = new EthereumClient(wagmiClient, chains);
 
   const getWalletName = () => {
-    if (wagmiConfig.connector?.name === "WalletConnect") {
+    if (wagmiClient.connector?.name === "WalletConnect") {
       /* TODO: Figure our how to properly get wallet name from WalletConnect */
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return wagmiConfig.data?.provider?.provider?.connector?.peerMeta?.name;
+      return wagmiClient.data?.provider?.provider?.connector?.peerMeta?.name;
     }
-    return wagmiConfig.connector?.name;
+    return wagmiClient.connector?.name;
   };
 
   const account = ref(ethereumClient.getAccount());
   const network = ref(ethereumClient.getNetwork());
-  const connectorName = ref(wagmiConfig.connector?.name);
+  const connectorName = ref(wagmiClient.connector?.name);
   const walletName = ref<string | undefined>(getWalletName());
   const web3modal = new Web3Modal(
     { projectId: env.walletConnectProjectID, enableNetworkView: false, enableAccountView: true, themeMode: "light" },
@@ -51,7 +51,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   web3modal.setDefaultChain(selectedEthereumNetwork.value);
   ethereumClient.watchAccount(async (updatedAccount) => {
     account.value = updatedAccount;
-    connectorName.value = wagmiConfig.connector?.name;
+    connectorName.value = wagmiClient.connector?.name;
     walletName.value = getWalletName();
   });
   ethereumClient.watchNetwork((updatedNetwork) => (network.value = updatedNetwork));
@@ -62,7 +62,16 @@ export const useOnboardStore = defineStore("onboard", () => {
   });
 
   const openModal = () => web3modal.openModal();
-  const disconnect = () => ethereumClient.disconnect();
+  const disconnect = () => {
+    ethereumClient.disconnect().then(() => {
+      // There is a bug in @wagmi/core@0.10.11 or @web3modal/ethereum@^2.3.7
+      // After using `ethereumClient.disconnect` method the account state
+      // is replaced with "connecting" state
+      setTimeout(() => {
+        wagmiClient.clearState();
+      }, 0);
+    });
+  };
 
   const isCorrectNetworkSet = computed(() => {
     const walletNetworkId = network.value.chain?.id;
