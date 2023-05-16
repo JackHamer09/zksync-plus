@@ -46,7 +46,7 @@ import { computed } from "vue";
 import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 
-import type { ZkSyncLiteTokenPrice } from "@/store/zksync/lite/tokens";
+import type { TokenPrice } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { Component, PropType } from "vue";
 
@@ -81,7 +81,7 @@ const props = defineProps({
     required: true,
   },
   price: {
-    type: [String, Number] as PropType<ZkSyncLiteTokenPrice>,
+    type: [String, Number] as PropType<TokenPrice>,
   },
   showSendButton: {
     type: Boolean,

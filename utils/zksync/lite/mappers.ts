@@ -1,6 +1,6 @@
 import { isNFT } from "zksync/build/utils";
 
-import type { Token } from "@/types";
+import type { ZkSyncLiteToken } from "@/types";
 import type { ApiTransaction } from "zksync/build/types";
 
 import { checksumAddress } from "@/utils/formatters";
@@ -16,11 +16,11 @@ type ZkSyncLiteTransactionToken =
         address: string;
       };
     }
-  | (Token & {
+  | (ZkSyncLiteToken & {
       isNFT: false;
     });
 
-export function mapApiTransaction(transaction: ApiTransaction, tokens: Token[]) {
+export function mapApiTransaction(transaction: ApiTransaction, tokens: ZkSyncLiteToken[]) {
   function getTokenBySymbolOrID(tokenIDorSymbol: number | string) {
     if (isNFT(tokenIDorSymbol)) {
       return {

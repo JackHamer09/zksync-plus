@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import liteTokenIcons from "@/assets/json/tokens/lite-tokens-icons.json";
 
-import type { Token, TokenPrice } from "@/types";
+import type { TokenPrice, ZkSyncLiteToken } from "@/types";
 import type { ExtendedTokens, TokenInfo } from "zksync/build/types";
 
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
@@ -56,7 +56,7 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     }
     return undefined;
   }
-  const tokens = computed<{ [tokenSymbol: string]: Token } | undefined>(() => {
+  const tokens = computed<{ [tokenSymbol: string]: ZkSyncLiteToken } | undefined>(() => {
     if (!tokensRaw.value) return undefined;
     return Object.fromEntries(
       tokensRaw.value.map((token) => {

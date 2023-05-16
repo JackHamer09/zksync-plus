@@ -5,7 +5,7 @@ import {
   ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
 } from "zksync/build/utils";
 
-import type { Token, TokenAmount } from "@/types";
+import type { ZkSyncLiteToken, ZkSyncLiteTokenAmount } from "@/types";
 import type { Provider } from "@wagmi/core";
 import type { BigNumberish } from "ethers";
 import type { Ref } from "vue";
@@ -23,8 +23,8 @@ export type FeeEstimationParams = {
 export default (
   getProvider: () => Provider,
   getWalletInstance: () => Promise<Wallet | undefined>,
-  tokens: Ref<{ [tokenSymbol: string]: Token } | undefined>,
-  balances: Ref<TokenAmount[]>
+  tokens: Ref<{ [tokenSymbol: string]: ZkSyncLiteToken } | undefined>,
+  balances: Ref<ZkSyncLiteTokenAmount[]>
 ) => {
   const params = {
     from: undefined as string | undefined,

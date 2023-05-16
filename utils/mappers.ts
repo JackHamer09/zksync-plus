@@ -3,9 +3,9 @@ import { computed } from "vue";
 import type { TokenAmount } from "@/types";
 import type { Ref } from "vue";
 
-export const groupBalancesByAmount = (balances: Ref<TokenAmount[]>) =>
+export const groupBalancesByAmount = <T = TokenAmount>(balances: Ref<T[]>) =>
   computed(() => {
-    const groups: Record<string, { title: string | null; balances: TokenAmount[] }> = {
+    const groups: Record<string, { title: string | null; balances: T[] }> = {
       default: {
         title: null,
         balances: [],
@@ -19,7 +19,7 @@ export const groupBalancesByAmount = (balances: Ref<TokenAmount[]>) =>
         balances: [],
       },
     };
-    for (const balanceItem of balances.value) {
+    for (const balanceItem of balances.value as (T & TokenAmount)[]) {
       const decimalBalance =
         typeof balanceItem.price === "number"
           ? removeSmallAmount(balanceItem.amount, balanceItem.decimals, balanceItem.price)

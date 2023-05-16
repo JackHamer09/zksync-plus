@@ -26,6 +26,8 @@ import { onBeforeUnmount } from "vue";
 
 import { storeToRefs } from "pinia";
 
+import type { ZkSyncLiteTokenAmount } from "@/types";
+
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { groupBalancesByAmount } from "@/utils/mappers";
@@ -34,7 +36,7 @@ const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
 
-const balanceGroups = groupBalancesByAmount(balance);
+const balanceGroups = groupBalancesByAmount<ZkSyncLiteTokenAmount>(balance);
 
 const fetch = () => {
   walletLiteStore.requestBalance();

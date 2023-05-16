@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
 import { RemoteWallet, Wallet } from "zksync";
 
-import type { TokenAmount } from "@/types";
+import type { ZkSyncLiteTokenAmount } from "@/types";
 import type { AccountState } from "zksync/build/types";
 
 import { useNetworkStore } from "@/store/network";
@@ -126,7 +126,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     return await provider.getState(account.value.address);
   });
 
-  const balance = computed<TokenAmount[]>(() => {
+  const balance = computed<ZkSyncLiteTokenAmount[]>(() => {
     if (!accountState.value) {
       return [];
     }

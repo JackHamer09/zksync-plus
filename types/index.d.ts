@@ -9,3 +9,6 @@ export type Token = {
   price: TokenPrice;
 };
 export type TokenAmount = Token & { amount: BigNumberish };
+
+export type ZkSyncLiteToken = Token & { id: number };
+export type ZkSyncLiteTokenAmount = TokenAmount & ZkSyncLiteToken;
