@@ -11,7 +11,7 @@
         <CommonButton
           as="a"
           target="_blank"
-          :href="`https://zkexport.netlify.app/export/account/transactions?address=${account.address}&network=${selectedEthereumNetwork.name}`"
+          :href="`https://zkexport.netlify.app/export/account/transactions?address=${account.address}&network=${selectedEthereumNetwork.network}`"
         >
           <template #icon>
             <DocumentArrowDownIcon aria-hidden="true" />
