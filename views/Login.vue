@@ -1,6 +1,8 @@
 <template>
   <div class="login-view isolate">
-    <div class="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]">
+    <div
+      class="bg-block-1 pointer-events-none absolute inset-x-0 top-[-10rem] -z-10 overflow-hidden blur-3xl sm:top-[-20rem]"
+    >
       <svg
         class="relative left-[calc(50%-11rem)] -z-10 h-[21.1875rem] max-w-none -translate-x-1/2 rotate-[30deg] sm:left-[calc(50%-30rem)] sm:h-[42.375rem]"
         viewBox="0 0 1155 678"
@@ -26,7 +28,7 @@
       </svg>
     </div>
     <div
-      class="absolute inset-x-0 top-[calc(100%-22rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-43rem)]"
+      class="bg-block-2 pointer-events-none absolute inset-x-0 top-[calc(100%-22rem)] -z-10 overflow-hidden blur-3xl sm:top-[calc(100%-43rem)]"
     >
       <svg
         class="relative left-[calc(50%+3rem)] h-[21.1875rem] max-w-none -translate-x-1/2 sm:left-[calc(50%+36rem)] sm:h-[42.375rem]"
@@ -154,6 +156,36 @@ const useAnotherAccount = async () => {
 
     .made-with-love {
       @apply whitespace-pre-line text-center text-sm text-gray-400;
+    }
+  }
+
+  .bg-block-1 {
+    animation: rotate-bg-1 100s linear 0s infinite;
+  }
+  .bg-block-2 {
+    animation: rotate-bg-2 100s linear 0s infinite;
+  }
+
+  @keyframes rotate-bg-1 {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg) translateY(-60%) translateX(50%);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes rotate-bg-2 {
+    0% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(180deg) translateY(-80%) translateX(-80%);
+    }
+    100% {
+      transform: rotate(360deg);
     }
   }
 }
