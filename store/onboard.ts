@@ -1,6 +1,6 @@
 import { configureChains, createClient } from "@wagmi/core";
 import { publicProvider } from "@wagmi/core/providers/public";
-import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3modal/ethereum";
+import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/html";
 import { defineStore, storeToRefs } from "pinia";
 
@@ -16,34 +16,33 @@ export const useOnboardStore = defineStore("onboard", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
   const { provider } = configureChains(chains, [
-    walletConnectProvider({ projectId: env.walletConnectProjectID }),
+    w3mProvider({ projectId: env.walletConnectProjectID }),
     publicProvider(),
   ]);
-  const wagmiClient = createClient({
+  const wagmiConfig = createClient({
     autoConnect: true,
-    connectors: modalConnectors({
+    connectors: w3mConnectors({
       projectId: env.walletConnectProjectID,
-      version: "1",
-      appName: "zkSync Plus",
+      version: 1,
       chains: chains,
     }),
     provider,
   });
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
+  const ethereumClient = new EthereumClient(wagmiConfig, chains);
 
   const getWalletName = () => {
-    if (wagmiClient.connector?.name === "WalletConnect") {
+    if (wagmiConfig.connector?.name === "WalletConnect") {
       /* TODO: Figure our how to properly get wallet name from WalletConnect */
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return wagmiClient.data?.provider?.provider?.connector?.peerMeta?.name;
+      return wagmiConfig.data?.provider?.provider?.connector?.peerMeta?.name;
     }
-    return wagmiClient.connector?.name;
+    return wagmiConfig.connector?.name;
   };
 
   const account = ref(ethereumClient.getAccount());
   const network = ref(ethereumClient.getNetwork());
-  const connectorName = ref(wagmiClient.connector?.name);
+  const connectorName = ref(wagmiConfig.connector?.name);
   const walletName = ref<string | undefined>(getWalletName());
   const web3modal = new Web3Modal(
     { projectId: env.walletConnectProjectID, enableNetworkView: false, enableAccountView: true, themeMode: "light" },
@@ -52,7 +51,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   web3modal.setDefaultChain(selectedEthereumNetwork.value);
   ethereumClient.watchAccount(async (updatedAccount) => {
     account.value = updatedAccount;
-    connectorName.value = wagmiClient.connector?.name;
+    connectorName.value = wagmiConfig.connector?.name;
     walletName.value = getWalletName();
   });
   ethereumClient.watchNetwork((updatedNetwork) => (network.value = updatedNetwork));
