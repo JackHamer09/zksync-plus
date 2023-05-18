@@ -13,7 +13,7 @@
           </template>
           <template #default>Add funds</template>
         </CommonButton>
-        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite' }">
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era' }">
           <template #icon>
             <PaperAirplaneIcon aria-hidden="true" />
           </template>

@@ -39,9 +39,9 @@ export default (
     transactions,
     transactionsRequestInProgress,
     transactionsRequestError,
-    requestTransactions: (transactionHashes: string[]) => {
+    requestTransactions: async (transactionHashes: string[]) => {
       currentTransactionHashes = transactionHashes;
-      requestTransactions();
+      await requestTransactions();
     },
   };
 };

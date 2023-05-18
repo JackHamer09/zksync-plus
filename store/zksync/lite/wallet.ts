@@ -135,7 +135,9 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
       return { ...token, amount };
     });
   });
-  const allBalancePricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
+  const allBalancePricesLoaded = computed(
+    () => !balance.value.some((e) => e.price === "loading") && !balanceInProgress.value
+  );
   const {
     inProgress: balanceInProgress,
     error: balanceError,

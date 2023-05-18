@@ -34,8 +34,10 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>, op
       error.value = undefined;
     }
 
+    let rawResult: ResultType | undefined;
     try {
-      result.value = await promise;
+      rawResult = await promise;
+      result.value = rawResult;
     } catch (e) {
       error.value = e as unknown as ErrorType;
       promise = undefined;
@@ -53,7 +55,7 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>, op
         }
       }
     }
-    return result.value;
+    return rawResult;
   };
 
   const reset = () => {

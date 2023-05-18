@@ -17,7 +17,7 @@ export const useEraTokensStore = defineStore("eraTokens", () => {
     execute: requestTokens,
     reset: resetTokens,
   } = usePromise<Token[]>(async () => {
-    const tokens = await getTokenCollection(eraNetwork.value.chainId);
+    const tokens = await getTokenCollection(eraNetwork.value.id);
     return tokens.map((token) => ({
       l1Address: checksumAddress(token.l1Address),
       address: checksumAddress(token.l2Address),

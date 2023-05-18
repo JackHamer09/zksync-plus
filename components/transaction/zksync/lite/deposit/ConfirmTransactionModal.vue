@@ -76,14 +76,11 @@
 
   <CommonModal v-else v-bind="$attrs" :closable="false" class="deposit-transaction-successful-modal" title="">
     <template #animation>
-      <Vue3Lottie v-if="!transactionCommitted" class="w-72" :animation-data="ProgressPlane" loop />
-      <Vue3Lottie v-else class="w-72" :animation-data="SuccessConfetti" :loop="false" />
+      <Vue3Lottie class="w-72" :animation-data="ProgressPlane" loop />
     </template>
 
     <div class="flex h-full flex-col overflow-auto">
-      <div class="h2 text-center sm:h1">
-        {{ transactionCommitted ? "Transaction completed" : "Transaction submitted" }}
-      </div>
+      <div class="h2 text-center sm:h1">Transaction submitted</div>
       <CommonCardWithLineButtons v-if="transaction">
         <TransactionLineItem
           :icon="transactionReceiptIcon"
@@ -110,21 +107,17 @@
         </TransactionLineItem>
       </CommonCardWithLineButtons>
 
-      <CommonAlert v-if="!transactionCommitted" class="mt-3" variant="neutral" :icon="InformationCircleIcon">
+      <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
           Your funds will be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> after the
-          transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span
+          transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> and then
+          processed on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span
           >. You are free to close this page.
         </p>
         <a :href="`${blockExplorerUrl}/tx/${ethTransactionHash}`" target="_blank" class="alert-link">
           Track status
           <ArrowUpRightIcon class="ml-1 h-3 w-3" />
         </a>
-      </CommonAlert>
-      <CommonAlert v-else class="mt-3" variant="success" :icon="InformationCircleIcon">
-        <p>
-          Your funds should now be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span>
-        </p>
       </CommonAlert>
 
       <div class="sticky bottom-0 z-[1] mt-auto flex w-full flex-col items-center">
@@ -157,7 +150,6 @@ import TotalPrice from "@/components/transaction/transactionLineItem/TotalPrice.
 import useTransaction from "@/composables/zksync/lite/deposit/useTransaction";
 
 import ProgressPlane from "@/assets/lottie/progress-plane.json";
-import SuccessConfetti from "@/assets/lottie/success-confetti.json";
 
 import type { ZkSyncLiteToken } from "@/types";
 import type { BigNumberish, ContractTransaction } from "ethers";
@@ -267,7 +259,7 @@ const transactionReceiptIcon = computed(() => {
   if (!transactionReceiptDirection.value) {
     return undefined;
   }
-  return transactionReceiptDirection.value === "in" ? ArrowRightIcon : ArrowLeftIcon;
+  return transactionReceiptDirection.value === "in" ? ArrowLeftIcon : ArrowRightIcon;
 });
 
 const makeTransaction = async () => {
@@ -291,12 +283,18 @@ const makeTransaction = async () => {
 
   if (tx) {
     transactionReceipt.value = tx?.ethTx;
-    tx.awaitEthereumTxCommit().then(() => {
-      transactionCommitted.value = true;
-      liteTransactionsHistoryStore.reloadRecentTransactions();
-      walletLiteStore.requestBalance({ force: true });
-      liteEthereumBalanceStore.requestBalance({ force: true });
-    });
+    tx.awaitEthereumTxCommit()
+      .then(() => {
+        transactionCommitted.value = true;
+        liteTransactionsHistoryStore.reloadRecentTransactions();
+        walletLiteStore.requestBalance({ force: true });
+        liteEthereumBalanceStore.requestBalance({ force: true });
+      })
+      .catch((err) => {
+        transactionCommitted.value = false;
+        error.value = err;
+        status.value = "not-started";
+      });
   }
 };
 </script>

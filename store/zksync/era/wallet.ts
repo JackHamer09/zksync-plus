@@ -8,7 +8,6 @@ import { Web3Provider } from "zksync-web3";
 import type { TokenAmount } from "@/types";
 import type { BigNumberish } from "ethers";
 
-import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useEraTokensStore } from "@/store/zksync/era/tokens";
@@ -17,15 +16,15 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
   const onboardStore = useOnboardStore();
   const eraProviderStore = useEraProviderStore();
   const eraTokensStore = useEraTokensStore();
+  const { eraNetwork } = storeToRefs(eraProviderStore);
   const { tokens } = storeToRefs(eraTokensStore);
   const { account, network } = storeToRefs(onboardStore);
-  const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
   const { execute: getSigner, reset: resetSigner } = usePromise(async () => {
     const walletNetworkId = network.value.chain?.id;
-    if (walletNetworkId !== selectedEthereumNetwork.value.id) {
+    if (walletNetworkId !== eraNetwork.value.id) {
       throw new Error(
-        `Incorrect wallet network selected: #${walletNetworkId} (expected: ${selectedEthereumNetwork.value.name} #${selectedEthereumNetwork.value.id})`
+        `Incorrect wallet network selected: #${walletNetworkId} (expected: ${eraNetwork.value.name} #${eraNetwork.value.id})`
       );
     }
 
@@ -87,7 +86,32 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
       return { ...token, amount };
     });
   });
-  const allBalancePricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
+  const allBalancePricesLoaded = computed(
+    () => !balance.value.some((e) => e.price === "loading") && !balanceInProgress.value
+  );
+
+  const isCorrectNetworkSet = computed(() => {
+    const walletNetworkId = network.value.chain?.id;
+    return walletNetworkId === eraNetwork.value.id;
+  });
+  const {
+    inProgress: switchingNetworkInProgress,
+    error: switchingNetworkError,
+    execute: switchNetwork,
+  } = usePromise(
+    async () => {
+      try {
+        await onboardStore.switchNetworkById(eraNetwork.value.id, eraNetwork.value.name);
+      } catch (err) {
+        const error = formatError(err as Error);
+        if (error) throw error;
+      }
+    },
+    { cache: false }
+  );
+  const setCorrectNetwork = async () => {
+    await switchNetwork().catch(() => undefined);
+  };
 
   onboardStore.subscribeOnAccountChange(() => {
     resetSigner();
@@ -102,5 +126,10 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
     balanceError: computed(() => balanceError.value),
     allBalancePricesLoaded,
     requestBalance,
+
+    isCorrectNetworkSet,
+    switchingNetworkInProgress,
+    switchingNetworkError,
+    setCorrectNetwork,
   };
 });

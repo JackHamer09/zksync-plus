@@ -388,8 +388,8 @@ const continueButtonDisabled = computed(
     totalComputeAmount.value.isZero()
 );
 
-const fetchBalances = () => {
-  walletLiteStore.requestBalance().then(() => {
+const fetchBalances = async () => {
+  await walletLiteStore.requestBalance().then(() => {
     if (allBalancePricesLoaded.value && !selectedToken.value) {
       selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
     }

@@ -76,6 +76,16 @@ export const useOnboardStore = defineStore("onboard", () => {
     const walletNetworkId = network.value.chain?.id;
     return walletNetworkId === selectedEthereumNetwork.value.id;
   });
+  const switchNetworkById = async (chainId: number, networkName = selectedEthereumNetwork.value.name) => {
+    try {
+      await ethereumClient.switchNetwork({ chainId });
+    } catch (err) {
+      if (err instanceof Error && err.message.includes("does not support programmatic chain switching")) {
+        throw new Error(`Please switch network manually to "${networkName}" in your ${walletName.value} wallet`);
+      }
+      throw err;
+    }
+  };
   const {
     inProgress: switchingNetworkInProgress,
     error: switchingNetworkError,
@@ -83,13 +93,8 @@ export const useOnboardStore = defineStore("onboard", () => {
   } = usePromise(
     async () => {
       try {
-        await ethereumClient.switchNetwork({ chainId: selectedEthereumNetwork.value.id });
+        await switchNetworkById(selectedEthereumNetwork.value.id);
       } catch (err) {
-        if (err instanceof Error && err.message.includes("does not support programmatic chain switching")) {
-          throw new Error(
-            `Please switch network manually to "${selectedEthereumNetwork.value.name}" in your ${walletName.value} wallet`
-          );
-        }
         const error = formatError(err as Error);
         if (error) throw error;
       }
@@ -120,6 +125,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     switchingNetworkInProgress,
     switchingNetworkError,
     setCorrectNetwork,
+    switchNetworkById,
 
     getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
 

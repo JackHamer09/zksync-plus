@@ -72,7 +72,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: Token[], 
     type: mainTransfer?.type,
     from: mainTransfer?.from ?? checksumAddress(transaction.initiatorAddress),
     fromNetwork: mainTransfer?.fromNetwork ?? "L2",
-    to: mainTransfer?.to,
+    to: mainTransfer?.to as string,
     toNetwork: mainTransfer?.toNetwork ?? "L2",
     token: mainTransfer?.tokenInfo?.address
       ? getTokenByAddress(checksumAddress(mainTransfer.tokenInfo.address))
