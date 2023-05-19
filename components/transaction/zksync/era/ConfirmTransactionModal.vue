@@ -94,7 +94,6 @@
     v-else-if="transaction?.type === 'withdrawal'"
     v-bind="$attrs"
     :transaction="transactionLineItem"
-    :in-progress="!transactionCommitted"
   />
 </template>
 
@@ -266,7 +265,7 @@ const makeTransaction = async () => {
       })
       .catch((err) => {
         transactionCommitted.value = false;
-        error.value = err;
+        error.value = err as Error;
         status.value = "not-started";
       });
   }

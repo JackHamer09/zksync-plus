@@ -12,7 +12,8 @@
 
       <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
-          Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> after a
+          Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
+          after a
           <a
             href="https://era.zksync.io/docs/dev/troubleshooting/withdrawal-delay.html#withdrawal-delay"
             target="_blank"
@@ -53,7 +54,7 @@ import EraTransactionLineItem from "@/components/transaction/zksync/era/EraTrans
 import ProgressPlane from "@/assets/lottie/progress-plane.json";
 
 import type { EraTransaction } from "@/utils/zksync/era/mappers";
-import type { PropType } from "nuxt/dist/app/compat/capi";
+import type { PropType } from "vue";
 
 import { useDestinationsStore } from "@/store/destinations";
 
