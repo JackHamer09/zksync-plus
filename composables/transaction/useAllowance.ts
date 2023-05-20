@@ -1,8 +1,9 @@
 import { fetchSigner } from "@wagmi/core";
 import { Contract } from "ethers";
-import { IERC20_INTERFACE } from "zksync/build/utils";
+import { IERC20 } from "zksync-web3/build/src/utils";
 
-import type { BigNumber, BigNumberish, ContractInterface, ContractTransaction } from "ethers";
+import type { Provider } from "@wagmi/core";
+import type { BigNumber, BigNumberish, ContractTransaction } from "ethers";
 import type { Ref } from "vue";
 
 import { ETH_ADDRESS } from "@/utils/constants";
@@ -10,7 +11,8 @@ import { ETH_ADDRESS } from "@/utils/constants";
 export default (
   accountAddress: Ref<string | undefined>,
   tokenAddress: Ref<string | undefined>,
-  getContractAddress: () => Promise<string | undefined>
+  getContractAddress: () => Promise<string | undefined>,
+  getEthereumProvider: () => Provider
 ) => {
   const getContractInstance = async () => {
     if (!tokenAddress.value) throw new Error("Token is not available");
@@ -18,7 +20,7 @@ export default (
     const signer = await fetchSigner();
     if (!signer) throw new Error("Signer is not available");
 
-    return new Contract(tokenAddress.value, IERC20_INTERFACE as ContractInterface, signer);
+    return new Contract(tokenAddress.value, IERC20, getEthereumProvider());
   };
 
   const {

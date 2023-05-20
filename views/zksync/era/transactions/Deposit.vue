@@ -3,7 +3,7 @@
     <TransactionAllowanceModal
       v-model:opened="allowanceModalOpened"
       :transaction="transaction"
-      :destination="destinations.zkSyncLite"
+      :destination="destinations.era"
       :get-allowance="requestAllowance"
       :set-allowance="setTokenAllowance"
       :fetch-balance="() => fetchBalances(true)"
@@ -11,8 +11,9 @@
     />
     <ConfirmTransactionModal
       v-model:opened="transactionConfirmModalOpened"
+      :fee="fee"
       :fee-token="feeToken"
-      :fee="gasLimitAndPrice"
+      :fee-values="feeValues"
       :destination="destination"
       :transaction="transaction"
       :button-disabled="continueButtonDisabled || !enoughBalanceForTransaction"
@@ -113,13 +114,13 @@
       </CommonErrorBlock>
     </form>
 
-    <ZksyncLiteTransactionFooter :authorization="false" :account-activation="false">
+    <EraTransactionFooter>
       <template #after-checks>
         <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="openConfirmationModal">
           Continue
         </CommonButton>
       </template>
-    </ZksyncLiteTransactionFooter>
+    </EraTransactionFooter>
   </div>
 </template>
 
@@ -131,21 +132,20 @@ import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import ZksyncLiteTransactionFooter from "@/components/transaction/zksync/lite/TransactionFooter.vue";
-import ConfirmTransactionModal from "@/components/transaction/zksync/lite/deposit/ConfirmTransactionModal.vue";
+import EraTransactionFooter from "@/components/transaction/zksync/era/EraTransactionFooter.vue";
+import ConfirmTransactionModal from "@/components/transaction/zksync/era/deposit/ConfirmTransactionModal.vue";
 
 import useAllowance from "@/composables/transaction/useAllowance";
-import useFee from "@/composables/zksync/lite/deposit/useFee";
+import useFee from "@/composables/zksync/era/deposit/useFee";
 
-import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/lite/deposit/ConfirmTransactionModal.vue";
+import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/era/deposit/ConfirmTransactionModal.vue";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
-import { useLiteEthereumBalanceStore } from "@/store/zksync/lite/ethereumBalance";
-import { useLiteProviderStore } from "@/store/zksync/lite/provider";
-import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
+import { useEraEthereumBalanceStore } from "@/store/zksync/era/ethereumBalance";
+import { useEraProviderStore } from "@/store/zksync/era/provider";
+import { useEraTokensStore } from "@/store/zksync/era/tokens";
 import {
   checksumAddress,
   decimalToBigNumber,
@@ -169,16 +169,15 @@ const emit = defineEmits<{
 const route = useRoute();
 
 const onboardStore = useOnboardStore();
-const walletLiteStore = useLiteWalletStore();
-const liteTokensStore = useLiteTokensStore();
-const liteProviderStore = useLiteProviderStore();
-const liteEthereumBalance = useLiteEthereumBalanceStore();
+const eraTokensStore = useEraTokensStore();
+const eraProviderStore = useEraProviderStore();
+const eraEthereumBalance = useEraEthereumBalanceStore();
 const { account } = storeToRefs(onboardStore);
 const { destinations } = storeToRefs(useDestinationsStore());
-const { tokens } = storeToRefs(liteTokensStore);
-const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(liteEthereumBalance);
+const { tokens } = storeToRefs(eraTokensStore);
+const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(eraEthereumBalance);
 
-const destination = computed(() => destinations.value.zkSyncLite);
+const destination = computed(() => destinations.value.era);
 
 const routeTokenAddress = computed(() => {
   if (!route.query.token || Array.isArray(route.query.token) || !isAddress(route.query.token)) {
@@ -202,10 +201,10 @@ const selectedToken = computed(() => {
   return balance.value.find((e) => e.address === selectedTokenAddress.value);
 });
 watch(
-  () => selectedToken?.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
+  () => selectedToken?.value?.address,
+  (address) => {
+    if (!address) return;
+    eraTokensStore.requestTokenPrice(address);
   }
 );
 watch(allBalancePricesLoaded, (loaded) => {
@@ -224,8 +223,8 @@ const {
   setAllowance,
 } = useAllowance(
   computed(() => account.value.address),
-  computed(() => selectedToken.value?.address),
-  async () => (await liteProviderStore.requestProvider())?.contractAddress.mainContract,
+  computed(() => selectedToken.value?.l1Address),
+  async () => (await eraProviderStore.requestProvider().getDefaultBridgeAddresses()).erc20L1,
   onboardStore.getEthereumProvider
 );
 const enoughAllowance = computed(() => {
@@ -264,31 +263,27 @@ const openConfirmationModal = () => {
 };
 
 const {
-  gasLimit,
-  gasPrice,
+  fee: feeValues,
   result: fee,
   inProgress: feeInProgress,
   error: feeError,
   feeToken,
   enoughBalanceToCoverFee,
   estimateFee,
-} = useFee(onboardStore.getEthereumProvider, walletLiteStore.getWalletInstance, tokens, balance);
+} = useFee(
+  onboardStore.getEthereumProvider,
+  eraProviderStore.requestProvider,
+  computed(() => account.value.address),
+  tokens,
+  balance
+);
 watch(
-  () => feeToken?.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
+  () => feeToken?.value?.address,
+  (address) => {
+    if (!address) return;
+    eraTokensStore.requestTokenPrice(address);
   }
 );
-const gasLimitAndPrice = computed(() => {
-  if (!gasLimit.value || !gasPrice.value) {
-    return undefined;
-  }
-  return {
-    gasLimit: gasLimit.value,
-    gasPrice: gasPrice.value,
-  };
-});
 watch(enoughBalanceToCoverFee, (isEnough) => {
   if (!isEnough && transactionConfirmModalOpened.value) {
     transactionConfirmModalOpened.value = false;
@@ -351,7 +346,7 @@ const feeAutoUpdateEstimate = async () => {
   await estimate();
 };
 watch(
-  [() => props.address, () => selectedToken.value?.symbol, () => account.value.address],
+  [() => props.address, () => selectedToken.value?.address, () => account.value.address],
   () => {
     estimate();
   },
@@ -373,7 +368,7 @@ const continueButtonDisabled = computed(() => {
 });
 
 const fetchBalances = async (force = false) => {
-  await liteEthereumBalance.requestBalance({ force }).then(() => {
+  await eraEthereumBalance.requestBalance({ force }).then(() => {
     if (allBalancePricesLoaded.value && !selectedToken.value) {
       selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
     }

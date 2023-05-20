@@ -7,7 +7,7 @@
         :error="balanceError"
       />
       <CommonButtonsLineGroup class="my-4">
-        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite-deposit' }">
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era-deposit' }">
           <template #icon>
             <PlusIcon aria-hidden="true" />
           </template>
@@ -45,8 +45,8 @@
               <br />
               <span class="mt-1.5 inline-block">
                 Proceed to
-                <NuxtLink class="link" :to="{ name: 'transaction-zksync-lite-deposit' }">Add funds</NuxtLink> page to
-                add balance to your account
+                <NuxtLink class="link" :to="{ name: 'transaction-zksync-era-deposit' }">Add funds</NuxtLink> page to add
+                balance to your account
               </span>
             </CommonEmptyBlock>
           </template>

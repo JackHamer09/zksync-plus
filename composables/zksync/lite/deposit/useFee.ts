@@ -10,15 +10,8 @@ import type { Provider } from "@wagmi/core";
 import type { BigNumberish } from "ethers";
 import type { Ref } from "vue";
 import type { Wallet } from "zksync";
-import type { IncomingTxFeeType } from "zksync/build/types";
 
 import { calculateFee } from "@/utils/helpers";
-
-export type FeeEstimationParams = {
-  type: IncomingTxFeeType;
-  to: string;
-  symbol: string;
-};
 
 export default (
   getProvider: () => Provider,

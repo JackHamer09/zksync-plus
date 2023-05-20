@@ -21,8 +21,8 @@
         <CommonCardWithLineButtons>
           <AddressCardParsed
             :address="transaction.to"
-            :destination="destinations.zkSyncLite"
-            :tooltip="`Add funds to ${destinations.zkSyncLite.label} (L2)`"
+            :destination="destinations.era"
+            :tooltip="`Add funds to ${destinations.era.label} (L2)`"
           />
         </CommonCardWithLineButtons>
       </template>
@@ -61,7 +61,7 @@
           <transition v-bind="TransitionPrimaryButtonText" mode="out-in">
             <span v-if="status === 'processing'">Processing...</span>
             <span v-else-if="status === 'waiting-for-signature'">Waiting for confirmation</span>
-            <span v-else>Add funds to {{ destinations.zkSyncLite.label }}</span>
+            <span v-else>Add funds to {{ destinations.era.label }}</span>
           </transition>
         </CommonButton>
         <transition v-bind="TransitionHeight()">
@@ -109,9 +109,9 @@
 
       <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
-          Your funds will be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
-          after the transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> and
-          then processed on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span
+          Your funds will be available on <span class="font-medium">{{ destinations.era.label }}</span> (L2) after the
+          transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> and then
+          processed on <span class="font-medium">{{ destinations.era.label }}</span
           >. You are free to close this page.
         </p>
         <a :href="`${blockExplorerUrl}/tx/${ethTransactionHash}`" target="_blank" class="alert-link">
@@ -147,11 +147,12 @@ import { storeToRefs } from "pinia";
 import TokenAmount from "@/components/transaction/transactionLineItem/TokenAmount.vue";
 import TotalPrice from "@/components/transaction/transactionLineItem/TotalPrice.vue";
 
-import useTransaction from "@/composables/zksync/lite/deposit/useTransaction";
+import useTransaction from "@/composables/zksync/era/deposit/useTransaction";
 
 import ProgressPlane from "@/assets/lottie/progress-plane.json";
 
-import type { ZkSyncLiteToken } from "@/types";
+import type { DepositFeeValues } from "@/composables/zksync/era/deposit/useFee";
+import type { Token } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
@@ -159,15 +160,14 @@ import { useDestinationsStore } from "@/store/destinations";
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { usePreferencesStore } from "@/store/preferences";
-import { useLiteEthereumBalanceStore } from "@/store/zksync/lite/ethereumBalance";
-import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
-import { calculateFee } from "@/utils/helpers";
+import { useEraEthereumBalanceStore } from "@/store/zksync/era/ethereumBalance";
+import { useEraTransactionsHistoryStore } from "@/store/zksync/era/transactionsHistory";
+import { useEraWalletStore } from "@/store/zksync/era/wallet";
 import { TransitionHeight, TransitionPrimaryButtonText } from "@/utils/transitions";
 
 export type ConfirmationModalTransaction = {
   to: string;
-  token: ZkSyncLiteToken;
+  token: Token;
   amount: BigNumberish;
 };
 
@@ -175,14 +175,14 @@ const props = defineProps({
   transaction: {
     type: Object as PropType<ConfirmationModalTransaction>,
   },
-  feeToken: {
-    type: Object as PropType<ZkSyncLiteToken>,
-  },
   fee: {
-    type: Object as PropType<{
-      gasLimit: BigNumberish;
-      gasPrice: BigNumberish;
-    }>,
+    type: String as PropType<BigNumberish>,
+  },
+  feeToken: {
+    type: Object as PropType<Token>,
+  },
+  feeValues: {
+    type: Object as PropType<DepositFeeValues>,
   },
   buttonDisabled: {
     type: Boolean,
@@ -194,32 +194,29 @@ const props = defineProps({
   },
 });
 
-const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
-const walletLiteStore = useLiteWalletStore();
-const liteEthereumBalanceStore = useLiteEthereumBalanceStore();
+const eraTransactionsHistoryStore = useEraTransactionsHistoryStore();
+const walletEraStore = useEraWalletStore();
+const eraEthereumBalanceStore = useEraEthereumBalanceStore();
 const { account, walletName } = storeToRefs(useOnboardStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { blockExplorerUrl } = storeToRefs(useNetworkStore());
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
-const { status, error, ethTransactionHash, commitTransaction } = useTransaction(() =>
-  walletLiteStore.getWalletInstance()
-);
+const { status, error, ethTransactionHash, commitTransaction } = useTransaction(walletEraStore.getL1Signer);
 
-const fee = computed(() => {
-  if (!props.fee) return undefined;
-  return calculateFee(props.fee.gasLimit, props.fee.gasPrice).toString();
-});
-const lastFee = ref(fee.value);
-watch(fee, (newFee) => {
-  if (newFee) {
-    lastFee.value = newFee;
+const lastFee = ref(props.fee);
+watch(
+  () => props.fee,
+  (newFee) => {
+    if (newFee) {
+      lastFee.value = newFee;
+    }
   }
-});
+);
 
 const newFeeAlert = ref(false);
 
-const totalOfEachToken = computed<{ token: ZkSyncLiteToken; amount: BigNumberish }[]>(() => {
-  const tokenBySymbol: { [symbol: string]: ZkSyncLiteToken } = {};
+const totalOfEachToken = computed<{ token: Token; amount: BigNumberish }[]>(() => {
+  const tokenBySymbol: { [symbol: string]: Token } = {};
   if (props.transaction) {
     tokenBySymbol[props.transaction.token.symbol] = props.transaction.token;
   }
@@ -261,30 +258,30 @@ const transactionReceiptIcon = computed(() => {
 });
 
 const makeTransaction = async () => {
-  if (!props.feeToken || !fee.value) return;
+  if (!props.feeToken || !props.fee || !props.feeValues) return;
 
   const prevFee = BigNumber.from(lastFee.value);
 
   await props.estimate();
 
-  if (prevFee.lt(fee.value)) {
+  if (prevFee.lt(props.fee)) {
     newFeeAlert.value = true;
   }
 
   if (newFeeAlert.value || props.buttonDisabled) return;
 
-  const tx = await commitTransaction(props.transaction!, props.fee!);
+  const tx = await commitTransaction(props.transaction!, props.feeValues);
 
   if (status.value === "done") {
     previousTransactionAddress.value = props.transaction!.to;
   }
 
   if (tx) {
-    tx.awaitEthereumTxCommit()
+    tx.waitL1Commit()
       .then(() => {
-        liteTransactionsHistoryStore.reloadRecentTransactions();
-        walletLiteStore.requestBalance({ force: true });
-        liteEthereumBalanceStore.requestBalance({ force: true });
+        eraTransactionsHistoryStore.reloadRecentTransactions();
+        walletEraStore.requestBalance({ force: true });
+        eraEthereumBalanceStore.requestBalance({ force: true });
       })
       .catch((err) => {
         error.value = err as Error;
