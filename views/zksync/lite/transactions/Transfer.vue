@@ -67,6 +67,7 @@
     <form v-else class="transaction-form pb-2" @submit.prevent="">
       <CommonAmountInput
         v-model.trim="amount"
+        v-model:error="amountError"
         v-model:token-address="selectedTokenAddress"
         :balances="balance"
         :maxAmount="maxAmount"
@@ -267,6 +268,7 @@ watch(enoughBalanceToCoverFee, (isEnough) => {
 });
 
 const amount = ref("");
+const amountError = ref<string | undefined>();
 const maxAmount = computed(() => {
   if (!selectedToken.value) {
     return undefined;
@@ -385,6 +387,7 @@ const continueButtonDisabled = computed(
     !fee.value ||
     !transactions.value.length ||
     feeLoading.value ||
+    amountError.value ||
     totalComputeAmount.value.isZero()
 );
 

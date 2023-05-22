@@ -62,7 +62,7 @@
       <transition v-bind="TransitionOpacity()">
         <div v-if="amountError" class="amount-input-error">
           <template v-if="amountError === 'insufficient_balance'">Insufficient balance</template>
-          <template v-if="amountError === 'exceeds_max_amount'">
+          <template v-else-if="amountError === 'exceeds_max_amount'">
             Max amount is
             <button
               type="button"
@@ -71,6 +71,9 @@
             >
               {{ maxDecimalAmount }}
             </button>
+          </template>
+          <template v-else-if="amountError === 'exceeds_decimals'">
+            Max decimal length for {{ selectedToken?.symbol }} is {{ selectedToken?.decimals }}
           </template>
         </div>
         <div v-else-if="inputted" class="amount-input-note">
@@ -120,6 +123,9 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  error: {
+    type: String,
+  },
   loading: {
     type: Boolean,
     default: false,
@@ -127,6 +133,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
+  (eventName: "update:error", error?: string): void;
   (eventName: "update:modelValue", amount: string): void;
   (eventName: "update:tokenAddress", tokenAddress?: string): void;
 }>();
@@ -153,8 +160,21 @@ const amountError = computed(() => {
     }
     return "exceeds_max_amount";
   }
+  if (inputted.value) {
+    const [, decimal] = inputted.value.split(".");
+    if (decimal && decimal.length > selectedToken.value.decimals) {
+      return "exceeds_decimals";
+    }
+  }
   return undefined;
 });
+watch(
+  amountError,
+  (value) => {
+    emit("update:error", value);
+  },
+  { immediate: true }
+);
 
 const inputElement = ref<HTMLInputElement | null>(null);
 const { focused } = useFocus(inputElement, { initialValue: !!props.autofocus });

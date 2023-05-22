@@ -4,7 +4,7 @@ import { fetchSigner } from "@wagmi/core";
 import { BigNumber } from "ethers";
 import { ethers } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
-import { L1Signer } from "zksync-web3";
+import { L1Signer, Web3Provider } from "zksync-web3";
 
 import type { TokenAmount } from "@/types";
 import type { BigNumberish } from "ethers";

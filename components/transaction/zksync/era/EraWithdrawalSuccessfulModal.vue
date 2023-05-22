@@ -10,7 +10,12 @@
         <EraTransactionLineItem :transaction="transaction" />
       </CommonCardWithLineButtons>
 
-      <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
+      <CommonAlert
+        v-if="selectedEthereumNetwork.network === 'mainnet'"
+        class="mt-3"
+        variant="neutral"
+        :icon="InformationCircleIcon"
+      >
         <p>
           Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
           after a
@@ -57,6 +62,7 @@ import type { EraTransaction } from "@/utils/zksync/era/mappers";
 import type { PropType } from "vue";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useNetworkStore } from "@/store/network";
 
 defineProps({
   transaction: {
@@ -65,6 +71,7 @@ defineProps({
   },
 });
 
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 </script>
 

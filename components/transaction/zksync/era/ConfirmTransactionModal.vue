@@ -54,7 +54,7 @@
           </CommonErrorBlock>
         </div>
         <a
-          v-if="destination.key === 'ethereum'"
+          v-if="destination.key === 'ethereum' && selectedEthereumNetwork.network === 'mainnet'"
           class="link mx-auto mt-2 -mb-1 flex items-center justify-center text-center text-sm"
           href="https://era.zksync.io/docs/dev/troubleshooting/withdrawal-delay.html#withdrawal-delay"
           target="_blank"
@@ -112,11 +112,12 @@ import useTransaction from "@/composables/zksync/era/useTransaction";
 import type { FeeEstimationParams } from "@/composables/zksync/era/useFee";
 import type { TransactionDestination } from "@/store/destinations";
 import type { Token } from "@/types";
+import type { EraTransaction } from "@/utils/zksync/era/mappers";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
-import type { EraTransaction } from "~~/utils/zksync/era/mappers";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { usePreferencesStore } from "@/store/preferences";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
@@ -163,6 +164,7 @@ const eraTransactionsHistoryStore = useEraTransactionsHistoryStore();
 const walletEraStore = useEraWalletStore();
 const eraProviderStore = useEraProviderStore();
 const { account, walletName } = storeToRefs(useOnboardStore());
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 

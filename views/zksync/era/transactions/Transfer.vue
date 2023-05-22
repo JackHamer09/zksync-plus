@@ -15,9 +15,10 @@
           <div v-if="!enoughBalanceForTransaction" class="mx-4 my-3">
             <CommonAlert variant="error" :icon="ExclamationTriangleIcon">
               <p>
-                The fee has changed since the last estimation. Insufficient
-                <span class="font-medium">{{ selectedToken?.symbol }}</span> balance to pay for transaction. Please go
-                back and adjust the amount to proceed.
+                {{
+                  selectedToken?.address === ETH_ADDRESS ? "The fee has changed since the last estimation. " : ""
+                }}Insufficient <span class="font-medium">{{ selectedToken?.symbol }}</span> balance to pay for
+                transaction. Please go back and adjust the amount to proceed.
               </p>
               <button type="button" class="alert-link" @click="transactionConfirmModalOpened = false">Go back</button>
             </CommonAlert>
@@ -48,6 +49,7 @@
     <form v-else class="transaction-form pb-2" @submit.prevent="">
       <CommonAmountInput
         v-model.trim="amount"
+        v-model:error="amountError"
         v-model:token-address="selectedTokenAddress"
         :balances="balance"
         :maxAmount="maxAmount"
@@ -81,7 +83,7 @@
     <EraTransactionFooter :authorization="false" :account-activation="false">
       <template #after-checks>
         <a
-          v-if="type === 'withdrawal'"
+          v-if="type === 'withdrawal' && selectedEthereumNetwork.network === 'mainnet'"
           class="link mb-2 flex items-center text-sm"
           href="https://era.zksync.io/docs/dev/troubleshooting/withdrawal-delay.html#withdrawal-delay"
           target="_blank"
@@ -116,6 +118,7 @@ import type { PropType } from "vue";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
+import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useEraTokensStore } from "@/store/zksync/era/tokens";
@@ -145,6 +148,7 @@ const walletEraStore = useEraWalletStore();
 const eraTokensStore = useEraTokensStore();
 const eraProviderStore = useEraProviderStore();
 const { account } = storeToRefs(onboardStore);
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { tokens } = storeToRefs(eraTokensStore);
 const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(walletEraStore);
@@ -235,6 +239,7 @@ watch(enoughBalanceToCoverFee, (isEnough) => {
 });
 
 const amount = ref("");
+const amountError = ref<string | undefined>();
 const maxAmount = computed(() => {
   if (!selectedToken.value) {
     return undefined;
@@ -319,7 +324,8 @@ const balancesLoading = computed(() => {
 });
 
 const continueButtonDisabled = computed(() => {
-  if (!selectedToken.value || !enoughBalanceToCoverFee.value || totalComputeAmount.value.isZero()) return true;
+  if (!selectedToken.value || !enoughBalanceToCoverFee.value || amountError.value || totalComputeAmount.value.isZero())
+    return true;
   if (feeLoading.value || !fee.value) return true;
   return false;
 });

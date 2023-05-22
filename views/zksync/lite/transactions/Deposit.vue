@@ -61,6 +61,7 @@
     <form v-else class="transaction-form pb-2" @submit.prevent="">
       <CommonAmountInput
         v-model.trim="amount"
+        v-model:error="amountError"
         v-model:token-address="selectedTokenAddress"
         :balances="balance"
         :maxAmount="maxAmount"
@@ -296,6 +297,7 @@ watch(enoughBalanceToCoverFee, (isEnough) => {
 });
 
 const amount = ref("");
+const amountError = ref<string | undefined>();
 const maxAmount = computed(() => {
   if (!selectedToken.value) {
     return undefined;
@@ -365,7 +367,8 @@ const balancesLoading = computed(() => {
 });
 
 const continueButtonDisabled = computed(() => {
-  if (!selectedToken.value || !enoughBalanceToCoverFee.value || totalComputeAmount.value.isZero()) return true;
+  if (!selectedToken.value || !enoughBalanceToCoverFee.value || amountError.value || totalComputeAmount.value.isZero())
+    return true;
   if (allowanceRequestInProgress.value || allowanceRequestError.value) return true;
   if (!enoughAllowance.value) return false; // We can proceed to allowance modal even if fee is not loaded
   if (feeLoading.value || !fee.value) return true;
