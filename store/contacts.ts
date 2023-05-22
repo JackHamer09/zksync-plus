@@ -30,7 +30,7 @@ export const useContactsStore = defineStore("contacts", () => {
   const userContactsByFirstCharacter = computed(() => {
     const contacts: { [firstCharacter: string]: Contact[] } = {};
     for (const contact of userContacts.value) {
-      const firstCharacter = contact.name.slice(0, 1);
+      const firstCharacter = contact.name.slice(0, 1).toUpperCase();
       if (!contacts[firstCharacter]) {
         contacts[firstCharacter] = [];
       }
@@ -44,12 +44,14 @@ export const useContactsStore = defineStore("contacts", () => {
       throw new Error("Can't add own account to contacts");
     }
     removeContact(contact.address);
-    userContacts.value.push(contact);
+    userContacts.value = [...userContacts.value, contact];
   };
   const removeContact = (contactAddress: string) => {
     const contactIndex = userContacts.value.map((e) => e.address).indexOf(contactAddress);
     if (contactIndex !== -1) {
-      userContacts.value.splice(contactIndex, 1);
+      const newContacts = [...userContacts.value];
+      newContacts.splice(contactIndex, 1);
+      userContacts.value = newContacts;
     }
   };
 
