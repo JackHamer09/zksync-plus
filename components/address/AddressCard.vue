@@ -18,6 +18,9 @@
         <slot name="icon" />
       </div>
     </template>
+    <template #right v-else-if="$slots.right">
+      <slot name="right" />
+    </template>
   </CommonButtonLineWithImg>
 </template>
 

@@ -81,7 +81,7 @@ const inputted = computed({
     @apply flex h-5 w-5 items-center justify-center text-gray-secondary;
 
     svg {
-      @apply block h-full w-full;
+      @apply block aspect-square h-full w-full;
     }
   }
   .small-input-field {

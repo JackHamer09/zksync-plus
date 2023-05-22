@@ -6,6 +6,6 @@
 
 <style lang="scss" scoped>
 .buttons-line-group {
-  @apply grid w-full grid-flow-col-dense grid-cols-[max-content] gap-2;
+  @apply flex w-full space-x-2 overflow-x-auto;
 }
 </style>
