@@ -1,5 +1,9 @@
 <template>
-  <TransactionLineItem :icon="icon" :transaction-url="`${blockExplorerUrl}/tx/${transaction.txHash}`">
+  <TransactionLineItem
+    :failed="isTransactionFailed"
+    :icon="icon"
+    :transaction-url="`${blockExplorerUrl}/tx/${transaction.txHash}`"
+  >
     <template #top-left>
       <div class="transaction-line-label">{{ label }}</div>
     </template>
@@ -35,9 +39,12 @@
 import { computed } from "vue";
 
 import {
-  ArrowLeftIcon,
+  ArrowDownLeftIcon,
   ArrowRightIcon,
   ArrowsRightLeftIcon,
+  BanknotesIcon,
+  MinusIcon,
+  PaperAirplaneIcon,
   PhotoIcon,
   PlusIcon,
   ShieldCheckIcon,
@@ -81,8 +88,11 @@ const label = computed(() => {
     return "Account activation";
   } else if (props.transaction.type === "MintNFT") {
     return "Mint NFT";
-  } else if (props.transaction.type === "TransferNFT") {
-    return "Transfer";
+  } else if (props.transaction.type === "Transfer" || props.transaction.type === "TransferNFT") {
+    if (direction.value === "in") {
+      return "Receive";
+    }
+    return "Send";
   } else if (props.transaction.type === "WithdrawNFT") {
     return "Withdraw";
   }
@@ -121,6 +131,7 @@ const priceLoading = computed(() => {
   }
   return false;
 });
+const isTransactionFailed = computed(() => !!props.transaction.failReason);
 const direction = computed(() => {
   if (props.transaction.isFeeTransaction) {
     return "out";
@@ -149,12 +160,16 @@ const direction = computed(() => {
   }
 });
 const icon = computed(() => {
+  if (props.transaction.isFeeTransaction) {
+    return BanknotesIcon;
+  }
   switch (props.transaction.type) {
     case "Transfer":
-      if (!direction.value) {
-        return ArrowRightIcon;
-      }
-      break;
+    case "TransferNFT":
+      return direction.value === "in" ? ArrowDownLeftIcon : PaperAirplaneIcon;
+    case "Withdraw":
+    case "WithdrawNFT":
+      return MinusIcon;
     case "ChangePubKey":
       return ShieldCheckIcon;
     case "Swap":
@@ -165,7 +180,7 @@ const icon = computed(() => {
       return PhotoIcon;
   }
   if (direction.value) {
-    return direction.value === "in" ? ArrowRightIcon : ArrowLeftIcon;
+    return direction.value === "in" ? ArrowDownLeftIcon : ArrowRightIcon;
   }
   return undefined;
 });

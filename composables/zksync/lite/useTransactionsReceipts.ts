@@ -1,4 +1,4 @@
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { ZkSyncLiteToken } from "@/types";
 import type { RestProvider } from "zksync";
 
 import { mapApiTransaction } from "@/utils/zksync/lite/mappers";
@@ -39,9 +39,9 @@ export default (
     transactions,
     transactionsRequestInProgress,
     transactionsRequestError,
-    requestTransactions: (transactionHashes: string[]) => {
+    requestTransactions: async (transactionHashes: string[]) => {
       currentTransactionHashes = transactionHashes;
-      requestTransactions();
+      await requestTransactions();
     },
   };
 };

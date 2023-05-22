@@ -33,7 +33,7 @@
         <div class="px-1 py-0.5">
           <MenuItem v-for="item in chains" as="template" v-slot="{ active }" :key="item.name">
             <a
-              :href="getNetworkUrl(item)"
+              :href="getNetworkUrl(item, route.path)"
               class="network-item"
               :class="{ selected: item.network === selectedEthereumNetwork.network, active }"
             >
@@ -65,21 +65,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
-import type { ExtendedChain } from "@/store/network";
-
 import { useRoute } from "#app";
 import { chains, useNetworkStore } from "@/store/network";
+import { getNetworkUrl } from "@/utils/helpers";
 
 const route = useRoute();
-
-const getNetworkUrl = (network: ExtendedChain) => {
-  const hostname = window.location.hostname;
-
-  if (hostname === "localhost" || !network.hostnames?.length) {
-    return `${route.path}?network=${network.network}`;
-  }
-  return network.hostnames[0] + route.path;
-};
 
 const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 </script>

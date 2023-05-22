@@ -1,5 +1,6 @@
 import { BigNumber } from "ethers";
 
+import type { ExtendedChain } from "@/store/network";
 import type { BigNumberish } from "ethers";
 
 export function generateAvatarColors(address: string) {
@@ -30,3 +31,12 @@ export function isOnlyZeroes(value: string) {
 export function calculateFee(gasLimit: BigNumberish, gasPrice: BigNumberish) {
   return BigNumber.from(gasLimit).mul(gasPrice);
 }
+
+export const getNetworkUrl = (network: ExtendedChain, routePath: string) => {
+  const hostname = window.location.hostname;
+
+  if (hostname === "localhost" || !network.hostnames?.length) {
+    return `${routePath}?network=${network.network}`;
+  }
+  return network.hostnames[0] + routePath;
+};

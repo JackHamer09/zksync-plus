@@ -5,27 +5,19 @@ import {
   ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT,
 } from "zksync/build/utils";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
-import type { Balance } from "@/store/zksync/lite/wallet";
+import type { ZkSyncLiteToken, ZkSyncLiteTokenAmount } from "@/types";
 import type { Provider } from "@wagmi/core";
 import type { BigNumberish } from "ethers";
 import type { Ref } from "vue";
 import type { Wallet } from "zksync";
-import type { IncomingTxFeeType } from "zksync/build/types";
 
 import { calculateFee } from "@/utils/helpers";
 
-export type FeeEstimationParams = {
-  type: IncomingTxFeeType;
-  to: string;
-  symbol: string;
-};
-
 export default (
-  requestProvider: () => Promise<Provider>,
+  getProvider: () => Provider,
   getWalletInstance: () => Promise<Wallet | undefined>,
   tokens: Ref<{ [tokenSymbol: string]: ZkSyncLiteToken } | undefined>,
-  balances: Ref<Balance[]>
+  balances: Ref<ZkSyncLiteTokenAmount[]>
 ) => {
   const params = {
     from: undefined as string | undefined,
@@ -59,7 +51,7 @@ export default (
     return BigNumber.from(ETH_RECOMMENDED_DEPOSIT_GAS_LIMIT);
   };
   const getERC20TransactionFee = async (gasPrice: BigNumberish) => {
-    const provider = await requestProvider();
+    const provider = getProvider();
     const wallet = await getWalletInstance();
     if (!wallet) throw new Error("Wallet is not available");
 
@@ -93,7 +85,7 @@ export default (
     execute: estimateFee,
   } = usePromise(
     async () => {
-      const provider = await requestProvider();
+      const provider = getProvider();
       gasPrice.value = await provider.getGasPrice();
 
       if (!feeToken.value) throw new Error("Tokens are not available");

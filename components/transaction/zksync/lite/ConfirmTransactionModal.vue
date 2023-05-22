@@ -97,41 +97,34 @@
       </div>
     </div>
   </CommonModal>
-  <TransactionSuccessfulModal v-else v-bind="$attrs" :transaction-hashes="transactionHashes">
-    <template #after-transactions>
-      <CommonAlert v-if="destination.key === 'ethereum'" class="mt-3" variant="neutral" :icon="InformationCircleIcon">
-        <p>
-          It can take <span class="font-medium">up to 7 hours</span> until funds arrive on
-          <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
-        </p>
-        <a href="https://docs.zksync.io/userdocs/faq/#how-long-are-withdrawal-times" target="_blank" class="alert-link">
-          Learn more
-          <ArrowUpRightIcon class="ml-1 h-3 w-3" />
-        </a>
-      </CommonAlert>
-    </template>
-  </TransactionSuccessfulModal>
+
+  <TransferSuccessfulModal
+    v-else-if="destination.key === 'zkSyncLite'"
+    v-bind="$attrs"
+    :transaction-hashes="transactionHashes"
+    :in-progress="!transactionCommitted"
+  />
+  <WithdrawSuccessfulModal
+    v-else-if="destination.key === 'ethereum'"
+    v-bind="$attrs"
+    :transaction-hashes="transactionHashes"
+  />
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 
-import {
-  ArrowDownIcon,
-  ArrowUpRightIcon,
-  ExclamationCircleIcon,
-  InformationCircleIcon,
-  PlusIcon,
-} from "@heroicons/vue/24/outline";
+import { ArrowDownIcon, ArrowUpRightIcon, ExclamationCircleIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 import { storeToRefs } from "pinia";
 
-import TransactionSuccessfulModal from "@/components/transaction/zksync/lite/TransactionSuccessfulModal.vue";
+import TransferSuccessfulModal from "@/components/transaction/zksync/lite/TransferSuccessfulModal.vue";
+import WithdrawSuccessfulModal from "@/components/transaction/zksync/lite/WithdrawSuccessfulModal.vue";
 
 import useTransaction from "@/composables/zksync/lite/useTransaction";
 
 import type { TransactionDestination } from "@/store/destinations";
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { ZkSyncLiteToken } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 import type { IncomingTxFeeType } from "zksync/build/types";
@@ -234,6 +227,8 @@ const totalOfEachToken = computed<{ token: ZkSyncLiteToken; amount: BigNumberish
   }));
 });
 
+const transactionCommitted = ref(false);
+
 const getActionName = (type: IncomingTxFeeType) => {
   if (type === "Transfer") return "Sending";
   else if (type === "Withdraw") return "Withdrawing";
@@ -272,17 +267,20 @@ const makeTransaction = async () => {
   }
 
   if (tx) {
-    /* Have to wait because for further transactions account needs to be activated, otherwise do it async */
-    if (liteAccountActivationStore.isAccountActivated === false) {
+    try {
       await tx[0].awaitReceipt();
-    }
-    tx[0].awaitReceipt().then(async () => {
+      transactionCommitted.value = true;
+
       liteTransactionsHistoryStore.reloadRecentTransactions();
       walletLiteStore.requestBalance({ force: true });
       if (liteAccountActivationStore.isAccountActivated === false) {
         liteAccountActivationStore.checkAccountActivation();
       }
-    });
+    } catch (err) {
+      transactionCommitted.value = false;
+      error.value = err as Error;
+      status.value = "not-started";
+    }
   }
 };
 </script>

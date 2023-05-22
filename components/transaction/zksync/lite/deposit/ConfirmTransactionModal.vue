@@ -75,22 +75,16 @@
   </CommonModal>
 
   <CommonModal v-else v-bind="$attrs" :closable="false" class="deposit-transaction-successful-modal" title="">
-    <Vue3Lottie
-      v-if="!transactionCommitted"
-      class="mx-auto mt-6 mb-14 w-72 pt-1.5"
-      :animation-data="ProgressPlane"
-      loop
-    />
-    <Vue3Lottie v-else class="mx-auto -mt-14 -mb-16 w-72" :animation-data="SuccessConfetti" :loop="false" />
+    <template #animation>
+      <Vue3Lottie class="w-72" :animation-data="ProgressPlane" loop />
+    </template>
 
     <div class="flex h-full flex-col overflow-auto">
-      <div class="h2 text-center sm:h1">
-        {{ transactionCommitted ? "Transaction completed" : "Transaction submitted" }}
-      </div>
+      <div class="h2 text-center sm:h1">Transaction submitted</div>
       <CommonCardWithLineButtons v-if="transaction">
         <TransactionLineItem
           :icon="transactionReceiptIcon"
-          :transaction-url="`${blockExplorerUrl}/tx/${transactionReceipt?.hash}`"
+          :transaction-url="`${blockExplorerUrl}/tx/${ethTransactionHash}`"
         >
           <template #top-left>
             <div class="transaction-line-label">Deposit</div>
@@ -113,21 +107,17 @@
         </TransactionLineItem>
       </CommonCardWithLineButtons>
 
-      <CommonAlert v-if="!transactionCommitted" class="mt-3" variant="neutral" :icon="InformationCircleIcon">
+      <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
-          Your funds will be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> after the
-          transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span
+          Your funds will be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
+          after the transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> and
+          then processed on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span
           >. You are free to close this page.
         </p>
         <a :href="`${blockExplorerUrl}/tx/${ethTransactionHash}`" target="_blank" class="alert-link">
           Track status
           <ArrowUpRightIcon class="ml-1 h-3 w-3" />
         </a>
-      </CommonAlert>
-      <CommonAlert v-else class="mt-3" variant="success" :icon="InformationCircleIcon">
-        <p>
-          Your funds should now be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span>
-        </p>
       </CommonAlert>
 
       <div class="sticky bottom-0 z-[1] mt-auto flex w-full flex-col items-center">
@@ -145,11 +135,11 @@ import { Vue3Lottie } from "vue3-lottie";
 
 import {
   ArrowDownIcon,
-  ArrowLeftIcon,
   ArrowRightIcon,
   ArrowUpRightIcon,
   ExclamationCircleIcon,
   InformationCircleIcon,
+  PlusIcon,
 } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 import { storeToRefs } from "pinia";
@@ -160,10 +150,9 @@ import TotalPrice from "@/components/transaction/transactionLineItem/TotalPrice.
 import useTransaction from "@/composables/zksync/lite/deposit/useTransaction";
 
 import ProgressPlane from "@/assets/lottie/progress-plane.json";
-import SuccessConfetti from "@/assets/lottie/success-confetti.json";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
-import type { BigNumberish, ContractTransaction } from "ethers";
+import type { ZkSyncLiteToken } from "@/types";
+import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
 import { useDestinationsStore } from "@/store/destinations";
@@ -260,8 +249,6 @@ const totalOfEachToken = computed<{ token: ZkSyncLiteToken; amount: BigNumberish
   }));
 });
 
-const transactionReceipt = ref<ContractTransaction | undefined>();
-const transactionCommitted = ref(false);
 const transactionReceiptDirection = computed(() => {
   if (!props.transaction) return undefined;
   return props.transaction.to === account.value.address ? "in" : "out";
@@ -270,7 +257,7 @@ const transactionReceiptIcon = computed(() => {
   if (!transactionReceiptDirection.value) {
     return undefined;
   }
-  return transactionReceiptDirection.value === "in" ? ArrowRightIcon : ArrowLeftIcon;
+  return transactionReceiptDirection.value === "in" ? PlusIcon : ArrowRightIcon;
 });
 
 const makeTransaction = async () => {
@@ -293,13 +280,16 @@ const makeTransaction = async () => {
   }
 
   if (tx) {
-    transactionReceipt.value = tx?.ethTx;
-    tx.awaitEthereumTxCommit().then(() => {
-      transactionCommitted.value = true;
-      liteTransactionsHistoryStore.reloadRecentTransactions();
-      walletLiteStore.requestBalance({ force: true });
-      liteEthereumBalanceStore.requestBalance({ force: true });
-    });
+    tx.awaitEthereumTxCommit()
+      .then(() => {
+        liteTransactionsHistoryStore.reloadRecentTransactions();
+        walletLiteStore.requestBalance({ force: true });
+        liteEthereumBalanceStore.requestBalance({ force: true });
+      })
+      .catch((err) => {
+        error.value = err as Error;
+        status.value = "not-started";
+      });
   }
 };
 </script>

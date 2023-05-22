@@ -1,6 +1,6 @@
 import { isNFT } from "zksync/build/utils";
 
-import type { ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import type { ZkSyncLiteToken } from "@/types";
 import type { ApiTransaction } from "zksync/build/types";
 
 import { checksumAddress } from "@/utils/formatters";

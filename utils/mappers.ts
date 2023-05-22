@@ -1,12 +1,11 @@
 import { computed } from "vue";
 
-import type { Balance } from "@/store/zksync/lite/wallet";
-import type { ZkSyncLiteTransaction } from "@/utils/zksync/lite/mappers";
+import type { TokenAmount } from "@/types";
 import type { Ref } from "vue";
 
-export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
+export const groupBalancesByAmount = <T = TokenAmount>(balances: Ref<T[]>) =>
   computed(() => {
-    const groups: Record<string, { title: string | null; balances: Balance[] }> = {
+    const groups: Record<string, { title: string | null; balances: T[] }> = {
       default: {
         title: null,
         balances: [],
@@ -20,7 +19,7 @@ export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
         balances: [],
       },
     };
-    for (const balanceItem of balances.value) {
+    for (const balanceItem of balances.value as (T & TokenAmount)[]) {
       const decimalBalance =
         typeof balanceItem.price === "number"
           ? removeSmallAmount(balanceItem.amount, balanceItem.decimals, balanceItem.price)
@@ -36,11 +35,11 @@ export const groupBalancesByAmount = (balances: Ref<Balance[]>) =>
     return [groups.default, groups.small, groups.zero].filter((group) => group.balances.length);
   });
 
-export const groupTransactionsByDate = (transactions: Ref<ZkSyncLiteTransaction[]>) =>
+export const groupTransactionsByDate = <T>(transactions: Ref<T[]>, getDate: (transaction: T) => Date) =>
   computed(() => {
-    const groups: Record<string, { title: string | null; transactions: ZkSyncLiteTransaction[] }> = {};
+    const groups: Record<string, { title: string | null; transactions: T[] }> = {};
     for (const transaction of transactions.value) {
-      const date = new Date(transaction.createdAt!);
+      const date = getDate(transaction);
       const dateKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
       if (!groups[dateKey]) {
         groups[dateKey] = {

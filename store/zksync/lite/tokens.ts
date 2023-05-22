@@ -2,16 +2,12 @@ import { defineStore } from "pinia";
 
 import liteTokenIcons from "@/assets/json/tokens/lite-tokens-icons.json";
 
+import type { TokenPrice, ZkSyncLiteToken } from "@/types";
 import type { ExtendedTokens, TokenInfo } from "zksync/build/types";
 
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { checksumAddress } from "@/utils/formatters";
 
-export type ZkSyncLiteTokenPrice = number | "loading" | undefined;
-export interface ZkSyncLiteToken extends TokenInfo {
-  price: ZkSyncLiteTokenPrice;
-  iconUrl?: string;
-}
 type TokenIcons = {
   thumb: string;
   small: string;
@@ -19,7 +15,7 @@ type TokenIcons = {
 };
 
 export const useLiteTokensStore = defineStore("liteTokens", () => {
-  const liteProvider = useLiteProviderStore();
+  const liteProviderStore = useLiteProviderStore();
 
   const {
     result: tokensRaw,
@@ -28,7 +24,7 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     execute: requestTokens,
     reset: resetTokens,
   } = usePromise<TokenInfo[]>(async () => {
-    const provider = await liteProvider.requestProvider();
+    const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
     // const tokens = await provider.getTokens(); <-- this is the right way but tokens are already available in the provider
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,14 +33,15 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     return Object.entries(tokens).map(([, token]) => ({ ...token, address: checksumAddress(token.address) }));
   });
 
-  const tokenPrices = ref<{ [tokenSymbol: string]: ZkSyncLiteTokenPrice }>({});
+  const tokenPrices = ref<{ [tokenSymbol: string]: TokenPrice }>({});
   const requestTokenPrice = async (tokenSymbol: string, { force } = { force: false }) => {
     if (!force && typeof tokenPrices.value[tokenSymbol] === "number") return;
     if (tokenPrices.value[tokenSymbol] === "loading") return;
     tokenPrices.value[tokenSymbol] = "loading";
     try {
-      const provider = await liteProvider.requestProvider();
+      const provider = await liteProviderStore.requestProvider();
       if (!provider) throw new Error("Provider is not available");
+
       const price = await provider.getTokenPrice(tokenSymbol);
       tokenPrices.value[tokenSymbol] = typeof price === "number" ? price : 0;
     } catch (error) {
@@ -64,7 +61,15 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     return Object.fromEntries(
       tokensRaw.value.map((token) => {
         const iconUrl = getTokenIconUrlBySymbol(token.symbol);
-        return [token.symbol, { ...token, price: tokenPrices.value[token.symbol], iconUrl }];
+        return [
+          token.symbol,
+          {
+            ...token,
+            l1Address: token.address,
+            price: tokenPrices.value[token.symbol],
+            iconUrl,
+          },
+        ];
       })
     );
   });
@@ -76,7 +81,6 @@ export const useLiteTokensStore = defineStore("liteTokens", () => {
     requestTokens,
     resetTokens,
 
-    tokenPrices: computed(() => tokenPrices.value),
     requestTokenPrice,
   };
 });

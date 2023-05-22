@@ -11,7 +11,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "prepare": "husky install",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore --no-error-on-unmatched-pattern --max-warnings=0"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.2",
@@ -35,11 +35,12 @@
   },
   "prettier": "@matterlabs/prettier-config",
   "lint-staged": {
-    "*.{vue,js,ts}": "npm run lint"
+    "*.{vue,js,ts,html,json}": "npm run lint"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.7",
     "@heroicons/vue": "^2.0.14",
+    "@matterlabs/token-library": "^2.5.2",
     "@metamask/logo": "^3.1.1",
     "@pinia/nuxt": "^0.4.7",
     "@vitejs/plugin-vue": "^3.2.0",
@@ -47,9 +48,9 @@
     "@vueuse/core": "^9.13.0",
     "@vueuse/integrations": "^9.11.1",
     "@vueuse/rxjs": "^9.11.0",
-    "@wagmi/core": "^0.9.7",
-    "@web3modal/ethereum": "^2.1.1",
-    "@web3modal/html": "^2.1.1",
+    "@wagmi/core": "^0.10.11",
+    "@web3modal/ethereum": "^2.3.7",
+    "@web3modal/html": "^2.3.7",
     "alchemy-sdk": "^2.8.1",
     "date-fns": "^2.29.3",
     "ethers": "^5.7.2",
@@ -65,7 +66,8 @@
     "vue-tippy": "^6.0.0",
     "vue3-lottie": "^2.5.0",
     "web3-avatar-vue": "^1.0.0",
-    "zksync": "^0.13.1"
+    "zksync": "^0.13.1",
+    "zksync-web3": "^0.14.4-beta.5"
   },
   "overrides": {
     "vue": "latest"

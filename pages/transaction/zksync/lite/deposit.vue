@@ -21,7 +21,7 @@ import { useRoute, useRouter } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
 import { checksumAddress } from "@/utils/formatters";
 import SelectAddress from "@/views/SelectAddress.vue";
-import LiteDepositForm from "@/views/transactions/lite/Deposit.vue";
+import LiteDepositForm from "@/views/zksync/lite/transactions/Deposit.vue";
 
 const { destinations } = storeToRefs(useDestinationsStore());
 

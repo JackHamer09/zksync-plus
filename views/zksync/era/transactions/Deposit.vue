@@ -1,9 +1,19 @@
 <template>
   <div class="flex h-full flex-col">
+    <TransactionAllowanceModal
+      v-model:opened="allowanceModalOpened"
+      :transaction="transaction"
+      :destination="destinations.era"
+      :get-allowance="requestAllowance"
+      :set-allowance="setTokenAllowance"
+      :fetch-balance="() => fetchBalances(true)"
+      @continue="allowanceModalContinue"
+    />
     <ConfirmTransactionModal
       v-model:opened="transactionConfirmModalOpened"
+      :fee="fee"
       :fee-token="feeToken"
-      :fee="gasLimitAndPrice"
+      :fee-values="feeValues"
       :destination="destination"
       :transaction="transaction"
       :button-disabled="continueButtonDisabled || !enoughBalanceForTransaction"
@@ -80,40 +90,69 @@
           </p>
         </CommonAlert>
       </transition>
+      <transition v-bind="TransitionAlertScaleInOutTransition">
+        <CommonAlert
+          v-if="!enoughAllowance && !allowance?.isZero()"
+          class="mt-1"
+          variant="info"
+          :icon="InformationCircleIcon"
+        >
+          <p>
+            Your current allowance for <span class="font-medium">{{ selectedToken!.symbol }}</span> is
+            <button type="button" class="link underline underline-offset-2" @click="setAmountToAllowance">
+              {{ parseTokenAmount(allowance!, selectedToken!.decimals) }}</button
+            >. Depositing more than that will require you to approve a new allowance.
+          </p>
+          <a href="https://cryptotesters.com/blog/token-allowances" target="_blank" class="alert-link">
+            Learn more
+            <ArrowUpRightIcon class="ml-1 h-3 w-3" />
+          </a>
+        </CommonAlert>
+      </transition>
+      <CommonErrorBlock v-if="allowanceRequestError" class="mt-2" @try-again="requestAllowance">
+        Checking allowance error: {{ allowanceRequestError.message }}
+      </CommonErrorBlock>
     </form>
 
-    <ZksyncLiteTransactionFooter :authorization="false" :account-activation="false">
+    <EraTransactionFooter>
       <template #after-checks>
         <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="openConfirmationModal">
           Continue
         </CommonButton>
       </template>
-    </ZksyncLiteTransactionFooter>
+    </EraTransactionFooter>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 
-import { ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
+import { ArrowUpRightIcon, ExclamationTriangleIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
 import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import ZksyncLiteTransactionFooter from "@/components/transaction/zksync/lite/TransactionFooter.vue";
-import ConfirmTransactionModal from "@/components/transaction/zksync/lite/deposit/ConfirmTransactionModal.vue";
+import EraTransactionFooter from "@/components/transaction/zksync/era/EraTransactionFooter.vue";
+import ConfirmTransactionModal from "@/components/transaction/zksync/era/deposit/ConfirmTransactionModal.vue";
 
-import useFee from "@/composables/zksync/lite/deposit/useFee";
+import useAllowance from "@/composables/transaction/useAllowance";
+import useFee from "@/composables/zksync/era/deposit/useFee";
 
-import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/lite/deposit/ConfirmTransactionModal.vue";
+import type { ConfirmationModalTransaction } from "@/components/transaction/zksync/era/deposit/ConfirmTransactionModal.vue";
 
 import { useRoute } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
-import { useLiteEthereumBalanceStore } from "@/store/zksync/lite/ethereumBalance";
-import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
-import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
-import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
+import { useEraEthereumBalanceStore } from "@/store/zksync/era/ethereumBalance";
+import { useEraProviderStore } from "@/store/zksync/era/provider";
+import { useEraTokensStore } from "@/store/zksync/era/tokens";
+import {
+  checksumAddress,
+  decimalToBigNumber,
+  formatRawTokenPrice,
+  parseTokenAmount,
+  shortenAddress,
+} from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
@@ -130,15 +169,15 @@ const emit = defineEmits<{
 const route = useRoute();
 
 const onboardStore = useOnboardStore();
-const walletLiteStore = useLiteWalletStore();
-const liteTokensStore = useLiteTokensStore();
-const liteEthereumBalance = useLiteEthereumBalanceStore();
+const eraTokensStore = useEraTokensStore();
+const eraProviderStore = useEraProviderStore();
+const eraEthereumBalance = useEraEthereumBalanceStore();
 const { account } = storeToRefs(onboardStore);
 const { destinations } = storeToRefs(useDestinationsStore());
-const { tokens } = storeToRefs(liteTokensStore);
-const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(liteEthereumBalance);
+const { tokens } = storeToRefs(eraTokensStore);
+const { balance, balanceInProgress, allBalancePricesLoaded, balanceError } = storeToRefs(eraEthereumBalance);
 
-const destination = computed(() => destinations.value.zkSyncLite);
+const destination = computed(() => destinations.value.era);
 
 const routeTokenAddress = computed(() => {
   if (!route.query.token || Array.isArray(route.query.token) || !isAddress(route.query.token)) {
@@ -162,10 +201,10 @@ const selectedToken = computed(() => {
   return balance.value.find((e) => e.address === selectedTokenAddress.value);
 });
 watch(
-  () => selectedToken?.value?.symbol,
-  (symbol) => {
-    if (!symbol) return;
-    liteTokensStore.requestTokenPrice(symbol);
+  () => selectedToken?.value?.address,
+  (address) => {
+    if (!address) return;
+    eraTokensStore.requestTokenPrice(address);
   }
 );
 watch(allBalancePricesLoaded, (loaded) => {
@@ -173,6 +212,40 @@ watch(allBalancePricesLoaded, (loaded) => {
     selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
   }
 });
+
+const allowanceModalOpened = ref(false);
+const {
+  result: allowance,
+  inProgress: allowanceRequestInProgress,
+  error: allowanceRequestError,
+  requestAllowance,
+
+  setAllowance,
+} = useAllowance(
+  computed(() => account.value.address),
+  computed(() => selectedToken.value?.l1Address),
+  async () => (await eraProviderStore.requestProvider().getDefaultBridgeAddresses()).erc20L1,
+  onboardStore.getEthereumProvider
+);
+const enoughAllowance = computed(() => {
+  if (!allowance.value || !selectedToken.value) {
+    return true;
+  }
+  return BigNumber.from(allowance.value).gte(totalComputeAmount.value);
+});
+const setAmountToAllowance = () => {
+  if (!allowance.value || !selectedToken.value) {
+    return;
+  }
+  amount.value = parseTokenAmount(allowance.value, selectedToken.value.decimals);
+};
+const setTokenAllowance = async () => await setAllowance(totalComputeAmount.value);
+const allowanceModalContinue = () => {
+  allowanceModalOpened.value = false;
+  if (enoughAllowance.value) {
+    transactionConfirmModalOpened.value = true;
+  }
+};
 
 const transactionConfirmModalOpened = ref(false);
 const unsubscribe = onboardStore.subscribeOnAccountChange(() => {
@@ -182,28 +255,35 @@ const openConfirmationModal = () => {
   if (continueButtonDisabled.value) {
     return;
   }
-  transactionConfirmModalOpened.value = true;
+  if (!enoughAllowance.value) {
+    allowanceModalOpened.value = true;
+  } else {
+    transactionConfirmModalOpened.value = true;
+  }
 };
 
 const {
-  gasLimit,
-  gasPrice,
+  fee: feeValues,
   result: fee,
   inProgress: feeInProgress,
   error: feeError,
   feeToken,
-  estimateFee,
   enoughBalanceToCoverFee,
-} = useFee(onboardStore.getEthereumProvider, walletLiteStore.getWalletInstance, tokens, balance);
-const gasLimitAndPrice = computed(() => {
-  if (!gasLimit.value || !gasPrice.value) {
-    return undefined;
+  estimateFee,
+} = useFee(
+  onboardStore.getEthereumProvider,
+  eraProviderStore.requestProvider,
+  computed(() => account.value.address),
+  tokens,
+  balance
+);
+watch(
+  () => feeToken?.value?.address,
+  (address) => {
+    if (!address) return;
+    eraTokensStore.requestTokenPrice(address);
   }
-  return {
-    gasLimit: gasLimit.value,
-    gasPrice: gasPrice.value,
-  };
-});
+);
 watch(enoughBalanceToCoverFee, (isEnough) => {
   if (!isEnough && transactionConfirmModalOpened.value) {
     transactionConfirmModalOpened.value = false;
@@ -260,13 +340,13 @@ const estimate = async () => {
   await estimateFee(account.value.address, selectedToken.value.address);
 };
 const feeAutoUpdateEstimate = async () => {
-  if (transactionConfirmModalOpened.value) {
+  if (transactionConfirmModalOpened.value || allowanceModalOpened.value) {
     return;
   }
   await estimate();
 };
 watch(
-  [() => props.address, () => selectedToken.value?.symbol, () => account.value.address],
+  [() => props.address, () => selectedToken.value?.address, () => account.value.address],
   () => {
     estimate();
   },
@@ -279,17 +359,16 @@ const balancesLoading = computed(() => {
   return balanceInProgress.value || (!selectedToken.value && !allBalancePricesLoaded.value);
 });
 
-const continueButtonDisabled = computed(
-  () =>
-    !selectedToken.value ||
-    !enoughBalanceToCoverFee.value ||
-    !fee.value ||
-    feeLoading.value ||
-    totalComputeAmount.value.isZero()
-);
+const continueButtonDisabled = computed(() => {
+  if (!selectedToken.value || !enoughBalanceToCoverFee.value || totalComputeAmount.value.isZero()) return true;
+  if (allowanceRequestInProgress.value || allowanceRequestError.value) return true;
+  if (!enoughAllowance.value) return false; // We can proceed to allowance modal even if fee is not loaded
+  if (feeLoading.value || !fee.value) return true;
+  return false;
+});
 
-const fetchBalances = () => {
-  liteEthereumBalance.requestBalance().then(() => {
+const fetchBalances = async (force = false) => {
+  await eraEthereumBalance.requestBalance({ force }).then(() => {
     if (allBalancePricesLoaded.value && !selectedToken.value) {
       selectedTokenAddress.value = tokenWithHighestBalancePrice.value?.address;
     }

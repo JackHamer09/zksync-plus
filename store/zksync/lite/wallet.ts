@@ -6,18 +6,14 @@ import { ethers } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
 import { RemoteWallet, Wallet } from "zksync";
 
-import type { BigNumberish } from "ethers";
+import type { ZkSyncLiteTokenAmount } from "@/types";
 import type { AccountState } from "zksync/build/types";
 
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
-import { useLiteTokensStore, type ZkSyncLiteToken } from "@/store/zksync/lite/tokens";
+import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { formatError } from "@/utils/formatters";
-
-export interface Balance extends ZkSyncLiteToken {
-  amount: BigNumberish;
-}
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
   const onboardStore = useOnboardStore();
@@ -45,24 +41,27 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     return (await RemoteWallet.fromEthSigner(web3Provider, provider)) as unknown as Wallet;
   };
 
-  const { execute: getWalletInstanceNoSigner, reset: resetWalletInstanceNoSigner } = usePromise<Wallet>(async () => {
-    const provider = await liteProviderStore.requestProvider();
-    if (!provider) throw new Error("Provider is not available");
-    const walletNetworkId = network.value.chain?.id;
-    if (walletNetworkId !== selectedEthereumNetwork.value.id) {
-      const voidSigner = new VoidSigner(account.value.address!, onboardStore.getEthereumProvider());
-      wallet = await Wallet.fromEthSignerNoKeys(voidSigner, provider);
-    } else if (walletName.value === "Argent") {
-      wallet = await getRemoteWallet();
-      isRemoteWallet.value = true;
-    } else {
-      const signer = await fetchSigner();
-      if (!signer) throw new Error("Signer is not available");
+  const { execute: getWalletInstanceNoSigner, reset: resetWalletInstanceNoSigner } = usePromise<Wallet>(
+    async () => {
+      const provider = await liteProviderStore.requestProvider();
+      if (!provider) throw new Error("Provider is not available");
+      const walletNetworkId = network.value.chain?.id;
+      if (walletNetworkId !== selectedEthereumNetwork.value.id) {
+        const voidSigner = new VoidSigner(account.value.address!, onboardStore.getEthereumProvider());
+        wallet = await Wallet.fromEthSignerNoKeys(voidSigner, provider);
+      } else if (walletName.value === "Argent") {
+        wallet = await getRemoteWallet();
+        isRemoteWallet.value = true;
+      } else {
+        const signer = await fetchSigner();
+        if (!signer) throw new Error("Signer is not available");
 
-      wallet = await Wallet.fromEthSignerNoKeys(signer, provider);
-    }
-    return wallet;
-  });
+        wallet = await Wallet.fromEthSignerNoKeys(signer, provider);
+      }
+      return wallet;
+    },
+    { cache: false }
+  );
   const {
     execute: getWalletInstanceWithSigner,
     reset: resetWalletInstanceWithSigner,
@@ -127,7 +126,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     return await provider.getState(account.value.address);
   });
 
-  const balance = computed<Balance[]>(() => {
+  const balance = computed<ZkSyncLiteTokenAmount[]>(() => {
     if (!accountState.value) {
       return [];
     }
@@ -136,7 +135,9 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
       return { ...token, amount };
     });
   });
-  const allBalancePricesLoaded = computed(() => !balance.value.some((e) => e.price === "loading"));
+  const allBalancePricesLoaded = computed(
+    () => !balance.value.some((e) => e.price === "loading") && !balanceInProgress.value
+  );
   const {
     inProgress: balanceInProgress,
     error: balanceError,

@@ -1,6 +1,6 @@
 import { configureChains, createClient } from "@wagmi/core";
 import { publicProvider } from "@wagmi/core/providers/public";
-import { EthereumClient, modalConnectors, walletConnectProvider } from "@web3modal/ethereum";
+import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/html";
 import { defineStore, storeToRefs } from "pinia";
 
@@ -16,15 +16,14 @@ export const useOnboardStore = defineStore("onboard", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
   const { provider } = configureChains(chains, [
-    walletConnectProvider({ projectId: env.walletConnectProjectID }),
+    w3mProvider({ projectId: env.walletConnectProjectID }),
     publicProvider(),
   ]);
   const wagmiClient = createClient({
     autoConnect: true,
-    connectors: modalConnectors({
+    connectors: w3mConnectors({
       projectId: env.walletConnectProjectID,
-      version: "1",
-      appName: "zkSync Plus",
+      version: 1,
       chains: chains,
     }),
     provider,
@@ -51,6 +50,12 @@ export const useOnboardStore = defineStore("onboard", () => {
   );
   web3modal.setDefaultChain(selectedEthereumNetwork.value);
   ethereumClient.watchAccount(async (updatedAccount) => {
+    // There is a bug in @wagmi/core@0.10.11 or @web3modal/ethereum@^2.3.7
+    // On page update or after using `ethereumClient.disconnect` method
+    // the account state is replaced with "connecting" state
+    if (updatedAccount.status === "connecting" && !updatedAccount.connector) {
+      return;
+    }
     account.value = updatedAccount;
     connectorName.value = wagmiClient.connector?.name;
     walletName.value = getWalletName();
@@ -63,12 +68,24 @@ export const useOnboardStore = defineStore("onboard", () => {
   });
 
   const openModal = () => web3modal.openModal();
-  const disconnect = () => ethereumClient.disconnect();
+  const disconnect = () => {
+    ethereumClient.disconnect();
+  };
 
   const isCorrectNetworkSet = computed(() => {
     const walletNetworkId = network.value.chain?.id;
     return walletNetworkId === selectedEthereumNetwork.value.id;
   });
+  const switchNetworkById = async (chainId: number, networkName = selectedEthereumNetwork.value.name) => {
+    try {
+      await ethereumClient.switchNetwork({ chainId });
+    } catch (err) {
+      if (err instanceof Error && err.message.includes("does not support programmatic chain switching")) {
+        throw new Error(`Please switch network manually to "${networkName}" in your ${walletName.value} wallet`);
+      }
+      throw err;
+    }
+  };
   const {
     inProgress: switchingNetworkInProgress,
     error: switchingNetworkError,
@@ -76,13 +93,8 @@ export const useOnboardStore = defineStore("onboard", () => {
   } = usePromise(
     async () => {
       try {
-        await ethereumClient.switchNetwork({ chainId: selectedEthereumNetwork.value.id });
+        await switchNetworkById(selectedEthereumNetwork.value.id);
       } catch (err) {
-        if (err instanceof Error && err.message.includes("does not support programmatic chain switching")) {
-          throw new Error(
-            `Please switch network manually to "${selectedEthereumNetwork.value.name}" in your ${walletName.value} wallet`
-          );
-        }
         const error = formatError(err as Error);
         if (error) throw error;
       }
@@ -104,6 +116,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   return {
     account: computed(() => account.value),
     network: computed(() => network.value),
+    isConnectingWallet: computed(() => account.value.isReconnecting || account.value.isConnecting),
     walletName,
     openModal,
     disconnect,
@@ -112,6 +125,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     switchingNetworkInProgress,
     switchingNetworkError,
     setCorrectNetwork,
+    switchNetworkById,
 
     getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
 
