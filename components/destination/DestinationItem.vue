@@ -9,6 +9,9 @@
         <div v-if="description" class="destination-item-description">{{ description }}</div>
       </div>
     </template>
+    <template #right v-if="icon">
+      <component :is="icon" class="destination-icon" aria-hidden="true" />
+    </template>
   </CommonButtonLineWithImg>
 </template>
 
@@ -27,6 +30,9 @@ defineProps({
   },
   description: {
     type: String,
+  },
+  icon: {
+    type: [Object, Function] as PropType<Component>,
   },
 });
 </script>
@@ -49,6 +55,9 @@ defineProps({
     .destination-item-description {
       @apply text-sm leading-tight text-gray-secondary;
     }
+  }
+  .destination-icon {
+    @apply mx-3 h-4 w-4 text-gray-secondary;
   }
 }
 </style>
