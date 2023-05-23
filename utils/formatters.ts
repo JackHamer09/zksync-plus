@@ -83,7 +83,8 @@ export function formatError(error?: Error) {
       message.includes("User rejected") ||
       message.includes("Rejected by user") ||
       message.includes('"Request rejected"') ||
-      message.includes("user rejected transaction")
+      message.includes("user rejected transaction") ||
+      message.includes("not configured for connector")
     ) {
       return undefined;
     } else if (message.toLowerCase().includes("fee is to low")) {

@@ -13,13 +13,41 @@
 </template>
 
 <script lang="ts" setup>
+import { watch } from "vue";
+
 import { storeToRefs } from "pinia";
 
+import { useRoute } from "#app";
 import LoginLayout from "@/layouts/login.vue";
 import { useOnboardStore } from "@/store/onboard";
+import { usePreferencesStore } from "@/store/preferences";
 import LoginPage from "@/views/Login.vue";
 
+const route = useRoute();
+
 const { account, isConnectingWallet } = storeToRefs(useOnboardStore());
+const { version } = storeToRefs(usePreferencesStore());
+watch(
+  () => route.name,
+  (routeName) => {
+    if (!routeName) return;
+
+    if (/(-lite-|.*-lite$)/.test(routeName.toString())) {
+      version.value = "lite";
+    } else if (/(-era-|.*-era$)/.test(routeName.toString())) {
+      version.value = "era";
+    }
+  },
+  { immediate: true }
+);
+watch(
+  version,
+  () => {
+    document.documentElement.classList.remove("lite", "era");
+    document.documentElement.classList.add(version.value);
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>
