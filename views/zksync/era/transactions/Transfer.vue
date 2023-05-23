@@ -324,7 +324,12 @@ const balancesLoading = computed(() => {
 });
 
 const continueButtonDisabled = computed(() => {
-  if (!selectedToken.value || !enoughBalanceToCoverFee.value || amountError.value || totalComputeAmount.value.isZero())
+  if (
+    !selectedToken.value ||
+    !enoughBalanceToCoverFee.value ||
+    !!amountError.value ||
+    totalComputeAmount.value.isZero()
+  )
     return true;
   if (feeLoading.value || !fee.value) return true;
   return false;

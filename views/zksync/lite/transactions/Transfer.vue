@@ -387,7 +387,7 @@ const continueButtonDisabled = computed(
     !fee.value ||
     !transactions.value.length ||
     feeLoading.value ||
-    amountError.value ||
+    !!amountError.value ||
     totalComputeAmount.value.isZero()
 );
 

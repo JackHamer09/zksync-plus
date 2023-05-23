@@ -150,32 +150,6 @@ const selectedToken = computed(() => {
 });
 const selectTokenModalOpened = ref(false);
 
-const amountError = computed(() => {
-  if (!selectedToken.value) {
-    return;
-  }
-  if (props.maxAmount && totalComputeAmount.value.gt(props.maxAmount)) {
-    if (BigNumber.from(props.maxAmount).isZero()) {
-      return "insufficient_balance";
-    }
-    return "exceeds_max_amount";
-  }
-  if (inputted.value) {
-    const [, decimal] = inputted.value.split(".");
-    if (decimal && decimal.length > selectedToken.value.decimals) {
-      return "exceeds_decimals";
-    }
-  }
-  return undefined;
-});
-watch(
-  amountError,
-  (value) => {
-    emit("update:error", value);
-  },
-  { immediate: true }
-);
-
 const inputElement = ref<HTMLInputElement | null>(null);
 const { focused } = useFocus(inputElement, { initialValue: !!props.autofocus });
 const inputWidth = ref(0);
@@ -220,6 +194,32 @@ const setMax = () => {
   if (!maxDecimalAmount.value) return;
   inputted.value = maxDecimalAmount.value;
 };
+
+const amountError = computed(() => {
+  if (!selectedToken.value) {
+    return;
+  }
+  if (props.maxAmount && totalComputeAmount.value.gt(props.maxAmount)) {
+    if (BigNumber.from(props.maxAmount).isZero()) {
+      return "insufficient_balance";
+    }
+    return "exceeds_max_amount";
+  }
+  if (inputted.value) {
+    const [, decimal] = inputted.value.split(".");
+    if (decimal && decimal.length > selectedToken.value.decimals) {
+      return "exceeds_decimals";
+    }
+  }
+  return undefined;
+});
+watch(
+  amountError,
+  (value) => {
+    emit("update:error", value);
+  },
+  { immediate: true }
+);
 
 const recalculateInputWidth = () => {
   inputWidth.value = 0;
@@ -277,7 +277,7 @@ const recalculateInputWidth = () => {
     @apply mt-1 text-sm text-gray-secondary;
   }
   .amount-input-select-asset {
-    @apply flex cursor-pointer items-center whitespace-pre-line transition-colors hover:text-gray-400 xs:w-max;
+    @apply flex cursor-pointer items-start whitespace-pre-line transition-colors hover:text-gray-400 xs:w-max;
     grid-area: c / c / c / c;
   }
   .amount-input-note {
