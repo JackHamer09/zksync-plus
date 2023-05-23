@@ -52,12 +52,12 @@
             <span v-else>Approve allowance</span>
           </transition>
         </CommonButton>
-        <transition v-bind="TransitionHeight()">
-          <div v-if="status === 'waiting-for-signature'" class="h-6 text-center text-sm font-medium text-gray-500">
+        <CommonHeightTransition :opened="status === 'waiting-for-signature'">
+          <div class="text-center text-sm font-medium text-gray-500">
             <div class="pt-1"></div>
             Confirm this transaction in your {{ walletName }} wallet
           </div>
-        </transition>
+        </CommonHeightTransition>
       </div>
     </div>
   </CommonModal>
@@ -155,11 +155,7 @@ import { useDestinationsStore } from "@/store/destinations";
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { formatError } from "@/utils/formatters";
-import {
-  TransitionAlertScaleInOutTransition,
-  TransitionHeight,
-  TransitionPrimaryButtonText,
-} from "@/utils/transitions";
+import { TransitionAlertScaleInOutTransition, TransitionPrimaryButtonText } from "@/utils/transitions";
 
 export type ConfirmationModalTransaction = {
   to: string;

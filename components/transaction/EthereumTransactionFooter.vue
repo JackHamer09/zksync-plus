@@ -5,7 +5,7 @@
       <CommonErrorBlock
         v-if="buttonStep === 'network' && switchingNetworkError"
         class="mb-2"
-        @try-again="eraWalletStore.setCorrectNetwork"
+        @try-again="onboardStore.setCorrectNetwork"
       >
         Network change error: {{ switchingNetworkError.message }}
       </CommonErrorBlock>
@@ -16,9 +16,9 @@
       <CommonButton
         :disabled="switchingNetworkInProgress"
         variant="primary-solid"
-        @click="eraWalletStore.setCorrectNetwork"
+        @click="onboardStore.setCorrectNetwork"
       >
-        Change wallet network to {{ eraNetwork.name }}
+        Change wallet network to {{ selectedEthereumNetwork.name }}
       </CommonButton>
     </div>
     <div v-else-if="buttonStep === 'continue'" class="transaction-footer-row">
@@ -34,17 +34,15 @@ import { computed } from "vue";
 
 import { storeToRefs } from "pinia";
 
+import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
-import { useEraProviderStore } from "@/store/zksync/era/provider";
-import { useEraWalletStore } from "@/store/zksync/era/wallet";
 import { TransitionAlertScaleInOutTransition } from "@/utils/transitions";
 
 const onboardStore = useOnboardStore();
-const eraWalletStore = useEraWalletStore();
 
-const { walletName } = storeToRefs(onboardStore);
-const { isCorrectNetworkSet, switchingNetworkInProgress, switchingNetworkError } = storeToRefs(eraWalletStore);
-const { eraNetwork } = storeToRefs(useEraProviderStore());
+const { isCorrectNetworkSet, switchingNetworkInProgress, switchingNetworkError, walletName } =
+  storeToRefs(onboardStore);
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
 const buttonStep = computed(() => {
   if (!isCorrectNetworkSet.value) {

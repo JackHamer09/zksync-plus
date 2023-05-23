@@ -92,15 +92,7 @@
       <slot name="after-checks" />
     </div>
 
-    <transition v-bind="TransitionHeight()">
-      <div
-        v-if="continueInWalletTipDisplayed"
-        class="h-6 whitespace-nowrap text-center text-sm font-medium text-gray-500"
-      >
-        <div class="pt-1"></div>
-        Continue in your {{ walletName }} wallet
-      </div>
-    </transition>
+    <TransactionContinueInWallet :opened="continueInWalletTipDisplayed" />
   </div>
 </template>
 

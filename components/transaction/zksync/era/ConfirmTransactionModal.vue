@@ -74,12 +74,12 @@
             <span v-else>Send to {{ destination.label }}</span>
           </transition>
         </CommonButton>
-        <transition v-bind="TransitionHeight()">
-          <div v-if="status === 'waiting-for-signature'" class="h-6 text-center text-sm font-medium text-gray-500">
+        <CommonHeightTransition :opened="status === 'waiting-for-signature'">
+          <div class="text-center text-sm font-medium text-gray-500">
             <div class="pt-1"></div>
             Confirm this transaction in your {{ walletName }} wallet
           </div>
-        </transition>
+        </CommonHeightTransition>
       </div>
     </div>
   </CommonModal>
@@ -124,7 +124,7 @@ import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useEraTransactionsHistoryStore } from "@/store/zksync/era/transactionsHistory";
 import { useEraWalletStore } from "@/store/zksync/era/wallet";
 import { calculateFee } from "@/utils/helpers";
-import { TransitionHeight, TransitionPrimaryButtonText } from "@/utils/transitions";
+import { TransitionPrimaryButtonText } from "@/utils/transitions";
 
 export type ConfirmationModalTransaction = {
   type: FeeEstimationParams["type"];

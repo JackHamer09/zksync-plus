@@ -16,15 +16,6 @@ export const TransitionOpacity = (durationIn = 200, durationOut = 50) => ({
   leaveToClass: "opacity-0",
 });
 
-export const TransitionHeight = (height = 1.5) => ({
-  enterActiveClass: "transition-all ease-in duration-200",
-  enterFromClass: "opacity-0 h-0",
-  enterToClass: `opacity-100 h-[${height}rem]`,
-  leaveActiveClass: "transition-all ease-in duration-50",
-  leaveFromClass: `opacity-100 h-[${height}rem]`,
-  leaveToClass: "opacity-0 h-0",
-});
-
 export const TransitionPrimaryButtonText = {
   enterActiveClass: "transition transform ease-in duration-150",
   enterFromClass: "-translate-y-3 opacity-0",

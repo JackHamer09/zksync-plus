@@ -115,13 +115,13 @@
       </CommonErrorBlock>
     </form>
 
-    <EraTransactionFooter>
+    <EthereumTransactionFooter>
       <template #after-checks>
         <CommonButton :disabled="continueButtonDisabled" variant="primary-solid" @click="openConfirmationModal">
           Continue
         </CommonButton>
       </template>
-    </EraTransactionFooter>
+    </EthereumTransactionFooter>
   </div>
 </template>
 
@@ -133,7 +133,7 @@ import { BigNumber } from "ethers";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import EraTransactionFooter from "@/components/transaction/zksync/era/EraTransactionFooter.vue";
+import EthereumTransactionFooter from "@/components/transaction/EthereumTransactionFooter.vue";
 import ConfirmTransactionModal from "@/components/transaction/zksync/era/deposit/ConfirmTransactionModal.vue";
 
 import useAllowance from "@/composables/transaction/useAllowance";
