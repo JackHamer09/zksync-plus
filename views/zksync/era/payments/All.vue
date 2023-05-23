@@ -10,7 +10,7 @@
     </div>
     <CommonCardWithLineButtons v-else-if="recentTransactionsRequestError">
       <CommonErrorBlock @try-again="fetch">
-        Loading transactions error: {{ recentTransactionsRequestError!.message }}
+        Loading transactions error: {{ recentTransactionsRequestError.message }}
       </CommonErrorBlock>
     </CommonCardWithLineButtons>
     <div v-else-if="transactions.length">
@@ -35,7 +35,7 @@
         </div>
         <CommonCardWithLineButtons v-else-if="previousTransactionsRequestError">
           <CommonErrorBlock @try-again="fetchMore">
-            Loading transactions error: {{ previousTransactionsRequestError!.message }}
+            Loading transactions error: {{ previousTransactionsRequestError.message }}
           </CommonErrorBlock>
         </CommonCardWithLineButtons>
         <CommonButton v-else ref="loadMoreEl" class="mx-auto mt-4">Load more</CommonButton>

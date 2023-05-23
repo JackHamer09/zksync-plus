@@ -5,7 +5,7 @@
     </CommonCardWithLineButtons>
     <CommonCardWithLineButtons v-else-if="balanceError">
       <CommonErrorBlock @try-again="fetch">
-        {{ balanceError!.message }}
+        {{ balanceError.message }}
       </CommonErrorBlock>
     </CommonCardWithLineButtons>
     <div v-else>

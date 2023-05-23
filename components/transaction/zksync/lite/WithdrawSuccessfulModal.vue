@@ -11,7 +11,7 @@
       </CommonCardWithLineButtons>
       <CommonCardWithLineButtons v-else-if="transactionsRequestError">
         <CommonErrorBlock class="m-2" @try-again="fetch">
-          {{ transactionsRequestError!.message }}
+          {{ transactionsRequestError.message }}
         </CommonErrorBlock>
       </CommonCardWithLineButtons>
       <template v-else>

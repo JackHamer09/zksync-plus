@@ -1,5 +1,9 @@
 <template>
-  <CommonModal v-model:opened="isModalOpened" title="Add contact" @after-leave="clearFields">
+  <CommonModal
+    v-model:opened="isModalOpened"
+    :title="contactPreset ? 'Edit contact' : 'Add contact'"
+    @after-leave="clearFields"
+  >
     <CommonInput
       v-model="name"
       autofocus
@@ -19,7 +23,7 @@
         {{ error }}
       </CommonErrorBlock>
     </div>
-    <CommonButton @click="addContact" variant="primary-solid" class="mx-auto mt-5">Add contact</CommonButton>
+    <CommonButton @click="addContact" variant="primary-solid" class="mx-auto mt-5">Save contact</CommonButton>
   </CommonModal>
 </template>
 
@@ -101,6 +105,7 @@ const addContact = async () => {
 };
 const clearFields = () => {
   emit("update:error", "");
+  emit("update:contactPreset", undefined);
   name.value = "";
   address.value = "";
   v$.value.$reset();
