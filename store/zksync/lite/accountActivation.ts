@@ -6,7 +6,6 @@ import type { PubKeyHash } from "zksync/build/types";
 
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
-import { formatError } from "@/utils/formatters";
 
 type AccountActivationTx = {
   accountId: number;
@@ -155,7 +154,7 @@ export const useLiteAccountActivationStore = defineStore("liteAccountActivation"
 
     isAccountActivationSigned,
     canSignAccountActivation,
-    accountActivationSigningError: computed(() => formatError(accountActivationSigningError.value)),
+    accountActivationSigningError: computed(() => accountActivationSigningError.value),
     accountActivationSigningInProgress,
     accountActivationSign,
 

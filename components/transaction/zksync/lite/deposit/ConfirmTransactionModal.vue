@@ -110,9 +110,9 @@
       <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
           Your funds will be available on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
-          after the transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> and
-          then processed on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span
-          >. You are free to close this page.
+          after the transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
+          and then processed on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2). You are free
+          to close this page.
         </p>
         <a :href="`${blockExplorerUrl}/tx/${ethTransactionHash}`" target="_blank" class="alert-link">
           Track status

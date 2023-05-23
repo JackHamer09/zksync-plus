@@ -122,12 +122,7 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
     execute: switchNetwork,
   } = usePromise(
     async () => {
-      try {
-        await onboardStore.switchNetworkById(eraNetwork.value.id, eraNetwork.value.name);
-      } catch (err) {
-        const error = formatError(err as Error);
-        if (error) throw error;
-      }
+      await onboardStore.switchNetworkById(eraNetwork.value.id, eraNetwork.value.name);
     },
     { cache: false }
   );

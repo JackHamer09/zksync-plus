@@ -76,6 +76,9 @@ export function capitalize(str: string) {
 }
 
 export function formatError(error?: Error) {
+  if (!error?.message) {
+    error = Object.assign(new Error("Unknown error"), error);
+  }
   const message = error?.message;
   if (typeof message === "string") {
     if (
@@ -89,6 +92,8 @@ export function formatError(error?: Error) {
       return undefined;
     } else if (message.toLowerCase().includes("fee is to low")) {
       return new Error("Transaction fee was to low. Try again.");
+    } else if (message === "Network Error" || message === "Failed to fetch ()" || message.includes("noNetwork")) {
+      return new Error("Network error. Check your internet connection and try again.");
     }
   }
   return error;

@@ -8,6 +8,6 @@
 
 <style lang="scss" scoped>
 .empty-block {
-  @apply rounded-lg border border-dashed p-4 text-center leading-normal text-gray-500;
+  @apply rounded-lg border border-dashed py-4 px-3.5 text-center leading-normal text-gray-500;
 }
 </style>

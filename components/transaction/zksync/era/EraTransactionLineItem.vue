@@ -39,6 +39,7 @@ import TotalPrice from "@/components/transaction/transactionLineItem/TotalPrice.
 import type { EraTransaction } from "@/utils/zksync/era/mappers";
 import type { Component, PropType } from "vue";
 
+import { useOnboardStore } from "@/store/onboard";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { isBigNumber } from "@/utils/validators";
 
@@ -57,6 +58,7 @@ const props = defineProps({
   },
 });
 
+const { account } = storeToRefs(useOnboardStore());
 const { blockExplorerUrl } = storeToRefs(useEraProviderStore());
 
 const label = computed(() => {
@@ -89,9 +91,6 @@ const amount = computed(() => {
 const computeAmount = computed(() => {
   return BigNumber.from(amount.value).abs().toString();
 });
-const isAmountNegative = computed(() => {
-  return BigNumber.from(amount.value).isNegative();
-});
 const token = computed(() => {
   return props.transaction.token;
 });
@@ -105,7 +104,11 @@ const direction = computed(() => {
   ) {
     return undefined;
   }
-  return isAmountNegative.value ? "out" : "in";
+  if (props.transaction.toNetwork === "L2" && props.transaction.to === account.value.address) {
+    return "in";
+  } else {
+    return "out";
+  }
 });
 const isTransactionFailed = computed(() => props.transaction.status === "failed");
 const icon = computed(() => {

@@ -77,7 +77,8 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: Token[], 
     token: mainTransfer?.tokenInfo?.address
       ? getTokenByAddress(checksumAddress(mainTransfer.tokenInfo.address))
       : undefined,
-    amount: balanceChangesByToken[mainTransfer?.tokenInfo?.address],
+    amount:
+      mainTransfer.type === "fee" ? balanceChangesByToken[mainTransfer?.tokenInfo?.address] : mainTransfer?.amount,
     feeToken: getTokenByAddress(ETH_ADDRESS),
     feeAmount: transaction.fee,
     receivedAt: transaction.receivedAt,

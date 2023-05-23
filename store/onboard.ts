@@ -8,7 +8,6 @@ import useObservable from "@/composables/useObservable";
 
 import { useRuntimeConfig } from "#imports";
 import { chains, useNetworkStore } from "@/store/network";
-import { formatError } from "@/utils/formatters";
 
 const { public: env } = useRuntimeConfig();
 
@@ -92,12 +91,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     execute: switchNetwork,
   } = usePromise(
     async () => {
-      try {
-        await switchNetworkById(selectedEthereumNetwork.value.id);
-      } catch (err) {
-        const error = formatError(err as Error);
-        if (error) throw error;
-      }
+      await switchNetworkById(selectedEthereumNetwork.value.id);
     },
     { cache: false }
   );

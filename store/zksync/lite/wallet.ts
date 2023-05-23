@@ -13,7 +13,6 @@ import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
-import { formatError } from "@/utils/formatters";
 
 export const useLiteWalletStore = defineStore("liteWallet", () => {
   const onboardStore = useOnboardStore();
@@ -173,7 +172,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
   return {
     isAuthorized,
     authorizationInProgress,
-    authorizationError: computed(() => formatError(authorizationError.value)),
+    authorizationError: computed(() => authorizationError.value),
     authorizeWallet: () => getWalletInstance(true),
     getSignerPubKeyHash,
 

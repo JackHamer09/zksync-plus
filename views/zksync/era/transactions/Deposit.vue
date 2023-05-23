@@ -69,7 +69,7 @@
         :loading="balancesLoading"
         autofocus
       />
-      <CommonErrorBlock v-if="feeError" class="mt-2" @try-again="estimate">
+      <CommonErrorBlock v-if="feeError" class="mt-2" @try-again="estimate().catch(() => {})">
         Fee estimation error: {{ feeError.message }}
       </CommonErrorBlock>
       <transition v-bind="TransitionOpacity()">

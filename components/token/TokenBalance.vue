@@ -50,7 +50,7 @@ import type { TokenPrice } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { Component, PropType } from "vue";
 
-import { parseTokenAmount, removeSmallAmount, shortenAddress } from "@/utils/formatters";
+import { formatTokenPrice, parseTokenAmount, removeSmallAmount, shortenAddress } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
 
 const props = defineProps({

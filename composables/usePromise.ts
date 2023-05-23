@@ -1,3 +1,5 @@
+import { formatError } from "@/utils/formatters";
+
 const defaultOptions: {
   cache?: number | boolean;
 } = {
@@ -39,9 +41,12 @@ export default <ResultType, ErrorType = Error>(fn: () => Promise<ResultType>, op
       rawResult = await promise;
       result.value = rawResult;
     } catch (e) {
-      error.value = e as unknown as ErrorType;
       promise = undefined;
-      throw e;
+      const err = formatError(e as Error);
+      if (!err) return;
+
+      error.value = err as unknown as ErrorType;
+      throw err;
     } finally {
       inProgress.value = false;
       if (opts.cache === false) {
