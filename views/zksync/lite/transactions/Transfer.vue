@@ -10,7 +10,7 @@
       <template #body-bottom>
         <CommonAlert class="sticky bottom-0 mt-3" variant="neutral" :icon="InformationCircleIcon">
           <p>Only tokens available for paying fees are displayed</p>
-          <a href="https://docs.zksync.io/userdocs/tokens/#how-fees-are-paid" target="_blank" class="alert-link">
+          <a :href="LITE_FEE_PAYING" target="_blank" class="alert-link">
             Learn more
             <ArrowUpRightIcon class="ml-1 h-3 w-3" />
           </a>
@@ -111,11 +111,7 @@
             requires <span class="font-medium">one-time</span> account activation. Transaction
             <span class="font-medium">fee</span> will be <span class="font-medium">higher than usual</span>
           </p>
-          <a
-            href="https://docs.zksync.io/userdocs/faq/#what-is-the-account-activation-fee"
-            target="_blank"
-            class="alert-link"
-          >
+          <a :href="LITE_ACCOUNT_ACTIVATION" target="_blank" class="alert-link">
             Learn more
             <ArrowUpRightIcon class="ml-1 h-3 w-3" />
           </a>
@@ -128,7 +124,7 @@
         <a
           v-if="type === 'Withdraw'"
           class="link mb-2 flex items-center text-sm"
-          href="https://docs.zksync.io/userdocs/faq/#how-long-are-withdrawal-times"
+          :href="LITE_WITHDRAWAL_TIMES"
           target="_blank"
         >
           Will arrive in 10 minutes to 7 hours
@@ -168,6 +164,7 @@ import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActiva
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
+import { LITE_ACCOUNT_ACTIVATION, LITE_FEE_PAYING, LITE_WITHDRAWAL_TIMES } from "@/utils/doc-links";
 import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 

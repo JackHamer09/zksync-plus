@@ -85,7 +85,7 @@
         <a
           v-if="type === 'withdrawal' && selectedEthereumNetwork.network === 'mainnet'"
           class="link mb-2 flex items-center text-sm"
-          href="https://era.zksync.io/docs/dev/troubleshooting/withdrawal-delay.html#withdrawal-delay"
+          :href="ERA_WITHDRAWAL_DELAY"
           target="_blank"
         >
           Arriving in ~24 hours
@@ -123,6 +123,7 @@ import { useOnboardStore } from "@/store/onboard";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useEraTokensStore } from "@/store/zksync/era/tokens";
 import { useEraWalletStore } from "@/store/zksync/era/wallet";
+import { ERA_WITHDRAWAL_DELAY } from "@/utils/doc-links";
 import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 

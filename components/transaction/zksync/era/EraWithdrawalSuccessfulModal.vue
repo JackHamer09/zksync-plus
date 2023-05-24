@@ -18,19 +18,10 @@
       >
         <p>
           Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
-          after a
-          <a
-            href="https://era.zksync.io/docs/dev/troubleshooting/withdrawal-delay.html#withdrawal-delay"
-            target="_blank"
-            class="link"
-            >~24-hour delay</a
-          >. During this time, the transaction will be processed and finalized. You are free to close this page.
+          after a <a :href="ERA_WITHDRAWAL_DELAY" target="_blank" class="link">~24-hour delay</a>. During this time, the
+          transaction will be processed and finalized. You are free to close this page.
         </p>
-        <a
-          href="https://era.zksync.io/docs/dev/troubleshooting/withdrawal-delay.html#withdrawal-delay"
-          target="_blank"
-          class="alert-link"
-        >
+        <a :href="ERA_WITHDRAWAL_DELAY" target="_blank" class="alert-link">
           Learn more
           <ArrowUpRightIcon class="ml-1 h-3 w-3" />
         </a>
@@ -63,6 +54,7 @@ import type { PropType } from "vue";
 
 import { useDestinationsStore } from "@/store/destinations";
 import { useNetworkStore } from "@/store/network";
+import { ERA_WITHDRAWAL_DELAY } from "@/utils/doc-links";
 
 defineProps({
   transaction: {

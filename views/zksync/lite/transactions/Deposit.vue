@@ -103,7 +103,7 @@
               {{ parseTokenAmount(allowance!, selectedToken!.decimals) }}</button
             >. Depositing more than that will require you to approve a new allowance.
           </p>
-          <a href="https://cryptotesters.com/blog/token-allowances" target="_blank" class="alert-link">
+          <a :href="TOKEN_ALLOWANCE" target="_blank" class="alert-link">
             Learn more
             <ArrowUpRightIcon class="ml-1 h-3 w-3" />
           </a>
@@ -147,6 +147,7 @@ import { useLiteEthereumBalanceStore } from "@/store/zksync/lite/ethereumBalance
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
+import { TOKEN_ALLOWANCE } from "@/utils/doc-links";
 import {
   checksumAddress,
   decimalToBigNumber,

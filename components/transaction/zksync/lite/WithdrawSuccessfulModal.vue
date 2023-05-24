@@ -25,7 +25,7 @@
           It can take <span class="font-medium">up to 7 hours</span> until funds arrive on
           <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
         </p>
-        <a href="https://docs.zksync.io/userdocs/faq/#how-long-are-withdrawal-times" target="_blank" class="alert-link">
+        <a :href="LITE_WITHDRAWAL_TIMES" target="_blank" class="alert-link">
           Learn more
           <ArrowUpRightIcon class="ml-1 h-3 w-3" />
         </a>
@@ -61,6 +61,7 @@ import type { PropType } from "vue";
 import { useDestinationsStore } from "@/store/destinations";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
+import { LITE_WITHDRAWAL_TIMES } from "@/utils/doc-links";
 
 const props = defineProps({
   transactionHashes: {

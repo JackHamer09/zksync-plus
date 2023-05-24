@@ -28,7 +28,7 @@
           will be deducted after signing, except for
           <span class="font-medium">{{ destinations.ethereum.label }}</span> transaction fee
         </p>
-        <a href="https://cryptotesters.com/blog/token-allowances" target="_blank" class="alert-link">
+        <a :href="TOKEN_ALLOWANCE" target="_blank" class="alert-link">
           Learn more
           <ArrowUpRightIcon class="ml-1 h-3 w-3" />
         </a>
@@ -154,6 +154,7 @@ import type { PropType } from "vue";
 import { useDestinationsStore } from "@/store/destinations";
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
+import { TOKEN_ALLOWANCE } from "@/utils/doc-links";
 import { formatError } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionPrimaryButtonText } from "@/utils/transitions";
 

@@ -69,7 +69,7 @@
         <a
           v-if="destination.key === 'ethereum'"
           class="link mx-auto mt-2 -mb-1 flex items-center justify-center text-center text-sm"
-          href="https://docs.zksync.io/userdocs/faq/#how-long-are-withdrawal-times"
+          :href="LITE_WITHDRAWAL_TIMES"
           target="_blank"
         >
           Will arrive in 10 minutes to 7 hours
@@ -135,6 +135,7 @@ import { usePreferencesStore } from "@/store/preferences";
 import { useLiteAccountActivationStore } from "@/store/zksync/lite/accountActivation";
 import { useLiteTransactionsHistoryStore } from "@/store/zksync/lite/transactionsHistory";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
+import { LITE_WITHDRAWAL_TIMES } from "@/utils/doc-links";
 import { TransitionPrimaryButtonText } from "@/utils/transitions";
 
 export type ConfirmationModalTransaction = {

@@ -104,7 +104,7 @@
               {{ parseTokenAmount(allowance!, selectedToken!.decimals) }}</button
             >. Depositing more than that will require you to approve a new allowance.
           </p>
-          <a href="https://cryptotesters.com/blog/token-allowances" target="_blank" class="alert-link">
+          <a :href="TOKEN_ALLOWANCE" target="_blank" class="alert-link">
             Learn more
             <ArrowUpRightIcon class="ml-1 h-3 w-3" />
           </a>
@@ -147,6 +147,7 @@ import { useOnboardStore } from "@/store/onboard";
 import { useEraEthereumBalanceStore } from "@/store/zksync/era/ethereumBalance";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useEraTokensStore } from "@/store/zksync/era/tokens";
+import { TOKEN_ALLOWANCE } from "@/utils/doc-links";
 import {
   checksumAddress,
   decimalToBigNumber,
