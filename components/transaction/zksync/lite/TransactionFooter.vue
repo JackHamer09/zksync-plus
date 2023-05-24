@@ -44,7 +44,7 @@
       >
         <p>
           To activate your account, you need a history of committed balance. Visit
-          <NuxtLink class="font-medium underline underline-offset-2" :to="{ name: 'transaction-zksync-lite-deposit' }"
+          <NuxtLink class="font-medium underline underline-offset-2" :to="{ name: 'transaction-zksync-lite-add-funds' }"
             >Add funds</NuxtLink
           >
           page to add balance, and wait for deposited funds to become available on

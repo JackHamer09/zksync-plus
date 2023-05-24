@@ -48,7 +48,7 @@ const back = () => {
   if (step.value === "transaction-form" && !getRouteAddress()) {
     return (address.value = null);
   }
-  router.push({ name: "index" });
+  router.push({ name: "transaction-zksync-era-add-funds" });
 };
 </script>
 

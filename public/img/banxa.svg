@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="100 100 400 400" width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient data-v-35db1c28="" id="paint0_linear" x1="123.533" y1="12.4933" x2="152.543" y2="12.4933" gradientUnits="userSpaceOnUse" gradientTransform="matrix(8.50222, 0, 0, 8.50222, -872.360229, 173.537491)">
+      <stop data-v-35db1c28="" stop-color="#0172D0"/>
+      <stop data-v-35db1c28="" offset="0.0644" stop-color="#0181CD"/>
+      <stop data-v-35db1c28="" offset="0.2231" stop-color="#019FC8"/>
+      <stop data-v-35db1c28="" offset="0.3899" stop-color="#00B7C3"/>
+      <stop data-v-35db1c28="" offset="0.5666" stop-color="#00C8C0"/>
+      <stop data-v-35db1c28="" offset="0.7597" stop-color="#00D2BF"/>
+      <stop data-v-35db1c28="" offset="1" stop-color="#00D5BE"/>
+    </linearGradient>
+  </defs>
+  <path data-v-35db1c28="" d="M 301.286 226.783 L 370.226 346.171 L 232.394 346.171 L 301.286 226.783 Z M 278.383 186.764 L 180.616 356.129 C 177.063 362.292 177.063 369.877 180.616 376.04 C 184.179 382.205 190.767 386 197.877 386 L 404.69 386 C 411.806 386 418.398 382.205 421.951 376.04 C 425.514 369.877 425.514 362.292 421.951 356.129 L 324.14 186.764 C 319.447 178.608 310.673 173.538 301.286 173.538 C 291.847 173.538 283.124 178.608 278.383 186.764 Z" fill="url(#paint0_linear)" style=""/>
+</svg>

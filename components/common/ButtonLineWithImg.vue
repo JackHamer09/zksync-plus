@@ -6,7 +6,7 @@
     <div class="button-line-with-img-body">
       <slot />
     </div>
-    <div class="button-line-with-img-right">
+    <div v-if="$slots.right" class="button-line-with-img-right">
       <slot name="right" />
     </div>
   </CommonLineButton>

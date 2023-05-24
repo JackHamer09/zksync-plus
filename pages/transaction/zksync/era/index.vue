@@ -1,17 +1,32 @@
 <template>
-  <SelectDestination @back="back()">
+  <div>
+    <CommonBackButton as="RouterLink" :to="{ name: 'index' }" />
+    <h1 class="h1">Where to send</h1>
+
+    <ModalTransactionWithdrawExchangeWarning
+      :opened="openedModal === 'withdraw-to-exchange'"
+      :button-location="{ name: 'transaction-zksync-era-withdraw' }"
+      @close="closeModal"
+    />
+
     <CommonCardWithLineButtons>
       <DestinationItem
         v-bind="destinations.era"
         as="RouterLink"
         :to="{ name: 'transaction-zksync-era-send', query: $route.query }"
-        :description="`Send inside zkSync Era∎ (L2) network`"
+        description="Send inside zkSync Era∎ (L2) network"
       />
       <DestinationItem
         v-bind="destinations.ethereum"
         as="RouterLink"
         :to="{ name: 'transaction-zksync-era-withdraw', query: $route.query }"
         description="Withdraw to Ethereum (L1)"
+      />
+      <DestinationItem
+        v-bind="destinations.zkSyncLite"
+        as="RouterLink"
+        :to="{ name: 'transaction-zksync-era-send-lite', query: $route.query }"
+        description="Send to zkSync Lite (L2) network"
       />
     </CommonCardWithLineButtons>
 
@@ -20,10 +35,8 @@
       <DestinationItem
         label="Official bridge"
         :icon-url="destinations.ethereum.iconUrl"
-        as="RouterLink"
-        :to="{ name: 'transaction-zksync-era-withdraw', query: $route.query }"
         description="Send to exchange using official bridge"
-        disabled
+        @click="openedModal = 'withdraw-to-exchange'"
       />
       <DestinationItem
         v-bind="destinations.layerswap"
@@ -50,24 +63,30 @@
         target="_blank"
         href="https://www.orbiter.finance/?source=zkSync%20Era"
       />
+      <DestinationItem
+        v-bind="destinations.multichain"
+        :icon="ArrowUpRightIcon"
+        as="a"
+        target="_blank"
+        href="https://app.multichain.org/#/router"
+      />
     </CommonCardWithLineButtons>
-  </SelectDestination>
+  </div>
 </template>
 
 <script lang="ts" setup>
+import { ref } from "vue";
+
 import { ArrowUpRightIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
-import { useRouter } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
-import SelectDestination from "@/views/SelectDestination.vue";
 
 const { destinations } = storeToRefs(useDestinationsStore());
 
-const router = useRouter();
-
-const back = () => {
-  router.push({ name: "index" });
+const openedModal = ref<"withdraw-to-exchange" | undefined>();
+const closeModal = () => {
+  openedModal.value = undefined;
 };
 </script>
 

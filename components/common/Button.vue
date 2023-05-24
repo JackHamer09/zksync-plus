@@ -43,7 +43,8 @@ defineProps({
           @apply hover:bg-primary-400;
         }
       }
-      &:disabled {
+      &:disabled,
+      &[aria-disabled="true"] {
         @apply bg-opacity-50;
       }
     }
