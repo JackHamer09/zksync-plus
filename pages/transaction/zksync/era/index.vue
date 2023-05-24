@@ -30,7 +30,7 @@
         :icon="ArrowUpRightIcon"
         as="a"
         target="_blank"
-        href="https://www.layerswap.io/?networkName=ZKSYNCERA_MAINNET"
+        href="https://www.layerswap.io/?sourceExchangeName=ZKSYNCERA_MAINNET"
       />
     </CommonCardWithLineButtons>
 
@@ -41,7 +41,7 @@
         :icon="ArrowUpRightIcon"
         as="a"
         target="_blank"
-        href="https://www.layerswap.io/?networkName=ZKSYNCERA_MAINNET"
+        href="https://www.layerswap.io/?sourceExchangeName=ZKSYNCERA_MAINNET"
       />
       <DestinationItem
         v-bind="destinations.orbiter"

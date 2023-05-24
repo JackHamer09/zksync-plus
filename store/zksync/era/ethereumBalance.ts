@@ -34,7 +34,8 @@ export const useEraEthereumBalanceStore = defineStore("eraEthereumBalances", () 
     }
     return Object.values(tokens.value).map((token) => ({
       ...token,
-      amount: ethereumBalance.value!.find((balance) => balance.contractAddress === token.address)?.tokenBalance ?? "0",
+      amount:
+        ethereumBalance.value!.find((balance) => balance.contractAddress === token.l1Address)?.tokenBalance ?? "0",
     }));
   });
   watch(
