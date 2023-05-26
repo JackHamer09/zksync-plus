@@ -131,7 +131,6 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import { Vue3Lottie } from "vue3-lottie";
 
 import {
   ArrowDownIcon,

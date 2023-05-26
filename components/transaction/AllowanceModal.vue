@@ -133,7 +133,6 @@
 
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import { Vue3Lottie } from "vue3-lottie";
 
 import { ArrowUpRightIcon, InformationCircleIcon, LockOpenIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";

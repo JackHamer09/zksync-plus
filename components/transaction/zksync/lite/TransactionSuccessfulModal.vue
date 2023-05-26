@@ -34,7 +34,6 @@
 
 <script lang="ts" setup>
 import { watch } from "vue";
-import { Vue3Lottie } from "vue3-lottie";
 
 import { storeToRefs } from "pinia";
 
