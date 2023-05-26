@@ -26,6 +26,7 @@
           maxlength="20"
           spellcheck="false"
           :style="{ width: `${inputWidth}px` }"
+          @keyup.enter="emit('enter')"
         />
         <transition v-bind="TransitionOpacity(250, 150)">
           <button
@@ -133,6 +134,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
+  (eventName: "enter"): void;
   (eventName: "update:error", error?: string): void;
   (eventName: "update:modelValue", amount: string): void;
   (eventName: "update:tokenAddress", tokenAddress?: string): void;

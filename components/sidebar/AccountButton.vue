@@ -3,7 +3,7 @@
     <ModalNetworkChange v-model:opened="networkChangeModalOpened" />
 
     <MenuButton as="template">
-      <SidebarAccountAvatarName hide-name-on-mobile class="main-account-button" />
+      <SidebarAccountAvatarName class="main-account-button" />
     </MenuButton>
 
     <transition
@@ -15,9 +15,7 @@
       leave-to-class="transform opacity-0"
     >
       <MenuItems class="menu-panel">
-        <MenuButton as="template">
-          <SidebarAccountAvatarName class="menu-account-button" tabindex="-1" title="Click to close popup" />
-        </MenuButton>
+        <SidebarAccountAvatarName :is-button="false" class="menu-account-button" tabindex="-1" />
 
         <div class="menu-options">
           <MenuItem v-slot="{ active }" as="template">

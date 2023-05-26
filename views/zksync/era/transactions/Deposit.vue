@@ -68,6 +68,7 @@
         :maxAmount="maxAmount"
         :loading="balancesLoading"
         autofocus
+        @enter="openConfirmationModal"
       />
       <CommonErrorBlock v-if="feeError" class="mt-2" @try-again="estimate().catch(() => {})">
         Fee estimation error: {{ feeError.message }}

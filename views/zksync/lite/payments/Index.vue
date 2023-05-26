@@ -45,10 +45,6 @@
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">
               You currently don't have any transactions on
               <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
-              <!-- <br />
-              <span class="mt-1.5 inline-block">
-                If you are looking for your deposit transaction then you should find it on etherscan
-              </span> -->
             </CommonEmptyBlock>
           </template>
         </div>

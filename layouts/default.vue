@@ -52,7 +52,9 @@ watch(
 
 <style lang="scss" scoped>
 .app-layout {
-  @apply mx-auto grid min-h-screen;
+  @apply mx-auto grid;
+  min-height: 100vh;
+  min-height: 100dvh;
   grid-template-areas:
     "main"
     "main-actions"

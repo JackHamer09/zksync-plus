@@ -30,7 +30,7 @@ export const useOnboardStore = defineStore("onboard", () => {
   const ethereumClient = new EthereumClient(wagmiClient, chains);
 
   const getWalletName = () => {
-    if (wagmiClient.connector?.name === "WalletConnect") {
+    if (wagmiClient.connector?.name === "WalletConnect" || wagmiClient.connector?.name === "WalletConnectLegacy") {
       /* TODO: Figure our how to properly get wallet name from WalletConnect */
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

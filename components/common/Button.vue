@@ -36,7 +36,7 @@ defineProps({
       }
     }
     &primary-solid {
-      @apply h-12 w-full max-w-sm rounded-2xl bg-primary-400 text-base text-white;
+      @apply h-max w-full max-w-sm rounded-2xl bg-primary-400 py-3 text-base text-white;
       &:enabled,
       &:is(a) {
         &:not([aria-disabled="true"]) {
