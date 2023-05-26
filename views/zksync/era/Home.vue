@@ -45,8 +45,8 @@
               <br />
               <span class="mt-1.5 inline-block">
                 Proceed to
-                <NuxtLink class="link" :to="{ name: 'transaction-zksync-add-funds' }">Add funds</NuxtLink> page to add
-                balance to your account
+                <NuxtLink class="link" :to="{ name: 'transaction-zksync-era-add-funds' }">Add funds</NuxtLink> page to
+                add balance to your account
               </span>
             </CommonEmptyBlock>
           </template>

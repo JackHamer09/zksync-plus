@@ -1,8 +1,10 @@
 <template>
-  <Popover as="div" class="account-button-container">
-    <PopoverButton as="template">
+  <Menu as="div" class="account-button-container">
+    <ModalNetworkChange v-model:opened="networkChangeModalOpened" />
+
+    <MenuButton as="template">
       <SidebarAccountAvatarName hide-name-on-mobile class="main-account-button" />
-    </PopoverButton>
+    </MenuButton>
 
     <transition
       enter-active-class="transition ease-out duration-100"
@@ -12,30 +14,54 @@
       leave-from-class="transform opacity-100"
       leave-to-class="transform opacity-0"
     >
-      <PopoverPanel class="popover-panel">
-        <PopoverButton as="template">
-          <SidebarAccountAvatarName class="popover-account-button" tabindex="-1" title="Click to close popup" />
-        </PopoverButton>
+      <MenuItems class="menu-panel">
+        <MenuButton as="template">
+          <SidebarAccountAvatarName class="menu-account-button" tabindex="-1" title="Click to close popup" />
+        </MenuButton>
 
-        <div class="popover-options">
-          <SidebarNetworkSelect />
-          <button class="account-menu-item has-hover" @click="onboardStore.disconnect">
-            <PowerIcon class="account-menu-item-icon p-2" aria-hidden="true" />
-            Logout
-          </button>
+        <div class="menu-options">
+          <MenuItem v-slot="{ active }" as="template">
+            <button class="account-menu-item" :class="{ active }" @click="networkChangeModalOpened = true">
+              <img
+                v-if="selectedEthereumNetwork.iconUrl"
+                :src="selectedEthereumNetwork.iconUrl"
+                :alt="selectedEthereumNetwork.name"
+                class="account-menu-item-icon p-1"
+              />
+              <div v-else class="account-menu-item-icon">{{ selectedEthereumNetwork.name.slice(0, 1) }}</div>
+              <div class="flex items-center justify-between">
+                <span>{{ selectedEthereumNetwork.name }}</span>
+                <ChevronDownIcon class="mr-1 ml-2 h-4 w-4 transition-transform" aria-hidden="true" />
+              </div>
+            </button>
+          </MenuItem>
+          <MenuItem v-slot="{ active }" as="template">
+            <button class="account-menu-item" :class="{ active }" @click="onboardStore.disconnect">
+              <PowerIcon class="account-menu-item-icon p-2" aria-hidden="true" />
+              Logout
+            </button>
+          </MenuItem>
         </div>
-      </PopoverPanel>
+      </MenuItems>
     </transition>
-  </Popover>
+  </Menu>
 </template>
 
 <script lang="ts" setup>
-import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
-import { PowerIcon } from "@heroicons/vue/24/solid";
+import { ref } from "vue";
 
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { ChevronDownIcon } from "@heroicons/vue/24/outline";
+import { PowerIcon } from "@heroicons/vue/24/solid";
+import { storeToRefs } from "pinia";
+
+import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 
+const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const onboardStore = useOnboardStore();
+
+const networkChangeModalOpened = ref(false);
 </script>
 
 <style lang="scss">
@@ -45,41 +71,39 @@ const onboardStore = useOnboardStore();
   .main-account-button {
     @apply transition-colors hover:bg-gray-200;
   }
-  .popover-panel {
-    @apply absolute left-0 bottom-0 z-10 h-max w-56 rounded-lg bg-white shadow-lg ring-1 ring-gray-900/5 focus:outline-none md:-left-px md:-top-px md:p-px;
-    display: grid;
+  .menu-panel {
+    @apply absolute left-0 bottom-0 z-10 grid h-max w-56 rounded-lg bg-white shadow-lg ring-1 ring-gray-900/5 focus:outline-none md:-left-px md:-top-px md:p-px;
     grid-template-areas:
-      "popover-options"
+      "menu-options"
       "account-button";
     grid-template-rows: repeat(2, max-content);
     @media screen and (min-width: 720px) {
       grid-template-areas:
         "account-button"
-        "popover-options";
+        "menu-options";
     }
 
-    .popover-account-button {
+    .menu-account-button {
       grid-area: account-button;
     }
-    .popover-options {
+    .menu-options {
       @apply border-b p-1 md:border-b-0 md:border-t;
-      grid-area: popover-options;
-    }
-  }
-  .account-menu-item {
-    @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 rounded-lg px-2 py-2 text-left leading-6 text-gray-900 transition-colors xl:px-4;
-    &.has-hover:hover {
-      @apply bg-gray-100 text-primary-400;
+      grid-area: menu-options;
 
-      .account-menu-item-icon {
-        @apply bg-white text-primary-400;
+      .account-menu-item {
+        @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 rounded-lg px-2 py-2 text-left leading-6 text-gray-900 transition-colors xl:px-4;
+        &.active {
+          @apply bg-gray-100 text-primary-400;
+
+          .account-menu-item-icon {
+            @apply bg-white text-primary-400;
+          }
+        }
+
+        .account-menu-item-icon {
+          @apply flex aspect-square h-auto w-8 items-center justify-center rounded-full bg-gray-50 text-center text-gray-500;
+        }
       }
-    }
-  }
-  .account-menu-item-icon {
-    @apply flex aspect-square h-auto w-8 items-center justify-center rounded-full bg-gray-50 text-center text-gray-500;
-    &.small {
-      @apply w-6;
     }
   }
 }

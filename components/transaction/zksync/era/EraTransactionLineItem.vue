@@ -73,6 +73,8 @@ const label = computed(() => {
     return "Deposit";
   } else if (props.transaction.type === "fee") {
     return "Contract execution";
+  } else if (props.transaction.type === undefined) {
+    return "Unknown";
   }
   return props.transaction.type;
 });
@@ -121,6 +123,8 @@ const icon = computed(() => {
       return PlusIcon;
     case "fee":
       return BanknotesIcon;
+    case undefined:
+      return undefined;
     default:
       if (direction.value) {
         return direction.value === "in" ? ArrowDownLeftIcon : ArrowRightIcon;

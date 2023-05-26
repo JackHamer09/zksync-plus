@@ -63,7 +63,7 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: Token[], 
     });
 
   const balanceChangesByToken = sumTokenTransfers(balanceChanges, userAddress);
-  const mainTransfer = balanceChanges[0];
+  const mainTransfer = balanceChanges[0] as ReturnType<typeof mapBalanceChange> | undefined;
 
   return {
     transactionHash: transaction.transactionHash,
@@ -75,10 +75,10 @@ export function mapApiTransaction(transaction: ApiTransaction, tokens: Token[], 
     to: mainTransfer?.to as string,
     toNetwork: mainTransfer?.toNetwork ?? "L2",
     token: mainTransfer?.tokenInfo?.address
-      ? getTokenByAddress(checksumAddress(mainTransfer.tokenInfo.address))
+      ? getTokenByAddress(checksumAddress(mainTransfer?.tokenInfo.address))
       : undefined,
     amount:
-      mainTransfer.type === "fee" ? balanceChangesByToken[mainTransfer?.tokenInfo?.address] : mainTransfer?.amount,
+      mainTransfer?.type === "fee" ? balanceChangesByToken[mainTransfer?.tokenInfo?.address] : mainTransfer?.amount,
     feeToken: getTokenByAddress(ETH_ADDRESS),
     feeAmount: transaction.fee,
     receivedAt: transaction.receivedAt,

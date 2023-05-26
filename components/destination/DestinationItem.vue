@@ -1,7 +1,9 @@
 <template>
   <CommonButtonLineWithImg :as="as" class="destination-item">
     <template #image>
-      <CommonImageLoader class="destination-item-icon" :src="iconUrl" />
+      <slot name="image">
+        <CommonImageLoader class="destination-item-icon" :src="iconUrl" />
+      </slot>
     </template>
     <template #default>
       <div class="destination-item-info">

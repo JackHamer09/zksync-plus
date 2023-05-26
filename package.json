@@ -44,7 +44,6 @@
     "@matterlabs/token-library": "^2.5.2",
     "@metamask/logo": "^3.1.1",
     "@pinia/nuxt": "^0.4.7",
-    "@tailwindcss/forms": "^0.5.3",
     "@vitejs/plugin-vue": "^3.2.0",
     "@vueuse/components": "^9.11.1",
     "@vueuse/core": "^9.13.0",

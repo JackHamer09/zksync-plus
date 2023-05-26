@@ -78,13 +78,19 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
+  (eventName: "close"): void;
   (eventName: "update:opened", value: boolean): void;
   (eventName: "after-leave", value: boolean): void;
 }>();
 
 const isModalOpened = computed({
   get: () => props.opened,
-  set: (value) => emit("update:opened", value),
+  set: (value) => {
+    if (!value) {
+      emit("close");
+    }
+    emit("update:opened", value);
+  },
 });
 const closeOnBackgroundClick = () => {
   if (props.closeOnBackgroundClick) {
