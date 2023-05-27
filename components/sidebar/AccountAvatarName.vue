@@ -6,16 +6,21 @@
       <span class="account-name" :class="{ 'hidden xl:block': isButton }">
         {{ name ? name : shortenAddress(account.address!) }}
       </span>
-      <button v-tooltip="'Copy address'" class="copy-button">
-        <DocumentDuplicateIcon class="copy-button-icon" tabindex="-1" />
+      <button v-tooltip="copied ? 'Address copied' : 'Copy address'" class="copy-button" @click="copy">
+        <DocumentDuplicateIcon v-if="!copied" class="copy-button-icon" tabindex="-1" />
+        <CheckIcon v-else class="copy-button-icon check-icon" tabindex="-1" />
       </button>
     </div>
   </component>
 </template>
 
 <script lang="ts" setup>
-import { DocumentDuplicateIcon } from "@heroicons/vue/24/outline";
+import { computed } from "vue";
+
+import { CheckIcon, DocumentDuplicateIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
+
+import useCopy from "@/composables/useCopy";
 
 import { useEnsStore } from "@/store/ens";
 import { useOnboardStore } from "@/store/onboard";
@@ -30,6 +35,9 @@ defineProps({
 
 const { account } = storeToRefs(useOnboardStore());
 const { name, avatar } = storeToRefs(useEnsStore());
+
+const contactAddress = computed(() => account.value.address || "");
+const { copy, copied } = useCopy(contactAddress, 700);
 </script>
 
 <style lang="scss" scoped>
@@ -54,10 +62,13 @@ const { name, avatar } = storeToRefs(useEnsStore());
       @apply mr-auto w-full overflow-hidden text-ellipsis text-left font-medium leading-4 tracking-[-0.1px];
     }
     .copy-button {
-      @apply p-1 focus:outline-none focus:ring-1;
+      @apply rounded p-1 ring-primary-400;
 
       .copy-button-icon {
         @apply pointer-events-none h-5 w-5 text-gray-secondary;
+        &.check-icon {
+          @apply text-primary-400;
+        }
       }
     }
   }

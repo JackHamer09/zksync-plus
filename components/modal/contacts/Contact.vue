@@ -13,7 +13,7 @@
       <div class="w-full rounded-xl bg-white p-3">
         <div class="flex justify-between">
           <div class="text-sm font-medium text-gray-secondary">Address</div>
-          <button class="text-sm font-medium text-primary-400" @click="copyAddress">
+          <button class="text-sm font-medium text-primary-400" @click="copy">
             <template v-if="!copied">
               <DocumentDuplicateIcon class="relative -top-px inline-block h-4 w-4" aria-hidden="true" />
               Copy
@@ -53,7 +53,8 @@
 import { computed, ref } from "vue";
 
 import { DocumentDuplicateIcon, PaperAirplaneIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
-import { useClipboard, useThrottleFn } from "@vueuse/core";
+
+import useCopy from "@/composables/useCopy";
 
 import type { Contact } from "@/store/contacts";
 import type { PropType } from "vue";
@@ -76,35 +77,5 @@ const removeContact = () => {
 };
 
 const contactAddress = computed(() => props.contact?.address || "");
-const { copy, copied: isCopied } = useClipboard({
-  source: contactAddress,
-  copiedDuring: 1000,
-});
-const tooltipShownViaLegacyCopy = ref(false);
-const showLegacyCopyTooltip = useThrottleFn(() => {
-  tooltipShownViaLegacyCopy.value = true;
-  setTimeout(() => {
-    tooltipShownViaLegacyCopy.value = false;
-  }, 1000);
-}, 1000);
-const copied = computed(() => isCopied.value || tooltipShownViaLegacyCopy.value);
-
-async function copyAddress() {
-  try {
-    await copy();
-  } catch (error) {
-    legacyCopy();
-    showLegacyCopyTooltip();
-  }
-}
-function legacyCopy() {
-  const ta = document.createElement("textarea");
-  ta.value = contactAddress.value;
-  ta.style.position = "absolute";
-  ta.style.opacity = "0";
-  document.body.appendChild(ta);
-  ta.select();
-  document.execCommand("copy");
-  ta.remove();
-}
+const { copy, copied } = useCopy(contactAddress);
 </script>
