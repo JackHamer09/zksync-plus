@@ -17,7 +17,7 @@
         </CommonCardWithLineButtons>
         <TransactionItemIcon :icon="LockOpenIcon" />
         <CommonCardWithLineButtons>
-          <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" :show-send-button="false" />
+          <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" />
           <div class="-mx-1 border-b border-dashed"></div>
           <DestinationItem v-bind="destination" as="div" description="Approving allowance for deposit" />
         </CommonCardWithLineButtons>

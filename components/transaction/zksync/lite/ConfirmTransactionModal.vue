@@ -27,7 +27,7 @@
             :tooltip="`${getActionName(item.type)} from ${destinations.zkSyncLite.label} (L2)`"
           />
           <div class="-mx-1 border-b border-dashed"></div>
-          <TokenBalance v-bind="item.token" as="div" :amount="item.amount" :show-send-button="false" />
+          <TokenBalance v-bind="item.token" as="div" :amount="item.amount" />
         </CommonCardWithLineButtons>
         <TransactionItemIcon :icon="ArrowDownIcon" />
         <CommonCardWithLineButtons>

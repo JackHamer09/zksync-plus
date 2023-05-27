@@ -29,10 +29,10 @@
           </div>
         </div>
         <CommonIconButton
-          v-if="showSendButton"
+          v-if="sendRouteName"
           as="RouterLink"
           :icon="PaperAirplaneIcon"
-          :to="{ name: 'transaction-zksync-lite', query: { token: address } }"
+          :to="{ name: sendRouteName, query: { token: address } }"
           class="send-button"
         />
       </div>
@@ -83,9 +83,8 @@ const props = defineProps({
   price: {
     type: [String, Number] as PropType<TokenPrice>,
   },
-  showSendButton: {
-    type: Boolean,
-    default: true,
+  sendRouteName: {
+    type: String,
   },
 });
 

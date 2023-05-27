@@ -29,7 +29,7 @@
         </div>
         <div class="-mx-3 -mt-1 -mb-3">
           <template v-if="balanceInProgress || !allBalancePricesLoaded">
-            <TokenBalanceLoader v-for="index in 2" :key="index" />
+            <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
           </template>
           <div v-else-if="balanceError" class="m-3 mb-2.5 -mt-1">
             <CommonErrorBlock @try-again="fetch">
@@ -37,7 +37,13 @@
             </CommonErrorBlock>
           </div>
           <template v-else-if="displayedBalances.length">
-            <TokenBalance v-for="item in displayedBalances" as="div" :key="item.address" v-bind="item" />
+            <TokenBalance
+              v-for="item in displayedBalances"
+              as="div"
+              :key="item.address"
+              send-route-name="transaction-zksync-lite"
+              v-bind="item"
+            />
           </template>
           <template v-else>
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">

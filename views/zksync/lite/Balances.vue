@@ -1,7 +1,7 @@
 <template>
   <div>
     <CommonCardWithLineButtons v-if="balanceInProgress || !allBalancePricesLoaded">
-      <TokenBalanceLoader v-for="index in 2" :key="index" />
+      <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
     </CommonCardWithLineButtons>
     <CommonCardWithLineButtons v-else-if="balanceError">
       <CommonErrorBlock @try-again="fetch">
@@ -14,7 +14,13 @@
           {{ group.title }}
         </TypographyCategoryLabel>
         <CommonCardWithLineButtons>
-          <TokenBalance v-for="item in group.balances" as="div" :key="item.address" v-bind="item" />
+          <TokenBalance
+            v-for="item in group.balances"
+            as="div"
+            :key="item.address"
+            send-route-name="transaction-zksync-lite"
+            v-bind="item"
+          />
         </CommonCardWithLineButtons>
       </div>
     </div>

@@ -15,7 +15,7 @@
           <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
           <div class="token-balance-price"><CommonContentLoader :length="20" /></div>
         </div>
-        <div v-if="showSendButton" class="send-button">
+        <div v-if="sendRouteName" class="send-button">
           <CommonContentLoader class="send-button-loader" />
         </div>
       </div>
@@ -25,9 +25,9 @@
 
 <script lang="ts" setup>
 defineProps({
-  showSendButton: {
+  sendRouteName: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 </script>

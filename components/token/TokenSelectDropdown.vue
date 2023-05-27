@@ -9,7 +9,7 @@
       </CommonSmallInput>
       <div class="h-full overflow-auto">
         <CommonCardWithLineButtons v-if="loading">
-          <TokenBalanceLoader v-for="index in 2" :show-send-button="false" :key="index" />
+          <TokenBalanceLoader v-for="index in 2" :key="index" />
         </CommonCardWithLineButtons>
         <CommonCardWithLineButtons v-else-if="error">
           <CommonErrorBlock class="m-2" @try-again="emit('try-again')">
@@ -24,7 +24,6 @@
             <CommonCardWithLineButtons>
               <TokenBalance
                 v-for="item in group.balances"
-                :show-send-button="false"
                 :key="item.address"
                 v-bind="item"
                 @click="selectedToken = item"
