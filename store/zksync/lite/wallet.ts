@@ -150,10 +150,23 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     },
     { cache: 30000 }
   );
+
+  const pendingDeposits = computed<ZkSyncLiteTokenAmount[]>(() => {
+    if (!accountState.value) {
+      return [];
+    }
+    return Object.entries(tokens.value ?? {})
+      .map(([symbol, token]) => {
+        const amount = accountState.value!.depositing.balances[symbol]?.amount ?? "0";
+        return { ...token, amount };
+      })
+      .filter(({ amount }) => !BigNumber.from(amount).isZero());
+  });
+
   watch(
-    balance,
-    (balances) => {
-      balances.map(({ symbol, amount }) => {
+    [balance, pendingDeposits],
+    ([balances, deposits]) => {
+      [...balances, ...deposits].map(({ symbol, amount }) => {
         if (BigNumber.from(amount).isZero()) return;
         liteTokensStore.requestTokenPrice(symbol);
       });
@@ -187,5 +200,7 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     balanceError: computed(() => balanceError.value),
     allBalancePricesLoaded,
     requestBalance,
+
+    pendingDeposits,
   };
 });

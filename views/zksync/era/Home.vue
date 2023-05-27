@@ -27,7 +27,7 @@
           <h2 class="text-sm text-gray-secondary">Balances</h2>
           <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
-        <div class="-mx-3 -mt-1 -mb-3">
+        <div class="-mx-2 -mt-1 -mb-3">
           <template v-if="balanceInProgress || !allBalancePricesLoaded">
             <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
           </template>

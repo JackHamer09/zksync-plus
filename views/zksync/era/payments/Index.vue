@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .transactions-block-container {
   .transactions-container {
-    @apply -mx-3 -mt-1 -mb-3;
+    @apply -mx-2 -mt-1 -mb-3;
   }
 }
 </style>

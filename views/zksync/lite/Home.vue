@@ -1,11 +1,7 @@
 <template>
   <div>
     <CommonContentBlock>
-      <CommonTotalBalance
-        :balance="balance"
-        :loading="balanceInProgress || !allBalancePricesLoaded"
-        :error="balanceError"
-      />
+      <CommonTotalBalance :balance="balance" :loading="areBalancesLoading" :error="balanceError" />
       <CommonButtonsLineGroup class="my-4">
         <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite-add-funds' }">
           <template #icon>
@@ -27,8 +23,8 @@
           <h2 class="text-sm text-gray-secondary">Balances</h2>
           <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
-        <div class="-mx-3 -mt-1 -mb-3">
-          <template v-if="balanceInProgress || !allBalancePricesLoaded">
+        <div class="-mx-2 -mt-1 -mb-3">
+          <template v-if="areBalancesLoading">
             <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
           </template>
           <div v-else-if="balanceError" class="m-3 mb-2.5 -mt-1">
@@ -59,6 +55,17 @@
         </div>
       </div>
     </CommonContentBlock>
+
+    <transition v-bind="TransitionOpacity()">
+      <TypographyCategoryLabel v-if="pendingDeposits.length">Pending deposits</TypographyCategoryLabel>
+    </transition>
+    <transition v-bind="TransitionAlertScaleInOutTransition">
+      <CommonContentBlock v-if="pendingDeposits.length">
+        <div class="-mx-2 -my-3">
+          <TokenBalance v-for="item in pendingDeposits" as="div" :key="item.address" v-bind="item" />
+        </div>
+      </CommonContentBlock>
+    </transition>
   </div>
 </template>
 
@@ -73,19 +80,18 @@ import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { parseTokenAmount, removeSmallAmount } from "@/utils/formatters";
 import { isOnlyZeroes } from "@/utils/helpers";
+import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 
 const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
-const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
+const { balance, balanceInProgress, balanceError, allBalancePricesLoaded, pendingDeposits } =
+  storeToRefs(walletLiteStore);
 const { destinations } = storeToRefs(useDestinationsStore());
-
-const fetch = () => {
-  walletLiteStore.requestBalance();
-};
-fetch();
 
 const displayedBalances = computed(() => {
   return balance.value.filter(({ amount, decimals, price }) => {
+    if (price === "loading") return false;
+
     const decimalAmount =
       typeof price === "number" ? removeSmallAmount(amount, decimals, price) : parseTokenAmount(amount, decimals);
     if (!isOnlyZeroes(decimalAmount)) {
@@ -95,13 +101,33 @@ const displayedBalances = computed(() => {
   });
 });
 
+const areBalancesLoading = computed(() => {
+  return !displayedBalances.value.length && (balanceInProgress.value || !allBalancePricesLoaded.value);
+});
+
+const fetch = () => {
+  walletLiteStore.requestBalance();
+};
+fetch();
+
+let interval: ReturnType<typeof setInterval> | undefined;
+const setAutoUpdate = () => {
+  clearInterval(interval);
+  interval = setInterval(() => {
+    fetch();
+  }, 60000);
+};
+setAutoUpdate();
+
 const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
   if (!newAddress) return;
   fetch();
+  setAutoUpdate();
 });
 
 onBeforeUnmount(() => {
   unsubscribe();
+  clearInterval(interval);
 });
 </script>
 
