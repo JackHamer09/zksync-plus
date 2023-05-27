@@ -4,26 +4,28 @@
     :title="contactPreset ? 'Edit contact' : 'Add contact'"
     @after-leave="clearFields"
   >
-    <CommonInput
-      v-model="name"
-      autofocus
-      placeholder="Name of the contact"
-      :error="v$.name.$error ? v$.name.$errors[0] && v$.name.$errors[0].$message.toString() : undefined"
-      @keydown.enter="addContact"
-    />
-    <CommonInput
-      v-model="address"
-      placeholder="Ethereum address"
-      class="mt-2"
-      :error="v$.address.$error ? v$.address.$errors[0] && v$.address.$errors[0].$message.toString() : undefined"
-      @keydown.enter="addContact"
-    />
-    <div v-if="error">
-      <CommonErrorBlock :retry-button="false" class="mt-3">
-        {{ error }}
-      </CommonErrorBlock>
-    </div>
-    <CommonButton @click="addContact" variant="primary-solid" class="mx-auto mt-5">Save contact</CommonButton>
+    <form @submit.prevent="addContact">
+      <CommonInput
+        v-model="name"
+        autofocus
+        placeholder="Name of the contact"
+        :error="v$.name.$error ? v$.name.$errors[0] && v$.name.$errors[0].$message.toString() : undefined"
+        @keydown.enter="addContact"
+      />
+      <CommonInput
+        v-model="address"
+        placeholder="Ethereum address"
+        class="mt-2"
+        :error="v$.address.$error ? v$.address.$errors[0] && v$.address.$errors[0].$message.toString() : undefined"
+        @keydown.enter="addContact"
+      />
+      <div v-if="error">
+        <CommonErrorBlock :retry-button="false" class="mt-3">
+          {{ error }}
+        </CommonErrorBlock>
+      </div>
+      <CommonButton type="submit" variant="primary-solid" class="mx-auto mt-5">Save contact</CommonButton>
+    </form>
   </CommonModal>
 </template>
 

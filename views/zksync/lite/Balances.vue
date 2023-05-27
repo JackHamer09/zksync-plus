@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CommonCardWithLineButtons v-if="balanceInProgress || !allBalancePricesLoaded">
+    <CommonCardWithLineButtons v-if="loading">
       <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
     </CommonCardWithLineButtons>
     <CommonCardWithLineButtons v-else-if="balanceError">
@@ -28,9 +28,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeUnmount } from "vue";
+import { computed, onBeforeUnmount } from "vue";
 
 import { storeToRefs } from "pinia";
+
+import useInterval from "@/composables/useInterval";
+import useSingleLoading from "@/composables/useSingleLoading";
 
 import type { ZkSyncLiteTokenAmount } from "@/types";
 
@@ -42,6 +45,10 @@ const onboardStore = useOnboardStore();
 const walletLiteStore = useLiteWalletStore();
 const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletLiteStore);
 
+const { loading, reset: resetSingleLoading } = useSingleLoading(
+  computed(() => balanceInProgress.value || !allBalancePricesLoaded.value)
+);
+
 const balanceGroups = groupBalancesByAmount<ZkSyncLiteTokenAmount>(balance);
 
 const fetch = () => {
@@ -49,12 +56,19 @@ const fetch = () => {
 };
 fetch();
 
+const { reset: resetAutoUpdate, stop: stopAutoUpdate } = useInterval(() => {
+  fetch();
+}, 60000);
+
 const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
   if (!newAddress) return;
+  resetSingleLoading();
+  resetAutoUpdate();
   fetch();
 });
 
 onBeforeUnmount(() => {
+  stopAutoUpdate();
   unsubscribe();
 });
 </script>

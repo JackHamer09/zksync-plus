@@ -1,11 +1,7 @@
 <template>
   <div>
     <CommonContentBlock>
-      <CommonTotalBalance
-        :balance="balance"
-        :loading="balanceInProgress || !allBalancePricesLoaded"
-        :error="balanceError"
-      />
+      <CommonTotalBalance :balance="balance" :loading="loading" :error="balanceError" />
       <CommonButtonsLineGroup class="my-4">
         <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era-add-funds' }">
           <template #icon>
@@ -28,7 +24,7 @@
           <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
         <div class="-mx-2 -mt-1 -mb-3">
-          <template v-if="balanceInProgress || !allBalancePricesLoaded">
+          <template v-if="loading">
             <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
           </template>
           <div v-else-if="balanceError" class="m-3 mb-2.5 -mt-1">
@@ -68,6 +64,9 @@ import { computed, onBeforeUnmount } from "vue";
 import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
+import useInterval from "@/composables/useInterval";
+import useSingleLoading from "@/composables/useSingleLoading";
+
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
 import { useEraWalletStore } from "@/store/zksync/era/wallet";
@@ -78,11 +77,6 @@ const onboardStore = useOnboardStore();
 const walletEraStore = useEraWalletStore();
 const { balance, balanceInProgress, balanceError, allBalancePricesLoaded } = storeToRefs(walletEraStore);
 const { destinations } = storeToRefs(useDestinationsStore());
-
-const fetch = () => {
-  walletEraStore.requestBalance();
-};
-fetch();
 
 const displayedBalances = computed(() => {
   return balance.value.filter(({ amount, decimals, price }) => {
@@ -95,12 +89,28 @@ const displayedBalances = computed(() => {
   });
 });
 
+const { loading, reset: resetSingleLoading } = useSingleLoading(
+  computed(() => balanceInProgress.value || !allBalancePricesLoaded.value)
+);
+
+const fetch = () => {
+  walletEraStore.requestBalance();
+};
+fetch();
+
+const { reset: resetAutoUpdate, stop: stopAutoUpdate } = useInterval(() => {
+  fetch();
+}, 60000);
+
 const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
   if (!newAddress) return;
+  resetSingleLoading();
+  resetAutoUpdate();
   fetch();
 });
 
 onBeforeUnmount(() => {
+  stopAutoUpdate();
   unsubscribe();
 });
 </script>

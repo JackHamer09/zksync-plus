@@ -1,7 +1,7 @@
 <template>
   <div>
     <CommonContentBlock>
-      <CommonTotalBalance :balance="balance" :loading="areBalancesLoading" :error="balanceError" />
+      <CommonTotalBalance :balance="balance" :loading="loading" :error="balanceError" />
       <CommonButtonsLineGroup class="my-4">
         <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite-add-funds' }">
           <template #icon>
@@ -24,7 +24,7 @@
           <CommonLabelButton as="RouterLink" :to="{ name: 'balances' }">View all</CommonLabelButton>
         </div>
         <div class="-mx-2 -mt-1 -mb-3">
-          <template v-if="areBalancesLoading">
+          <template v-if="loading">
             <TokenBalanceLoader v-for="index in 2" :key="index" send-route-name />
           </template>
           <div v-else-if="balanceError" class="m-3 mb-2.5 -mt-1">
@@ -75,6 +75,9 @@ import { computed, onBeforeUnmount } from "vue";
 import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
+import useInterval from "@/composables/useInterval";
+import useSingleLoading from "@/composables/useSingleLoading";
+
 import { useDestinationsStore } from "@/store/destinations";
 import { useOnboardStore } from "@/store/onboard";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
@@ -101,33 +104,29 @@ const displayedBalances = computed(() => {
   });
 });
 
-const areBalancesLoading = computed(() => {
-  return !displayedBalances.value.length && (balanceInProgress.value || !allBalancePricesLoaded.value);
-});
+const { loading, reset: resetSingleLoading } = useSingleLoading(
+  computed(() => balanceInProgress.value || !allBalancePricesLoaded.value)
+);
 
 const fetch = () => {
   walletLiteStore.requestBalance();
 };
 fetch();
 
-let interval: ReturnType<typeof setInterval> | undefined;
-const setAutoUpdate = () => {
-  clearInterval(interval);
-  interval = setInterval(() => {
-    fetch();
-  }, 60000);
-};
-setAutoUpdate();
+const { reset: resetAutoUpdate, stop: stopAutoUpdate } = useInterval(() => {
+  fetch();
+}, 60000);
 
 const unsubscribe = onboardStore.subscribeOnAccountChange((newAddress) => {
   if (!newAddress) return;
+  resetSingleLoading();
+  resetAutoUpdate();
   fetch();
-  setAutoUpdate();
 });
 
 onBeforeUnmount(() => {
+  stopAutoUpdate();
   unsubscribe();
-  clearInterval(interval);
 });
 </script>
 
