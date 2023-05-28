@@ -99,6 +99,13 @@ export const useOnboardStore = defineStore("onboard", () => {
     await switchNetwork().catch(() => undefined);
   };
 
+  const blockExplorerUrl = computed(() => {
+    if (selectedEthereumNetwork.value.network === "mainnet") {
+      return "https://etherscan.io";
+    }
+    return `https://${selectedEthereumNetwork.value.network}.etherscan.io`;
+  });
+
   const { subscribe: subscribeOnAccountChange, notify: notifyOnAccountChange } = useObservable<string | undefined>();
   watch(
     () => account.value.address,
@@ -121,6 +128,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     setCorrectNetwork,
     switchNetworkById,
 
+    blockExplorerUrl,
     getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
 
     subscribeOnAccountChange,

@@ -15,6 +15,13 @@
         :href="`${liteBlockExplorerUrl}/address/${account.address}`"
         target="_blank"
       />
+      <DestinationItem
+        v-bind="destinations.ethereum"
+        as="a"
+        :icon="ArrowUpRightIcon"
+        :href="`${ethereumBlockExplorerUrl}/address/${account.address}`"
+        target="_blank"
+      />
     </CommonCardWithLineButtons>
   </CommonModal>
 </template>
@@ -28,7 +35,7 @@ import { useOnboardStore } from "@/store/onboard";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 
-const { account } = storeToRefs(useOnboardStore());
+const { account, blockExplorerUrl: ethereumBlockExplorerUrl } = storeToRefs(useOnboardStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { blockExplorerUrl: eraBlockExplorerUrl } = storeToRefs(useEraProviderStore());
 const { blockExplorerUrl: liteBlockExplorerUrl } = storeToRefs(useLiteProviderStore());
