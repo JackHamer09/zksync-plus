@@ -37,13 +37,4 @@ const content = computed(() => props.copyContent || "");
 const { copy, copied } = useCopy(content);
 </script>
 
-<style lang="scss">
-.qr-code-container {
-  @apply aspect-square h-48 w-48 rounded-lg bg-white p-3;
-
-  .qr-code {
-    width: 100% !important;
-    height: 100% !important;
-  }
-}
-</style>
+<style lang="scss"></style>
