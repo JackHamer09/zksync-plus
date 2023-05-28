@@ -6,6 +6,7 @@
     <ModalTransactionWithdrawExchangeWarning
       :opened="openedModal === 'withdraw-to-exchange'"
       :button-location="{ name: 'transaction-zksync-era-withdraw' }"
+      :withdraw-to-self-link-location="{ name: 'transaction-zksync-era-withdraw', query: { address: account.address } }"
       @close="closeModal"
     />
 
@@ -81,8 +82,10 @@ import { ArrowUpRightIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import { useDestinationsStore } from "@/store/destinations";
+import { useOnboardStore } from "@/store/onboard";
 
 const { destinations } = storeToRefs(useDestinationsStore());
+const { account } = storeToRefs(useOnboardStore());
 
 const openedModal = ref<"withdraw-to-exchange" | undefined>();
 const closeModal = () => {

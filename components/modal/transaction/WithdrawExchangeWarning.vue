@@ -6,8 +6,10 @@
     </p>
     <p class="leading-normal">
       If you are unsure, the safest way would be to firstly
-      <NuxtLink :to="buttonLocation" class="link">withdraw to {{ selectedEthereumNetwork.name }} (L1)</NuxtLink> and
-      then send funds to the exchange.
+      <NuxtLink :to="withdrawToSelfLinkLocation" class="link"
+        >withdraw to {{ selectedEthereumNetwork.name }} (L1)</NuxtLink
+      >
+      and then send funds to the exchange.
     </p>
 
     <div class="mt-3 flex items-start">
@@ -59,6 +61,10 @@ import { useNetworkStore } from "@/store/network";
 
 defineProps({
   buttonLocation: {
+    type: Object as PropType<RouteLocationRaw>,
+    required: true,
+  },
+  withdrawToSelfLinkLocation: {
     type: Object as PropType<RouteLocationRaw>,
     required: true,
   },
