@@ -1,6 +1,7 @@
 <template>
   <Menu as="div" class="account-button-container">
     <ModalNetworkChange v-model:opened="networkChangeModalOpened" />
+    <ModalViewOnExplorer v-model:opened="viewOnExplorerModalOpened" />
 
     <MenuButton as="template">
       <SidebarAccountAvatarName class="main-account-button" />
@@ -34,6 +35,12 @@
             </button>
           </MenuItem>
           <MenuItem v-slot="{ active }" as="template">
+            <button class="account-menu-item" :class="{ active }" @click="viewOnExplorerModalOpened = true">
+              <Squares2X2Icon class="account-menu-item-icon p-2" aria-hidden="true" />
+              View on explorer
+            </button>
+          </MenuItem>
+          <MenuItem v-slot="{ active }" as="template">
             <button class="account-menu-item" :class="{ active }" @click="onboardStore.disconnect">
               <PowerIcon class="account-menu-item-icon p-2" aria-hidden="true" />
               Logout
@@ -49,7 +56,7 @@
 import { ref } from "vue";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon } from "@heroicons/vue/24/outline";
+import { ChevronDownIcon, Squares2X2Icon } from "@heroicons/vue/24/outline";
 import { PowerIcon } from "@heroicons/vue/24/solid";
 import { storeToRefs } from "pinia";
 
@@ -60,6 +67,7 @@ const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const onboardStore = useOnboardStore();
 
 const networkChangeModalOpened = ref(false);
+const viewOnExplorerModalOpened = ref(false);
 </script>
 
 <style lang="scss">
@@ -91,7 +99,7 @@ const networkChangeModalOpened = ref(false);
       .account-menu-item {
         @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 rounded-lg px-2 py-2 text-left leading-6 text-gray-900 transition-colors xl:px-4;
         &.active {
-          @apply bg-gray-100 text-primary-400;
+          @apply bg-gray text-primary-400;
 
           .account-menu-item-icon {
             @apply bg-white text-primary-400;
