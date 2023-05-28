@@ -15,7 +15,7 @@
       <DestinationItem
         v-bind="destinations.zkSyncLite"
         as="RouterLink"
-        :to="{ name: 'transaction-zksync-era-withdraw', query: $route.query }"
+        :to="{ name: 'transaction-zksync-lite-send', query: $route.query }"
         description="Send on zkSync Lite"
       />
     </CommonCardWithLineButtons>
