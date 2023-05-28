@@ -5,6 +5,7 @@
     <LoginPage />
   </LoginLayout>
   <div class="app-layout" v-else>
+    <ModalWalletWarning />
     <Sidebar />
     <main class="app-layout-main">
       <slot />
