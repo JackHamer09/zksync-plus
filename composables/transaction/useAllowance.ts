@@ -3,7 +3,7 @@ import { Contract } from "ethers";
 import { IERC20 } from "zksync-web3/build/src/utils";
 
 import type { Provider } from "@wagmi/core";
-import type { BigNumber, BigNumberish, ContractTransaction } from "ethers";
+import type { BigNumber, BigNumberish, ContractTransaction, Signer } from "ethers";
 import type { Ref } from "vue";
 
 import { ETH_ADDRESS } from "@/utils/constants";
@@ -14,13 +14,10 @@ export default (
   getContractAddress: () => Promise<string | undefined>,
   getEthereumProvider: () => Provider
 ) => {
-  const getContractInstance = async () => {
+  const getContractInstance = async (providerOrSigner: Signer | Provider) => {
     if (!tokenAddress.value) throw new Error("Token is not available");
 
-    const signer = await fetchSigner();
-    if (!signer) throw new Error("Signer is not available");
-
-    return new Contract(tokenAddress.value, IERC20, getEthereumProvider());
+    return new Contract(tokenAddress.value, IERC20, providerOrSigner);
   };
 
   const {
@@ -36,7 +33,7 @@ export default (
       const contractAddress = await getContractAddress();
       if (!contractAddress) throw new Error("Contract address is not available");
 
-      const erc20contract = await getContractInstance();
+      const erc20contract = await getContractInstance(getEthereumProvider());
       return (await erc20contract.allowance(accountAddress.value, contractAddress)) as BigNumber;
     },
     { cache: false }
@@ -48,7 +45,10 @@ export default (
     const contractAddress = await getContractAddress();
     if (!contractAddress) throw new Error("Contract address is not available");
 
-    const erc20contract = await getContractInstance();
+    const signer = await fetchSigner();
+    if (!signer) throw new Error("Signer is not available");
+
+    const erc20contract = await getContractInstance(signer);
     return (await erc20contract.approve(contractAddress, amount)) as ContractTransaction;
   };
 

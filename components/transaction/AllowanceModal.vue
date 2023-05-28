@@ -69,6 +69,7 @@
     :close-on-background-click="false"
     class="allowance-transaction-successful-modal"
     title=""
+    @after-leave="checkAfterModalClose"
   >
     <template #animation>
       <Vue3Lottie v-if="!transactionCommitted" class="mt-4 w-64" :animation-data="ProgressBlocks" loop />
@@ -218,6 +219,16 @@ const { execute: makeTransaction, error } = usePromise(
   },
   { cache: false }
 );
+
+const checkAfterModalClose = () => {
+  if (status.value === "done") {
+    reset();
+  }
+};
+const reset = () => {
+  status.value = "not-started";
+  transactionReceipt.value = undefined;
+};
 </script>
 
 <style lang="scss">
