@@ -41,8 +41,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { ArrowsRightLeftIcon, HeartIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
-import { ChevronDownIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, ChevronDownIcon, HeartIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import { useNetworkStore } from "@/store/network";
@@ -72,7 +71,7 @@ const supportModalOpened = ref(false);
       @apply flex justify-around space-y-1 pr-3 md:mt-6 md:flex-col md:pr-0;
     }
     .navbar-link {
-      @apply flex items-center rounded-xl bg-transparent text-gray-secondary no-underline transition-colors md:w-full md:py-3 md:px-4 md:hover:bg-gray-200;
+      @apply flex items-center rounded-xl bg-transparent text-gray-secondary no-underline transition-colors md:w-full md:py-3 md:px-4 md:hover:bg-gray-200/60;
       &.router-link-exact-active {
         @apply bg-white text-primary-400;
       }
