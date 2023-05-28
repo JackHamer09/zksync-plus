@@ -1,6 +1,7 @@
 <template>
   <nav class="navbar-container">
     <ModalNetworkChange v-model:opened="networkChangeModalOpened" />
+    <ModalSupport v-model:opened="supportModalOpened" />
 
     <nav class="navbar-inner">
       <SidebarAccountButton />
@@ -18,11 +19,21 @@
           <span class="navbar-link-label">Contacts</span>
         </NuxtLink>
       </div>
-      <button v-tooltip="'Change network'" class="navbar-link network-switch" @click="networkChangeModalOpened = true">
-        <img class="navbar-link-icon" src="/img/ethereum.svg" alt="" />
-        <span class="navbar-link-label">{{ selectedEthereumNetwork.name }}</span>
-        <ChevronDownIcon class="dropdown-icon" aria-hidden="true" />
-      </button>
+      <div class="navbar-bottom">
+        <button
+          v-tooltip="'Change network'"
+          class="navbar-link navbar-bottom-button network-switch"
+          @click="networkChangeModalOpened = true"
+        >
+          <img class="navbar-link-icon" src="/img/ethereum.svg" alt="Selected Ethereum network" />
+          <span class="navbar-link-label">{{ selectedEthereumNetwork.name }}</span>
+          <ChevronDownIcon class="dropdown-icon" aria-hidden="true" />
+        </button>
+        <button class="navbar-link navbar-bottom-button support-button" @click="supportModalOpened = true">
+          <HeartIcon class="navbar-link-icon" aria-hidden="true" />
+          <span class="navbar-link-label">Support</span>
+        </button>
+      </div>
     </nav>
   </nav>
 </template>
@@ -30,7 +41,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { ArrowsRightLeftIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, HeartIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
 import { ChevronDownIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
@@ -39,6 +50,7 @@ import { useNetworkStore } from "@/store/network";
 const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
 const networkChangeModalOpened = ref(false);
+const supportModalOpened = ref(false);
 </script>
 
 <style lang="scss" scoped>
@@ -72,17 +84,29 @@ const networkChangeModalOpened = ref(false);
         @apply mr-auto ml-4 hidden text-left font-medium leading-4 tracking-[-0.1px] xl:block;
       }
     }
-    .network-switch {
-      @apply mt-auto hidden border bg-gray-100 md:flex;
+    .navbar-bottom {
+      @apply mt-auto hidden space-y-2 md:block;
 
-      .navbar-link-icon {
-        @apply scale-150 xl:scale-125;
+      .navbar-bottom-button {
+        @apply border bg-gray-100 hover:border-gray-300;
+
+        .navbar-link-label {
+          @apply text-sm;
+        }
       }
-      .navbar-link-label {
-        @apply text-sm;
+      .support-button {
+        @apply py-2;
+        .navbar-link-icon {
+          @apply text-pink-600/70;
+        }
       }
-      .dropdown-icon {
-        @apply hidden h-4 w-4 text-inherit xl:block;
+      .network-switch {
+        .navbar-link-icon {
+          @apply scale-150 xl:scale-125;
+        }
+        .dropdown-icon {
+          @apply hidden h-4 w-4 text-inherit xl:block;
+        }
       }
     }
   }

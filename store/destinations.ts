@@ -60,6 +60,11 @@ export const useDestinationsStore = defineStore("destinations", () => {
       label: "Moonpay",
       iconUrl: "/img/moonpay.svg",
     },
+    binance: {
+      key: "binance",
+      label: "Binance",
+      iconUrl: "/img/binance.svg",
+    },
   }));
 
   return {

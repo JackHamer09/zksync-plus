@@ -2,6 +2,7 @@
   <Menu as="div" class="account-button-container">
     <ModalNetworkChange v-model:opened="networkChangeModalOpened" />
     <ModalViewOnExplorer v-model:opened="viewOnExplorerModalOpened" />
+    <ModalSupport v-model:opened="supportModalOpened" />
 
     <MenuButton as="template">
       <SidebarAccountAvatarName class="main-account-button" />
@@ -19,7 +20,7 @@
         <SidebarAccountAvatarName :is-button="false" class="menu-account-button" tabindex="-1" />
 
         <div class="menu-options">
-          <MenuItem v-slot="{ active }" as="template">
+          <MenuItem v-if="mdAndSmaller" v-slot="{ active }" as="template">
             <button class="account-menu-item" :class="{ active }" @click="networkChangeModalOpened = true">
               <img
                 v-if="selectedEthereumNetwork.iconUrl"
@@ -40,6 +41,12 @@
               View on explorer
             </button>
           </MenuItem>
+          <MenuItem v-if="mdAndSmaller" v-slot="{ active }" as="template">
+            <button class="account-menu-item" :class="{ active }" @click="supportModalOpened = true">
+              <HeartIcon class="account-menu-item-icon p-1.5" aria-hidden="true" />
+              Support
+            </button>
+          </MenuItem>
           <MenuItem v-slot="{ active }" as="template">
             <button class="account-menu-item" :class="{ active }" @click="onboardStore.disconnect">
               <PowerIcon class="account-menu-item-icon p-2" aria-hidden="true" />
@@ -56,8 +63,9 @@
 import { ref } from "vue";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon, Squares2X2Icon } from "@heroicons/vue/24/outline";
+import { ChevronDownIcon, HeartIcon, Squares2X2Icon } from "@heroicons/vue/24/outline";
 import { PowerIcon } from "@heroicons/vue/24/solid";
+import { useBreakpoints } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
 import { useNetworkStore } from "@/store/network";
@@ -66,8 +74,14 @@ import { useOnboardStore } from "@/store/onboard";
 const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const onboardStore = useOnboardStore();
 
+const breakpoints = useBreakpoints({
+  md: "720px",
+});
+const mdAndSmaller = breakpoints.smallerOrEqual("md");
+
 const networkChangeModalOpened = ref(false);
 const viewOnExplorerModalOpened = ref(false);
+const supportModalOpened = ref(false);
 </script>
 
 <style lang="scss">
