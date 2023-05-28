@@ -27,7 +27,7 @@ defineProps({
   @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] px-4 text-sm font-medium backdrop-blur-sm transition-colors;
   &.variant- {
     &primary {
-      @apply bg-primary-100/50 text-primary-400;
+      @apply whitespace-nowrap bg-primary-100/50 text-primary-400;
       &:enabled,
       &:is(a) {
         &:not([aria-disabled="true"]) {

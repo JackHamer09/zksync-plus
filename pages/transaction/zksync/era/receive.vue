@@ -1,16 +1,26 @@
 <template>
   <div>
     <CommonBackButton as="RouterLink" :to="{ name: 'index' }" />
-    <h1 class="h1">Add funds</h1>
+    <h1 class="h1">Receive</h1>
 
     <CommonCardWithLineButtons>
       <DestinationItem
         label="Official bridge"
         :icon-url="destinations.ethereum.iconUrl"
         as="RouterLink"
-        :to="{ name: 'transaction-zksync-lite-deposit', query: $route.query }"
+        :to="{ name: 'transaction-zksync-era-deposit', query: $route.query }"
         description="Add funds using official bridge"
       />
+      <DestinationItem
+        label="View address"
+        as="RouterLink"
+        :to="{ name: 'transaction-zksync-era-receive-address', query: $route.query }"
+        description="Receive from another account"
+      >
+        <template #image>
+          <QrCodeIcon class="p-0.5" />
+        </template>
+      </DestinationItem>
     </CommonCardWithLineButtons>
 
     <TypographyCategoryLabel>Top-up from another network</TypographyCategoryLabel>
@@ -20,40 +30,19 @@
         :icon="ArrowUpRightIcon"
         as="a"
         target="_blank"
-        href="https://www.layerswap.io/?destNetwork=ZKSYNC_MAINNET"
+        href="https://www.layerswap.io/?destNetwork=ZKSYNCERA_MAINNET"
       />
       <DestinationItem
         v-bind="destinations.orbiter"
         :icon="ArrowUpRightIcon"
         as="a"
         target="_blank"
-        href="https://www.orbiter.finance/?dest=zkSync%20Lite"
+        href="https://www.orbiter.finance/?dest=zkSync%20Era"
       />
     </CommonCardWithLineButtons>
 
     <TypographyCategoryLabel>Top-up with cash</TypographyCategoryLabel>
     <CommonCardWithLineButtons>
-      <DestinationItem
-        v-bind="destinations.banxa"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        :href="
-          buildUrl('https://zksync.banxa.com/', {
-            walletAddress: account.address!,
-            accountReference: account.address!,
-            returnUrlOnSuccess: 'https://zkplus.io',
-            returnUrlOnFailure: 'https://zkplus.io',
-          })
-        "
-      />
-      <DestinationItem
-        v-bind="destinations.moonpay"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://buy.moonpay.com"
-      />
       <DestinationItem
         v-bind="destinations.ramp"
         :icon="ArrowUpRightIcon"
@@ -66,20 +55,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowUpRightIcon } from "@heroicons/vue/24/outline";
+import { ArrowUpRightIcon, QrCodeIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import { useDestinationsStore } from "@/store/destinations";
-import { useOnboardStore } from "@/store/onboard";
 
-const { account } = storeToRefs(useOnboardStore());
 const { destinations } = storeToRefs(useDestinationsStore());
-
-function buildUrl(base: string, params: Record<string, string>) {
-  let url = new URL(base);
-  Object.keys(params).forEach((key) => url.searchParams.append(key, params[key]));
-  return url;
-}
 </script>
 
 <style lang="scss" scoped></style>

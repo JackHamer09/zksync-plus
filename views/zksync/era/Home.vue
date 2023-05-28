@@ -3,11 +3,11 @@
     <CommonContentBlock>
       <CommonTotalBalance :balance="balance" :loading="loading" :error="balanceError" />
       <CommonButtonsLineGroup class="my-4">
-        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era-add-funds' }">
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era-receive' }">
           <template #icon>
-            <PlusIcon aria-hidden="true" />
+            <ArrowDownIcon aria-hidden="true" />
           </template>
-          <template #default>Add funds</template>
+          <template #default>Receive</template>
         </CommonButton>
         <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era' }">
           <template #icon>
@@ -47,8 +47,8 @@
               <br />
               <span class="mt-1.5 inline-block">
                 Proceed to
-                <NuxtLink class="link" :to="{ name: 'transaction-zksync-era-add-funds' }">Add funds</NuxtLink> page to
-                add balance to your account
+                <NuxtLink class="link" :to="{ name: 'transaction-zksync-era-receive' }">Add funds</NuxtLink> page to add
+                balance to your account
               </span>
             </CommonEmptyBlock>
           </template>
@@ -61,7 +61,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount } from "vue";
 
-import { PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
+import { ArrowDownIcon, PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import useInterval from "@/composables/useInterval";

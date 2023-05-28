@@ -10,19 +10,9 @@
     </template>
     <template #default v-if="contact">
       <TypographyCategoryLabel>Information</TypographyCategoryLabel>
-      <div class="w-full rounded-xl bg-white p-3">
-        <div class="flex justify-between">
-          <div class="text-sm font-medium text-gray-secondary">Address</div>
-          <button class="text-sm font-medium text-primary-400" @click="copy">
-            <template v-if="!copied">
-              <DocumentDuplicateIcon class="relative -top-px inline-block h-4 w-4" aria-hidden="true" />
-              Copy
-            </template>
-            <template v-else>Copied!</template>
-          </button>
-        </div>
-        <div class="mt-2">{{ shortenAddress(contact.address, 5) }}</div>
-      </div>
+      <CommonInfoContent label="Address" :copy-content="contact.address">
+        {{ shortenAddress(contact.address, 5) }}
+      </CommonInfoContent>
 
       <TypographyCategoryLabel>Actions</TypographyCategoryLabel>
       <CommonButtonsLineGroup>
@@ -50,18 +40,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
-import { DocumentDuplicateIcon, PaperAirplaneIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
-
-import useCopy from "@/composables/useCopy";
+import { PaperAirplaneIcon, PencilIcon, TrashIcon } from "@heroicons/vue/24/outline";
 
 import type { Contact } from "@/store/contacts";
 import type { PropType } from "vue";
 
 import { shortenAddress } from "@/utils/formatters";
 
-const props = defineProps({
+defineProps({
   contact: {
     type: Object as PropType<Contact | undefined>,
   },
@@ -75,7 +63,4 @@ const confirmRemove = ref(false);
 const removeContact = () => {
   emit("remove");
 };
-
-const contactAddress = computed(() => props.contact?.address || "");
-const { copy, copied } = useCopy(contactAddress);
 </script>
