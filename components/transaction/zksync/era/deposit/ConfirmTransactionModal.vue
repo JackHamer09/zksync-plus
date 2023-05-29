@@ -27,7 +27,7 @@
         </CommonCardWithLineButtons>
       </template>
 
-      <TransactionFeeDetails class="my-2" label="Fee:" :fee-token="feeToken" :fee-amount="fee" />
+      <TransactionFeeDetails class="my-2" label="Fee:" :fee-token="feeToken" :fee-amount="lastFee" />
 
       <div class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm">
         <div class="mx-4 mb-3 border-t border-dashed border-gray-300"></div>
