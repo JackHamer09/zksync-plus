@@ -46,10 +46,14 @@ const { walletName } = storeToRefs(useOnboardStore());
 
 const doNotShowWarning = useStorage("wallet-warning-hidden", false);
 const walletWarningModal = ref(false);
-watch(walletName, (name) => {
-  if (doNotShowWarning.value) return;
-  if (name && name !== "MetaMask") {
-    walletWarningModal.value = true;
-  }
-});
+watch(
+  walletName,
+  (name) => {
+    if (doNotShowWarning.value) return;
+    if (name && name !== "MetaMask") {
+      walletWarningModal.value = true;
+    }
+  },
+  { immediate: true }
+);
 </script>
