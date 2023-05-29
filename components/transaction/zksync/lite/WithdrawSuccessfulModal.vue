@@ -1,7 +1,7 @@
 <template>
   <CommonModal v-bind="$attrs" :closable="false" class="transaction-successful-modal" title="">
     <template #animation>
-      <Vue3Lottie class="w-72" :animation-data="ProgressPlane" loop />
+      <AnimationsProgressPlane class="w-72" />
     </template>
 
     <div class="flex h-full flex-col overflow-auto">
@@ -52,8 +52,6 @@ import { storeToRefs } from "pinia";
 import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
 
 import useTransactionsReceipt from "@/composables/zksync/lite/useTransactionsReceipts";
-
-import ProgressPlane from "@/assets/lottie/progress-plane.json";
 
 import type { PropType } from "vue";
 

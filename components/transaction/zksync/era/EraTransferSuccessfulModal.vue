@@ -1,7 +1,7 @@
 <template>
   <CommonModal v-bind="$attrs" :closable="false" class="transaction-successful-modal" title="">
     <template #animation>
-      <Vue3Lottie v-if="inProgress" class="w-72" :animation-data="ProgressPlane" loop />
+      <AnimationsProgressPlane v-if="inProgress" class="w-72" />
       <Vue3Lottie v-else class="w-72" :animation-data="SuccessConfetti" :loop="false" />
     </template>
 
@@ -60,7 +60,6 @@ import { storeToRefs } from "pinia";
 
 import EraTransactionLineItem from "@/components/transaction/zksync/era/EraTransactionLineItem.vue";
 
-import ProgressPlane from "@/assets/lottie/progress-plane.json";
 import SuccessConfetti from "@/assets/lottie/success-confetti.json";
 
 import type { EraTransaction } from "@/utils/zksync/era/mappers";

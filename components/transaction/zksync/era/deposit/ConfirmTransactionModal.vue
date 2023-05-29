@@ -76,7 +76,7 @@
 
   <CommonModal v-else v-bind="$attrs" :closable="false" class="deposit-transaction-successful-modal" title="">
     <template #animation>
-      <Vue3Lottie class="w-72" :animation-data="ProgressPlane" loop />
+      <AnimationsProgressPlane class="w-72" />
     </template>
 
     <div class="flex h-full flex-col overflow-auto">
@@ -147,8 +147,6 @@ import TokenAmount from "@/components/transaction/transactionLineItem/TokenAmoun
 import TotalPrice from "@/components/transaction/transactionLineItem/TotalPrice.vue";
 
 import useTransaction from "@/composables/zksync/era/deposit/useTransaction";
-
-import ProgressPlane from "@/assets/lottie/progress-plane.json";
 
 import type { DepositFeeValues } from "@/composables/zksync/era/deposit/useFee";
 import type { Token } from "@/types";

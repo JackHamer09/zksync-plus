@@ -72,7 +72,7 @@
     @after-leave="checkAfterModalClose"
   >
     <template #animation>
-      <Vue3Lottie v-if="!transactionCommitted" class="mt-4 w-64" :animation-data="ProgressBlocks" loop />
+      <AnimationsProgressBlocks v-if="!transactionCommitted" class="mt-4 w-64" />
       <Vue3Lottie v-else class="w-32" :animation-data="SuccessUnlock" :loop="false" />
     </template>
 
@@ -142,7 +142,6 @@ import TokenAmount from "@/components/transaction/transactionLineItem/TokenAmoun
 
 import usePromise from "@/composables/usePromise";
 
-import ProgressBlocks from "@/assets/lottie/progress-blocks.json";
 import SuccessUnlock from "@/assets/lottie/success-unlock.json";
 
 import type { TransactionDestination } from "@/store/destinations";
