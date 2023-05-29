@@ -1,3 +1,5 @@
+![zkSync Plus](https://zkplus.io/preview.jpg)
+
 # zkSync Plus
 zkSync Plus is a unique wallet dapp that brings the best of zkSync Era∎ and zkSync Lite under one friendly user interface. Crafted with an emphasis on a seamless user experience, zkSync Plus allows you to easily manage your tokens. It's your go-to interface to interact with both versions of zkSync, ensuring a smooth and efficient process every step of the way.
 

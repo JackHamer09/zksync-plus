@@ -11,6 +11,28 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
         },
       ],
+      meta: [
+        {
+          property: "og:image",
+          content: "https://zkplus.io/preview.jpg",
+        },
+        {
+          property: "og:image:type",
+          content: "image/jpeg",
+        },
+        {
+          property: "og:image:width",
+          content: "1200",
+        },
+        {
+          property: "og:image:height",
+          content: "630",
+        },
+        {
+          property: "og:image:alt",
+          content: "zkSync Plus",
+        },
+      ],
     },
   },
   plugins: [],
