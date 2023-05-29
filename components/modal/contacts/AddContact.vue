@@ -4,10 +4,6 @@
     :title="contactPreset ? 'Edit contact' : 'Add contact'"
     @after-leave="clearFields"
   >
-    <template #animation>
-      <AnimationsProgressBlocks class="w-64" />
-    </template>
-
     <form @submit.prevent="addContact">
       <CommonInput
         v-model="name"
