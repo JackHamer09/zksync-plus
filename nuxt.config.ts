@@ -19,11 +19,11 @@ export default defineNuxtConfig({
   pwa: {
     meta: {
       name: "zkSync Plus",
-      description: "zkSync Plus - all in one wallet for zkSync",
+      description: "All in one wallet for zkSync Era∎ and zkSync Lite",
     },
     manifest: {
       name: "zkSync Plus",
-      short_name: "zkSync Plus",
+      short_name: "zkPlus",
     },
   },
   css: ["@/assets/css/tailwind.css", "web3-avatar-vue/dist/style.css"],
