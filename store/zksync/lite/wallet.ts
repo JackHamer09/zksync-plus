@@ -30,13 +30,8 @@ export const useLiteWalletStore = defineStore("liteWallet", () => {
     const provider = await liteProviderStore.requestProvider();
     if (!provider) throw new Error("Provider is not available");
 
-    const signer = await fetchSigner();
-    if (!signer) throw new Error("Signer is not available");
-
     /* TODO: Fix Argent connection */
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const web3Provider = new ethers.providers.Web3Provider(signer?.provider!.provider, "any");
+    const web3Provider = new ethers.providers.Web3Provider(await onboardStore.getEIP1193Provider(), "any");
     return (await RemoteWallet.fromEthSigner(web3Provider, provider)) as unknown as Wallet;
   };
 

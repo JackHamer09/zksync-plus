@@ -1,6 +1,5 @@
 import { watch } from "vue";
 
-import { fetchSigner } from "@wagmi/core";
 import { BigNumber } from "ethers";
 import { ethers } from "ethers";
 import { defineStore, storeToRefs } from "pinia";
@@ -31,13 +30,7 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
       );
     }
 
-    const signer = await fetchSigner();
-    if (!signer) throw new Error("Signer is not available");
-
-    // TODO: Figure out a better way to create an Era signer
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const web3Provider = new Web3Provider(signer.provider.provider);
+    const web3Provider = new Web3Provider(await onboardStore.getEIP1193Provider());
     const eraL2Signer = web3Provider.getSigner();
     eraL2Signer.provider.getSigner();
     return eraL2Signer;
@@ -50,13 +43,7 @@ export const useEraWalletStore = defineStore("eraWallet", () => {
       );
     }
 
-    const signer = await fetchSigner();
-    if (!signer) throw new Error("Signer is not available");
-
-    // TODO: Figure out a better way to create an Era signer
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const web3Provider = new ethers.providers.Web3Provider(signer.provider.provider);
+    const web3Provider = new ethers.providers.Web3Provider(await onboardStore.getEIP1193Provider());
     const eraL1Signer = L1Signer.from(web3Provider.getSigner(), eraProviderStore.requestProvider());
     return eraL1Signer;
   });

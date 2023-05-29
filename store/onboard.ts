@@ -1,4 +1,5 @@
-import { configureChains, createClient } from "@wagmi/core";
+import { configureChains, createClient, fetchSigner } from "@wagmi/core";
+import { zkSync, zkSyncTestnet } from "@wagmi/core/chains";
 import { publicProvider } from "@wagmi/core/providers/public";
 import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/html";
@@ -9,12 +10,13 @@ import useObservable from "@/composables/useObservable";
 import { useRuntimeConfig } from "#imports";
 import { chains, useNetworkStore } from "@/store/network";
 
+const extendedChains = [...chains, zkSync, zkSyncTestnet];
 const { public: env } = useRuntimeConfig();
 
 export const useOnboardStore = defineStore("onboard", () => {
   const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
-  const { provider } = configureChains(chains, [
+  const { provider } = configureChains(extendedChains, [
     w3mProvider({ projectId: env.walletConnectProjectID }),
     publicProvider(),
   ]);
@@ -23,11 +25,11 @@ export const useOnboardStore = defineStore("onboard", () => {
     connectors: w3mConnectors({
       projectId: env.walletConnectProjectID,
       version: 1,
-      chains: chains,
+      chains: extendedChains,
     }),
     provider,
   });
-  const ethereumClient = new EthereumClient(wagmiClient, chains);
+  const ethereumClient = new EthereumClient(wagmiClient, extendedChains);
 
   const getWalletName = () => {
     if (wagmiClient.connector?.name === "WalletConnect" || wagmiClient.connector?.name === "WalletConnectLegacy") {
@@ -114,6 +116,19 @@ export const useOnboardStore = defineStore("onboard", () => {
     }
   );
 
+  const getEIP1193Provider = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const signer = (await fetchSigner()) as any;
+    if (!signer) throw new Error("Signer is not available");
+
+    const provider = Object.assign(signer.provider, signer.provider.provider, {
+      request: signer.provider.request ?? signer.provider.provider.request,
+      send: signer.provider.send ?? signer.provider.send,
+      sendAsync: signer.provider.sendAsync ?? signer.provider.provider.sendAsync,
+    });
+    return provider;
+  };
+
   return {
     account: computed(() => account.value),
     network: computed(() => network.value),
@@ -130,6 +145,7 @@ export const useOnboardStore = defineStore("onboard", () => {
 
     blockExplorerUrl,
     getEthereumProvider: () => provider({ chainId: selectedEthereumNetwork.value.id }),
+    getEIP1193Provider,
 
     subscribeOnAccountChange,
   };
