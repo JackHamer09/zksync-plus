@@ -111,7 +111,7 @@ const supportModalOpened = ref(false);
       grid-area: menu-options;
 
       .account-menu-item {
-        @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 rounded-lg px-2 py-2 text-left leading-6 text-gray-900 transition-colors xl:px-4;
+        @apply grid w-full grid-cols-[max-content_1fr] items-center gap-3 rounded-lg px-2 py-2 text-left leading-6 text-gray-900 transition-colors;
         &.active {
           @apply bg-gray text-primary-400;
 
