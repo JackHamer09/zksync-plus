@@ -23,6 +23,17 @@
       </DestinationItem>
     </CommonCardWithLineButtons>
 
+    <TypographyCategoryLabel>Top-up with cash</TypographyCategoryLabel>
+    <CommonCardWithLineButtons>
+      <DestinationItem
+        v-bind="destinations.ramp"
+        :icon="ArrowUpRightIcon"
+        as="a"
+        target="_blank"
+        href="https://ramp.network/buy/"
+      />
+    </CommonCardWithLineButtons>
+
     <TypographyCategoryLabel>Top-up from another network</TypographyCategoryLabel>
     <CommonCardWithLineButtons>
       <DestinationItem
@@ -38,17 +49,6 @@
         as="a"
         target="_blank"
         href="https://www.orbiter.finance/?dest=zkSync%20Era"
-      />
-    </CommonCardWithLineButtons>
-
-    <TypographyCategoryLabel>Top-up with cash</TypographyCategoryLabel>
-    <CommonCardWithLineButtons>
-      <DestinationItem
-        v-bind="destinations.ramp"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://ramp.network/buy/"
       />
     </CommonCardWithLineButtons>
   </div>

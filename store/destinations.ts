@@ -60,6 +60,16 @@ export const useDestinationsStore = defineStore("destinations", () => {
       label: "Binance",
       iconUrl: "/img/binance.svg",
     },
+    zigzag: {
+      key: "zigzag",
+      label: "ZigZag",
+      iconUrl: "/img/zigzag.png",
+    },
+    syncswap: {
+      key: "syncswap",
+      label: "SyncSwap",
+      iconUrl: "/img/syncswap.svg",
+    },
   }));
 
   return {

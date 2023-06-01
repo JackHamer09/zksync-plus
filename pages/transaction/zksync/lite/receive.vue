@@ -23,24 +23,6 @@
       </DestinationItem>
     </CommonCardWithLineButtons>
 
-    <TypographyCategoryLabel>Top-up from another network</TypographyCategoryLabel>
-    <CommonCardWithLineButtons>
-      <DestinationItem
-        v-bind="destinations.layerswap"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://www.layerswap.io/?destNetwork=ZKSYNC_MAINNET"
-      />
-      <DestinationItem
-        v-bind="destinations.orbiter"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://www.orbiter.finance/?dest=zkSync%20Lite"
-      />
-    </CommonCardWithLineButtons>
-
     <TypographyCategoryLabel>Top-up with cash</TypographyCategoryLabel>
     <CommonCardWithLineButtons>
       <DestinationItem
@@ -70,6 +52,24 @@
         as="a"
         target="_blank"
         href="https://ramp.network/buy/"
+      />
+    </CommonCardWithLineButtons>
+
+    <TypographyCategoryLabel>Top-up from another network</TypographyCategoryLabel>
+    <CommonCardWithLineButtons>
+      <DestinationItem
+        v-bind="destinations.layerswap"
+        :icon="ArrowUpRightIcon"
+        as="a"
+        target="_blank"
+        href="https://www.layerswap.io/?destNetwork=ZKSYNC_MAINNET"
+      />
+      <DestinationItem
+        v-bind="destinations.orbiter"
+        :icon="ArrowUpRightIcon"
+        as="a"
+        target="_blank"
+        href="https://www.orbiter.finance/?dest=zkSync%20Lite"
       />
     </CommonCardWithLineButtons>
   </div>
