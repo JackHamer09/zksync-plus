@@ -275,7 +275,7 @@ const makeTransaction = async () => {
       liteTransactionsHistoryStore.reloadRecentTransactions();
       walletLiteStore.requestBalance({ force: true });
       if (liteAccountActivationStore.isAccountActivated === false) {
-        liteAccountActivationStore.checkAccountActivation();
+        liteAccountActivationStore.checkAccountActivation({ force: true });
       }
     } catch (err) {
       transactionCommitted.value = false;
