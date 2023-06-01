@@ -23,7 +23,7 @@
       </CommonButton>
     </div>
     <div>
-      <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
+      <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus="desktop">
         <template #icon>
           <MagnifyingGlassIcon aria-hidden="true" />
         </template>

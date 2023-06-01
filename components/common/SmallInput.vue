@@ -27,6 +27,7 @@ import { useFocus } from "@vueuse/core";
 
 import type { Component, PropType } from "vue";
 
+import { isMobile } from "@/utils/helpers";
 import { TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
@@ -47,7 +48,7 @@ const props = defineProps({
     default: "text",
   },
   autofocus: {
-    type: Boolean,
+    type: [Boolean, String] as PropType<boolean | "desktop">,
     default: false,
   },
 });
@@ -57,7 +58,9 @@ const emit = defineEmits<{
 }>();
 
 const inputElement = ref<HTMLInputElement | null>(null);
-const { focused } = useFocus(inputElement, { initialValue: !!props.autofocus });
+const { focused } = useFocus(inputElement, {
+  initialValue: props.autofocus === true || (props.autofocus === "desktop" && isMobile() === false),
+});
 
 const inputted = computed({
   get: () => props.modelValue,

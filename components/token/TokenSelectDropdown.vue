@@ -2,7 +2,7 @@
   <CommonModal v-model:opened="isModalOpened" class="token-select-modal" :title="title" @after-leave="search = ''">
     <Combobox v-model="selectedToken">
       <!-- TODO: Refactor this to use ComboboxInput as main component but look like CommonSmallInput -->
-      <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Symbol or address" autofocus>
+      <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Symbol or address" autofocus="desktop">
         <template #icon>
           <MagnifyingGlassIcon aria-hidden="true" />
         </template>
