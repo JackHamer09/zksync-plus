@@ -8,6 +8,12 @@
           </template>
           <template #default>Send</template>
         </CommonButton>
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-lite-swap' }">
+          <template #icon>
+            <ArrowsRightLeftIcon aria-hidden="true" />
+          </template>
+          <template #default>Swap</template>
+        </CommonButton>
         <CommonButton
           as="a"
           target="_blank"
@@ -56,7 +62,7 @@
 <script lang="ts" setup>
 import { onBeforeUnmount } from "vue";
 
-import { DocumentArrowDownIcon, PaperAirplaneIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, DocumentArrowDownIcon, PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import ZkSyncLiteTransactionLineItem from "@/components/transaction/zksync/lite/ZkSyncLiteTransactionLineItem.vue";
