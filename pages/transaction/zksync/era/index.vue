@@ -64,13 +64,6 @@
         target="_blank"
         href="https://www.orbiter.finance/?source=zkSync%20Era"
       />
-      <DestinationItem
-        v-bind="destinations.multichain"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://app.multichain.org/#/router"
-      />
     </CommonCardWithLineButtons>
   </div>
 </template>
