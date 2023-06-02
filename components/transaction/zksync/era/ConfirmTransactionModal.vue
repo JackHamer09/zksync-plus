@@ -1,10 +1,11 @@
 <template>
   <CommonModal
     v-if="status !== 'done'"
-    v-bind="$attrs"
+    :opened="opened"
     :close-on-background-click="status === 'not-started'"
     class="confirm-transaction-modal"
     title="Confirm transaction"
+    @close="closeModal"
   >
     <div class="flex h-full flex-col overflow-auto">
       <template v-if="transaction">
@@ -86,12 +87,13 @@
 
   <EraTransferSuccessfulModal
     v-else-if="transaction?.type === 'transfer'"
-    v-bind="$attrs"
+    opened
     :transaction="transactionLineItem"
     :in-progress="!transactionCommitted"
   />
   <EraWithdrawalSuccessfulModal
     v-else-if="transaction?.type === 'withdrawal'"
+    opened
     v-bind="$attrs"
     :transaction="transactionLineItem"
   />
@@ -135,6 +137,9 @@ export type ConfirmationModalTransaction = {
 };
 
 const props = defineProps({
+  opened: {
+    type: Boolean,
+  },
   transaction: {
     type: Object as PropType<ConfirmationModalTransaction>,
   },
@@ -160,6 +165,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits<{
+  (eventName: "update:opened", value: boolean): void;
+}>();
+const closeModal = () => emit("update:opened", false);
 
 const eraTransactionsHistoryStore = useEraTransactionsHistoryStore();
 const walletEraStore = useEraWalletStore();

@@ -1,10 +1,11 @@
 <template>
   <CommonModal
     v-if="status !== 'done'"
-    v-bind="$attrs"
+    :opened="opened"
     :close-on-background-click="status === 'not-started'"
     class="confirm-deposit-transaction-modal"
-    :title="`Confirm transaction`"
+    title="Confirm transaction"
+    @close="closeModal"
   >
     <div class="flex h-full flex-col overflow-auto">
       <template v-if="transaction">
@@ -74,7 +75,7 @@
     </div>
   </CommonModal>
 
-  <CommonModal v-else v-bind="$attrs" :closable="false" class="deposit-transaction-successful-modal" title="">
+  <CommonModal v-else opened :closable="false" class="deposit-transaction-successful-modal" title="">
     <template #animation>
       <AnimationsProgressPlane class="w-72" />
     </template>
@@ -169,6 +170,9 @@ export type ConfirmationModalTransaction = {
 };
 
 const props = defineProps({
+  opened: {
+    type: Boolean,
+  },
   transaction: {
     type: Object as PropType<ConfirmationModalTransaction>,
   },
@@ -190,6 +194,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits<{
+  (eventName: "update:opened", value: boolean): void;
+}>();
+const closeModal = () => emit("update:opened", false);
 
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const walletLiteStore = useLiteWalletStore();

@@ -16,7 +16,7 @@ type TransactionParams = {
 };
 
 export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
-  const status = ref<"not-started" | "processing" | "waiting-for-signature" | "committing" | "done">("not-started");
+  const status = ref<"not-started" | "processing" | "waiting-for-signature" | "sending" | "done">("not-started");
   const error = ref<Error | undefined>();
   const transactionHashes = ref<string[]>([]);
 
@@ -64,7 +64,7 @@ export default (getWalletInstance: () => Promise<Wallet | undefined>) => {
       status.value = "waiting-for-signature";
       const batchTransactionData = await batchBuilder.build();
 
-      status.value = "committing";
+      status.value = "sending";
       const submittedTransactions = await submitSignedTransactionsBatch(
         wallet.provider,
         batchTransactionData.txs,

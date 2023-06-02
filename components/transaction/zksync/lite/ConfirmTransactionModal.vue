@@ -1,10 +1,11 @@
 <template>
   <CommonModal
     v-if="status !== 'done'"
-    v-bind="$attrs"
+    :opened="opened"
     :close-on-background-click="status === 'not-started'"
     class="confirm-transaction-modal"
-    :title="`Confirm transaction`"
+    title="Confirm transaction"
+    @close="closeModal"
   >
     <div class="flex h-full flex-col overflow-auto">
       <template v-if="accountActivation">
@@ -84,7 +85,7 @@
           <transition v-bind="TransitionPrimaryButtonText" mode="out-in">
             <span v-if="status === 'processing'">Processing...</span>
             <span v-else-if="status === 'waiting-for-signature'">Waiting for confirmation</span>
-            <span v-else-if="status === 'committing'">Sending...</span>
+            <span v-else-if="status === 'sending'">Sending...</span>
             <span v-else>Send to {{ destination.label }}</span>
           </transition>
         </CommonButton>
@@ -100,15 +101,11 @@
 
   <TransferSuccessfulModal
     v-else-if="destination.key === 'zkSyncLite'"
-    v-bind="$attrs"
+    opened
     :transaction-hashes="transactionHashes"
     :in-progress="!transactionCommitted"
   />
-  <WithdrawSuccessfulModal
-    v-else-if="destination.key === 'ethereum'"
-    v-bind="$attrs"
-    :transaction-hashes="transactionHashes"
-  />
+  <WithdrawSuccessfulModal v-else-if="destination.key === 'ethereum'" opened :transaction-hashes="transactionHashes" />
 </template>
 
 <script lang="ts" setup>
@@ -146,6 +143,9 @@ export type ConfirmationModalTransaction = {
 };
 
 const props = defineProps({
+  opened: {
+    type: Boolean,
+  },
   transactions: {
     type: Array as PropType<ConfirmationModalTransaction[]>,
   },
@@ -172,6 +172,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits<{
+  (eventName: "update:opened", value: boolean): void;
+}>();
+const closeModal = () => emit("update:opened", false);
 
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const liteAccountActivationStore = useLiteAccountActivationStore();
