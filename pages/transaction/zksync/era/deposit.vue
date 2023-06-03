@@ -1,23 +1,23 @@
 <template>
+  <BackButton :fallback="{ name: 'transaction-zksync-era-receive' }" />
   <SelectAddress
     v-if="step === 'address'"
     title="Where to add funds"
     :destination="destinations.era"
     :destination-tooltip="`Add funds to ${destinations.era.label} (L2)`"
     own-address-displayed
-    @selected="address = $event"
-    @back="back()"
+    @selected="queryAddress = $event"
   />
-  <EraDepositForm v-else-if="step === 'transaction-form'" :address="address!" @back="back()" />
+  <EraDepositForm v-else-if="step === 'transaction-form'" :address="address!" />
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 
+import { useRouteQuery } from "@vueuse/router";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import { useRoute, useRouter } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
 import { checksumAddress } from "@/utils/formatters";
 import SelectAddress from "@/views/SelectAddress.vue";
@@ -25,17 +25,17 @@ import EraDepositForm from "@/views/zksync/era/transactions/Deposit.vue";
 
 const { destinations } = storeToRefs(useDestinationsStore());
 
-const router = useRouter();
-const route = useRoute();
+const queryAddress = useRouteQuery("address", undefined, {
+  transform: String,
+  mode: "push",
+});
 
-const getRouteAddress = () => {
-  if (typeof route.query.address !== "string" || !isAddress(route.query.address)) {
-    return null;
+const address = computed(() => {
+  if (isAddress(queryAddress.value)) {
+    return checksumAddress(queryAddress.value);
   }
-  return checksumAddress(route.query.address);
-};
-
-const address = ref<string | null>(getRouteAddress());
+  return undefined;
+});
 
 const step = computed<"address" | "transaction-form">(() => {
   if (!address.value) {
@@ -43,13 +43,6 @@ const step = computed<"address" | "transaction-form">(() => {
   }
   return "transaction-form";
 });
-
-const back = () => {
-  if (step.value === "transaction-form" && !getRouteAddress()) {
-    return (address.value = null);
-  }
-  router.push({ name: "transaction-zksync-era-receive" });
-};
 </script>
 
 <style lang="scss" scoped></style>

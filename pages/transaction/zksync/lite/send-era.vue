@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CommonBackButton as="RouterLink" :to="{ name: 'transaction-zksync-lite' }" />
+    <BackButton :fallback="{ name: 'transaction-zksync-lite' }" />
     <h1 class="h1">Choose provider</h1>
 
     <CommonCardWithLineButtons>

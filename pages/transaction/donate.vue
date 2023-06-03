@@ -3,7 +3,7 @@
     <ModalTransactionDonateBinance v-model:opened="donateBinanceModalOpened" />
     <ModalTransactionDonateEthereum v-model:opened="donateEthereumModalOpened" />
 
-    <CommonBackButton as="RouterLink" :to="{ name: 'index' }" />
+    <BackButton :fallback="{ name: 'index' }" />
     <h1 class="h1">Donate ❤️</h1>
 
     <CommonCardWithLineButtons>

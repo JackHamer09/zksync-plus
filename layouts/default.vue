@@ -25,7 +25,6 @@ import { usePreferencesStore } from "@/store/preferences";
 import LoginPage from "@/views/Login.vue";
 
 const route = useRoute();
-
 const { account, isConnectingWallet } = storeToRefs(useOnboardStore());
 const { version } = storeToRefs(usePreferencesStore());
 watch(

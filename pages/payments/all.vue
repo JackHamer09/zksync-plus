@@ -1,5 +1,6 @@
 <template>
-  <CommonPage title="All payments" :to="{ name: 'payments' }">
+  <BackButton :fallback="{ name: 'payments' }" />
+  <CommonPage title="All payments">
     <template #era>
       <AllPaymentsEra />
     </template>

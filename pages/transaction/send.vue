@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CommonBackButton as="RouterLink" :to="{ name: 'contacts' }" />
+    <BackButton :fallback="{ name: 'contacts' }" />
     <h1 class="h1">Select network</h1>
 
     <CommonCardWithLineButtons>

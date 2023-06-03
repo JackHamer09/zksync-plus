@@ -45,7 +45,6 @@
       </template>
     </ConfirmTransactionModal>
 
-    <CommonBackButton @click="emit('back')" />
     <div class="transaction-header">
       <div class="transaction-header-info">
         <h1 class="transaction-header-title h1">Send to</h1>
@@ -179,10 +178,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const emit = defineEmits<{
-  (eventName: "back"): void;
-}>();
 
 const route = useRoute();
 

@@ -1,21 +1,21 @@
 <template>
+  <BackButton :fallback="{ name: 'transaction-zksync-era' }" />
   <SelectAddress
     v-if="step === 'address'"
     :destination="destinations.era"
     :destination-tooltip="`Send to ${destinations.era.label} (L2)`"
-    @selected="address = $event"
-    @back="back()"
+    @selected="queryAddress = $event"
   />
-  <EraTransferForm v-else-if="step === 'transaction-form'" type="transfer" :address="address!" @back="back()" />
+  <EraTransferForm v-else-if="step === 'transaction-form'" type="transfer" :address="address!" />
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 
+import { useRouteQuery } from "@vueuse/router";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import { useRoute, useRouter } from "#app";
 import { useDestinationsStore } from "@/store/destinations";
 import { checksumAddress } from "@/utils/formatters";
 import SelectAddress from "@/views/SelectAddress.vue";
@@ -23,17 +23,17 @@ import EraTransferForm from "@/views/zksync/era/transactions/Transfer.vue";
 
 const { destinations } = storeToRefs(useDestinationsStore());
 
-const router = useRouter();
-const route = useRoute();
+const queryAddress = useRouteQuery("address", undefined, {
+  transform: String,
+  mode: "push",
+});
 
-const getRouteAddress = () => {
-  if (typeof route.query.address !== "string" || !isAddress(route.query.address)) {
-    return null;
+const address = computed(() => {
+  if (isAddress(queryAddress.value)) {
+    return checksumAddress(queryAddress.value);
   }
-  return checksumAddress(route.query.address);
-};
-
-const address = ref<string | null>(getRouteAddress());
+  return undefined;
+});
 
 const step = computed<"address" | "transaction-form">(() => {
   if (!address.value) {
@@ -41,13 +41,6 @@ const step = computed<"address" | "transaction-form">(() => {
   }
   return "transaction-form";
 });
-
-const back = () => {
-  if (step.value === "transaction-form" && !getRouteAddress()) {
-    return (address.value = null);
-  }
-  router.push({ name: "transaction-zksync-era", query: route.query });
-};
 </script>
 
 <style lang="scss" scoped></style>

@@ -14,7 +14,6 @@
       </CommonButton>
     </CommonModal>
 
-    <CommonBackButton @click="emit('back')" />
     <h1 class="h1">{{ title }}</h1>
     <div class="mb-4 flex gap-x-2.5">
       <CommonSmallInput v-model.trim="search" placeholder="Address or name" autofocus="desktop">
@@ -114,7 +113,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (eventName: "back"): void;
   (eventName: "selected", address: string): void;
 }>();
 
