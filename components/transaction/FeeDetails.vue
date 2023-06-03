@@ -6,9 +6,11 @@
         <template v-if="loading">
           <CommonContentLoader :length="30" />
         </template>
-        <span
+        <component
+          type="button"
+          :is="canDisplayFeeAsFiat ? 'button' : 'span'"
           v-else-if="feeToken && feeAmount"
-          :title="canDisplayFeeAsFiat ? 'Click to toggle how fee is displayed' : ''"
+          v-tooltip="canDisplayFeeAsFiat ? 'Click to toggle how amount is displayed' : ''"
           class="flex items-center"
           :class="{ 'cursor-pointer': canDisplayFeeAsFiat }"
           @click="displayFeeAsFiat = !displayFeeAsFiat"
@@ -37,7 +39,7 @@
           </transition>
           <TokenImage class="ml-1 mr-0.5 h-5 w-5" v-bind="feeToken" />
           <span class="font-medium">{{ feeToken.symbol }}</span>
-        </span>
+        </component>
         <template v-else>Unknown fee</template>
         <CommonCircleLoader
           v-if="updateDuration"
