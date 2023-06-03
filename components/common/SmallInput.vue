@@ -11,10 +11,11 @@
       :type="type"
       spellcheck="false"
     />
-    <transition v-bind="TransitionOpacity()">
+    <transition v-bind="TransitionOpacity()" mode="out-in">
       <button v-if="inputted" class="small-input-clear-button" type="button" @click="inputted = ''">
         <XMarkIcon class="small-input-clear-button-icon" aria-hidden="true" />
       </button>
+      <slot v-else name="right" />
     </transition>
   </component>
 </template>

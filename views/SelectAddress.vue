@@ -1,12 +1,39 @@
 <template>
   <div>
+    <CommonModal v-model:opened="qrCodeModalOpened" title="QR Decoding Error">
+      <CommonErrorBlock :retry-button="false">{{ qrDecodeErrorMessage }}</CommonErrorBlock>
+
+      <CommonButton
+        as="label"
+        for="qr-code-input"
+        variant="primary-solid"
+        class="mx-auto mt-6"
+        @click="qrCodeModalOpened = false"
+      >
+        Try again
+      </CommonButton>
+    </CommonModal>
+
     <CommonBackButton @click="emit('back')" />
     <h1 class="h1">{{ title }}</h1>
-    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus="desktop">
-      <template #icon>
-        <MagnifyingGlassIcon aria-hidden="true" />
-      </template>
-    </CommonSmallInput>
+    <div class="mb-4 flex gap-x-2.5">
+      <CommonSmallInput v-model.trim="search" placeholder="Address or name" autofocus="desktop">
+        <template #icon>
+          <MagnifyingGlassIcon aria-hidden="true" />
+        </template>
+        <template #right>
+          <label
+            class="aspect-square h-full w-auto scale-125 cursor-pointer rounded p-0.5 transition-colors hover:bg-gray-300"
+          >
+            <QrCodeIcon class="aspect-square h-full w-auto" aria-hidden="true" />
+            <CommonQrInput id="qr-code-input" class="sr-only" @decoded="onQrCodeDecoded" @error="onQrDecodeError" />
+          </label>
+        </template>
+      </CommonSmallInput>
+      <!-- <CommonIconButton as="label" :icon="QrCodeIcon">
+        <CommonQrInput id="qr-code-input" class="sr-only" @decoded="onQrCodeDecoded" @error="onQrDecodeError" />
+      </CommonIconButton> -->
+    </div>
 
     <div v-if="displayedAddresses.length">
       <template v-for="(group, groupIndex) in displayedAddresses" :key="groupIndex">
@@ -53,7 +80,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 
-import { ClockIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
+import { ClockIcon, MagnifyingGlassIcon, QrCodeIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
@@ -95,6 +122,20 @@ const contactsStore = useContactsStore();
 const { account } = storeToRefs(useOnboardStore());
 const { userContacts, userContactsByFirstCharacter } = storeToRefs(contactsStore);
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
+
+const qrDecodeErrorMessage = ref<string>();
+const qrCodeModalOpened = ref(false);
+const onQrDecodeError = (message: string) => {
+  qrDecodeErrorMessage.value = message;
+  qrCodeModalOpened.value = true;
+};
+const onQrCodeDecoded = (data: string) => {
+  if (isAddress(data)) {
+    emit("selected", checksumAddress(data));
+  } else {
+    onQrDecodeError("QR code doesn't contain a valid ethereum address");
+  }
+};
 
 const search = ref("");
 const isAddressValid = computed(() => isAddress(search.value));
