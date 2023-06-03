@@ -36,24 +36,12 @@
       </template>
     </ConfirmTransactionModal>
 
-    <div class="transaction-header">
-      <div class="transaction-header-info">
-        <h1 class="transaction-header-title h1">Add funds to</h1>
-        <div class="transaction-header-address hidden xs:block" :title="props.address">{{ props.address }}</div>
-        <div class="transaction-header-address xs:hidden" :title="props.address">
-          {{ shortenAddress(props.address, 5) }}
-        </div>
-      </div>
-      <AddressAvatar class="transaction-header-avatar" :address="props.address">
-        <template #icon>
-          <img
-            v-tooltip="`Adding funds to ${destination.label} (L2)`"
-            :src="destination.iconUrl"
-            :alt="destination.label"
-          />
-        </template>
-      </AddressAvatar>
-    </div>
+    <TransactionHeader
+      title="Add funds to"
+      :address="props.address"
+      :destination="destination"
+      :destination-tooltip="`Adding funds to ${destination.label}`"
+    />
 
     <CommonErrorBlock v-if="balanceError" @try-again="fetchBalances">
       {{ balanceError.message }}
@@ -148,13 +136,7 @@ import { useEraEthereumBalanceStore } from "@/store/zksync/era/ethereumBalance";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
 import { useEraTokensStore } from "@/store/zksync/era/tokens";
 import { TOKEN_ALLOWANCE } from "@/utils/doc-links";
-import {
-  checksumAddress,
-  decimalToBigNumber,
-  formatRawTokenPrice,
-  parseTokenAmount,
-  shortenAddress,
-} from "@/utils/formatters";
+import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, parseTokenAmount } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
@@ -392,20 +374,4 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-.transaction-header {
-  @apply flex items-center justify-between pb-6;
-
-  .transaction-header-info {
-    .transaction-header-title {
-      @apply pb-1;
-    }
-    .transaction-header-address {
-      @apply text-sm font-semibold text-primary-400;
-    }
-  }
-  .transaction-header-avatar {
-    @apply mt-5 h-14 w-14;
-  }
-}
-</style>
+<style lang="scss" scoped></style>
