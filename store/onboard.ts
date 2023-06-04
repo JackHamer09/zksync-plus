@@ -117,11 +117,16 @@ export const useOnboardStore = defineStore("onboard", () => {
   );
 
   const getEIP1193Provider = async () => {
-    const signer = await fetchSigner();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const signer = (await fetchSigner()) as any;
     if (!signer) throw new Error("Signer is not available");
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (signer.provider as any).provider;
+    const provider = Object.assign(signer.provider, signer.provider.provider, {
+      request: signer.provider.request ?? signer.provider.provider.request,
+      send: signer.provider.send ?? signer.provider.send,
+      sendAsync: signer.provider.sendAsync ?? signer.provider.provider.sendAsync,
+    });
+    return provider;
   };
 
   return {
