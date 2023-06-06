@@ -1,18 +1,18 @@
 {
   "ETH": {
-    "thumb": "https://assets.coingecko.com/coins/images/279/thumb/ethereum.png?1595348880",
-    "small": "https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880",
-    "large": "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/eth.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/eth.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/eth.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615"
   },
   "DAI": {
-    "thumb": "https://assets.coingecko.com/coins/images/9956/thumb/4943.png?1636636734",
-    "small": "https://assets.coingecko.com/coins/images/9956/small/4943.png?1636636734",
-    "large": "https://assets.coingecko.com/coins/images/9956/large/4943.png?1636636734"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/dai.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/dai.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/dai.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615"
   },
   "USDC": {
-    "thumb": "https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png?1547042389",
-    "small": "https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png?1547042389",
-    "large": "https://assets.coingecko.com/coins/images/6319/large/USD_Coin_icon.png?1547042389"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/usdc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/usdc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/usdc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615"
   },
   "TUSD": {
     "thumb": "https://assets.coingecko.com/coins/images/3449/thumb/tusd.png?1618395665",
@@ -50,9 +50,9 @@
     "large": "https://assets.coingecko.com/coins/images/14899/large/RwdVsGcw_400x400.jpg?1618923851"
   },
   "LINK": {
-    "thumb": "https://assets.coingecko.com/coins/images/877/thumb/chainlink-new-logo.png?1547034700",
-    "small": "https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png?1547034700",
-    "large": "https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1547034700"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/link.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/link.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/link.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615"
   },
   "MANA": {
     "thumb": "https://assets.coingecko.com/coins/images/878/thumb/decentraland-mana.png?1550108745",
@@ -74,10 +74,20 @@
     "small": "https://assets.coingecko.com/coins/images/3406/small/SNX.png?1598631139",
     "large": "https://assets.coingecko.com/coins/images/3406/large/SNX.png?1598631139"
   },
+  "GOVI": {
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/govi.svg?alt=media&token=82358649-c6cb-4f3e-ba13-fbb70d1d801f",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/govi.svg?alt=media&token=82358649-c6cb-4f3e-ba13-fbb70d1d801f",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/govi.svg?alt=media&token=82358649-c6cb-4f3e-ba13-fbb70d1d801f"
+  },
+  "WBTC": {
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/wbtc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/wbtc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/wbtc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615"
+  },
   "wBTC": {
-    "thumb": "https://assets.coingecko.com/coins/images/7598/thumb/wrapped_bitcoin_wbtc.png?1548822744",
-    "small": "https://assets.coingecko.com/coins/images/7598/small/wrapped_bitcoin_wbtc.png?1548822744",
-    "large": "https://assets.coingecko.com/coins/images/7598/large/wrapped_bitcoin_wbtc.png?1548822744"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/wbtc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/wbtc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/wbtc.svg?alt=media&token=1985e3d8-3aa7-4d04-8839-565d4c341615"
   },
   "ZRX": {
     "thumb": "https://assets.coingecko.com/coins/images/863/thumb/0x.png?1547034672",
@@ -220,9 +230,9 @@
     "large": "https://assets.coingecko.com/coins/images/15406/large/Copy_of_BTC2x-FLI_token_logo.png?1646749417"
   },
   "DEXTF": {
-    "thumb": "https://assets.coingecko.com/coins/images/12634/thumb/0qgT0aMu_400x400.jpg?1639175406",
-    "small": "https://assets.coingecko.com/coins/images/12634/small/0qgT0aMu_400x400.jpg?1639175406",
-    "large": "https://assets.coingecko.com/coins/images/12634/large/0qgT0aMu_400x400.jpg?1639175406"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/dextf.svg?alt=media&token=1793cf4c-6933-42c0-a4a3-20ddbc7db753",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/dextf.svg?alt=media&token=1793cf4c-6933-42c0-a4a3-20ddbc7db753",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/dextf.svg?alt=media&token=1793cf4c-6933-42c0-a4a3-20ddbc7db753"
   },
   "MASK": {
     "thumb": "https://assets.coingecko.com/coins/images/14051/thumb/Mask_Network.jpg?1614050316",
@@ -240,9 +250,9 @@
     "large": "https://assets.coingecko.com/coins/images/11035/large/0xmnr.PNG?1587357680"
   },
   "MUTE": {
-    "thumb": "https://assets.coingecko.com/coins/images/14331/thumb/MUTE.png?1617618967",
-    "small": "https://assets.coingecko.com/coins/images/14331/small/MUTE.png?1617618967",
-    "large": "https://assets.coingecko.com/coins/images/14331/large/MUTE.png?1617618967"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/mute.svg?alt=media&token=91b36efd-93fe-4e05-86dd-b97890f5f137",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/mute.svg?alt=media&token=91b36efd-93fe-4e05-86dd-b97890f5f137",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/mute.svg?alt=media&token=91b36efd-93fe-4e05-86dd-b97890f5f137"
   },
   "VOICE": {
     "thumb": "https://assets.coingecko.com/coins/images/12926/thumb/OjCQtdL.png?1614780024",
@@ -525,14 +535,14 @@
     "large": "https://assets.coingecko.com/coins/images/19060/large/ANGLE_Token-light.png?1666774221"
   },
   "RPL": {
-    "thumb": "https://assets.coingecko.com/coins/images/2090/thumb/rocket_pool_%28RPL%29.png?1637662441",
-    "small": "https://assets.coingecko.com/coins/images/2090/small/rocket_pool_%28RPL%29.png?1637662441",
-    "large": "https://assets.coingecko.com/coins/images/2090/large/rocket_pool_%28RPL%29.png?1637662441"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/rpl.svg?alt=media&token=d00177fb-503a-45fe-bd50-dea7a4b7c32e",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/rpl.svg?alt=media&token=d00177fb-503a-45fe-bd50-dea7a4b7c32e",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/rpl.svg?alt=media&token=d00177fb-503a-45fe-bd50-dea7a4b7c32e"
   },
   "rETH": {
-    "thumb": "https://assets.coingecko.com/coins/images/20764/thumb/reth.png?1637652366",
-    "small": "https://assets.coingecko.com/coins/images/20764/small/reth.png?1637652366",
-    "large": "https://assets.coingecko.com/coins/images/20764/large/reth.png?1637652366"
+    "thumb": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/reth.svg?alt=media&token=05c2bfe7-2967-4db1-9e0d-bbd49cace416",
+    "small": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/reth.svg?alt=media&token=05c2bfe7-2967-4db1-9e0d-bbd49cace416",
+    "large": "https://firebasestorage.googleapis.com/v0/b/token-library.appspot.com/o/reth.svg?alt=media&token=05c2bfe7-2967-4db1-9e0d-bbd49cace416"
   },
   "LDO": {
     "thumb": "https://assets.coingecko.com/coins/images/13573/thumb/Lido_DAO.png?1609873644",
