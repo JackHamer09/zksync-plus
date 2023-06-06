@@ -7,7 +7,6 @@
         <MagnifyingGlassIcon aria-hidden="true" />
       </template>
     </CommonSmallInput>
-
     <div v-if="displayedAddresses.length">
       <template v-for="(group, groupIndex) in displayedAddresses" :key="groupIndex">
         <TypographyCategoryLabel v-if="group.title" class="group-category-label">
@@ -40,6 +39,16 @@
         </span>
       </CommonEmptyBlock>
     </div>
+    <div v-else-if="inProgress">
+      <CommonCardWithLineButtons>
+        <AddressCardLoader></AddressCardLoader>
+      </CommonCardWithLineButtons>
+    </div>
+    <div v-else-if="error">
+      <CommonErrorBlock @try-again="clearSearch">
+        {{ error }}
+      </CommonErrorBlock>
+    </div>
     <div v-else>
       <CommonEmptyBlock class="search-empty-block">
         Nothing was found for "{{ search }}"
@@ -51,11 +60,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { ClockIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
+
+import useEns from "@/composables/useEns";
 
 import type { Contact } from "@/store/contacts";
 import type { TransactionDestination } from "@/store/destinations";
@@ -99,6 +110,17 @@ const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 const search = ref("");
 const isAddressValid = computed(() => isAddress(search.value));
 
+const { inProgress, parseEns, address, error } = useEns(search);
+
+const clearSearch = () => (search.value = "");
+
+watch(search, async (newValue) => {
+  address.value = undefined;
+  if (newValue.endsWith(".eth")) {
+    await parseEns();
+  }
+});
+
 function findContactsByText(contacts: ContactWithIcon[], text: string) {
   const lowercaseSearch = text.toLowerCase();
   return contacts.filter((item) =>
@@ -109,7 +131,12 @@ function findContactsByText(contacts: ContactWithIcon[], text: string) {
 }
 
 const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
-  if (isAddressValid.value) {
+  if (address.value && address.value.length) {
+    return {
+      name: "",
+      address: checksumAddress(address.value),
+    };
+  } else if (isAddressValid.value) {
     return {
       name: "",
       address: checksumAddress(search.value),

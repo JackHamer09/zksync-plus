@@ -53,6 +53,16 @@
           </CommonCardWithLineButtons>
         </template>
       </div>
+      <div v-else-if="inProgress">
+        <CommonCardWithLineButtons>
+          <AddressCardLoader></AddressCardLoader>
+        </CommonCardWithLineButtons>
+      </div>
+      <div v-else-if="error">
+        <CommonErrorBlock @try-again="clearSearch">
+          {{ error }}
+        </CommonErrorBlock>
+      </div>
       <div v-else-if="inputtedAddress">
         <CommonCardWithLineButtons>
           <AddressCard name="" :address="inputtedAddress" :key="inputtedAddress" @click="addInputtedAddress">
@@ -83,11 +93,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { MagnifyingGlassIcon, PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
+
+import useEns from "@/composables/useEns";
 
 import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
@@ -103,7 +115,26 @@ const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
 const search = ref("");
 const inputtedValidAddress = computed(() => isAddress(search.value));
-const inputtedAddress = computed(() => (inputtedValidAddress.value ? checksumAddress(search.value) : null));
+
+const inputtedAddress = computed(() => {
+  if (address.value && address.value.length) {
+    return checksumAddress(address.value);
+  } else if (inputtedValidAddress.value) {
+    return checksumAddress(search.value);
+  }
+  return null;
+});
+
+const { inProgress, parseEns, address, error } = useEns(search);
+
+const clearSearch = () => (search.value = "");
+
+watch(search, async (newValue) => {
+  address.value = undefined;
+  if (newValue.endsWith(".eth")) {
+    await parseEns();
+  }
+});
 
 const addContactModalOpened = ref(false);
 const addContactModalContactPreset = ref<Contact | undefined>();
@@ -126,7 +157,13 @@ const addContact = (contact: Contact) => {
   }
 };
 const addInputtedAddress = () => {
-  if (inputtedValidAddress.value) {
+  if (address.value) {
+    addContactModalContactPreset.value = {
+      name: "",
+      address: address.value!,
+    };
+    addContactModalOpened.value = true;
+  } else if (inputtedValidAddress.value) {
     addContactModalContactPreset.value = {
       name: "",
       address: inputtedAddress.value!,
