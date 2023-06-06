@@ -19,7 +19,7 @@ defineProps({
 
 <style lang="scss" scoped>
 .back-button-container {
-  @apply mt-5 block text-black transition-colors hover:text-gray-600 md:mt-8;
+  @apply block pt-5 text-black transition-colors hover:text-gray-600 md:pt-8;
 
   .arrow-icon {
     @apply h-6 w-6;
