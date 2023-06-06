@@ -10,7 +10,7 @@
       <div class="amount-input-token">
         <CommonContentLoader v-if="loading" :length="10" />
         <template v-else-if="selectedToken">
-          <div class="flex items-center">
+          <div class="flex items-center" @click="selectTokenModalOpened = true">
             <TokenImage class="-ml-0.5 h-5 w-5" v-bind="selectedToken" />
             <span class="ml-1 inline-block">{{ selectedToken.symbol }}</span>
           </div>
@@ -43,8 +43,9 @@
       </div>
       <div class="amount-input-select-asset">
         <CommonContentLoader v-if="loading" :length="35" />
-        <div
+        <button
           v-else
+          type="button"
           class="grid grid-cols-[1fr_calc(1rem_+_0.375rem)] items-center"
           @click.prevent="selectTokenModalOpened = true"
         >
@@ -58,7 +59,7 @@
           </template>
           <template v-else>Select token</template>
           <ChevronDownIcon class="ml-1.5 h-4 w-4" aria-hidden="true" />
-        </div>
+        </button>
       </div>
       <transition v-bind="TransitionOpacity()">
         <div v-if="amountError" class="amount-input-error">

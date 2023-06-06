@@ -40,11 +40,6 @@ export const useDestinationsStore = defineStore("destinations", () => {
       label: "Orbiter",
       iconUrl: "/img/orbiter.svg",
     },
-    multichain: {
-      key: "multichain",
-      label: "Multichain",
-      iconUrl: "/img/multichain.svg",
-    },
     banxa: {
       key: "banxa",
       label: "Banxa",
@@ -64,6 +59,16 @@ export const useDestinationsStore = defineStore("destinations", () => {
       key: "binance",
       label: "Binance",
       iconUrl: "/img/binance.svg",
+    },
+    zigzag: {
+      key: "zigzag",
+      label: "ZigZag",
+      iconUrl: "/img/zigzag.png",
+    },
+    syncswap: {
+      key: "syncswap",
+      label: "SyncSwap",
+      iconUrl: "/img/syncswap.svg",
     },
   }));
 

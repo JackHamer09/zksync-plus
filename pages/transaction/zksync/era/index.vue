@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CommonBackButton as="RouterLink" :to="{ name: 'index' }" />
+    <BackButton :fallback="{ name: 'index' }" />
     <h1 class="h1">Where to send</h1>
 
     <ModalTransactionWithdrawExchangeWarning
@@ -63,13 +63,6 @@
         as="a"
         target="_blank"
         href="https://www.orbiter.finance/?source=zkSync%20Era"
-      />
-      <DestinationItem
-        v-bind="destinations.multichain"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://app.multichain.org/#/router"
       />
     </CommonCardWithLineButtons>
   </div>

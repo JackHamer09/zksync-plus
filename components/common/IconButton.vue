@@ -1,6 +1,7 @@
 <template>
   <component :is="as" type="button" class="icon-button" :class="`variant-${variant}`">
     <component :is="icon" class="icon" aria-hidden="true" />
+    <slot />
   </component>
 </template>
 
@@ -26,11 +27,14 @@ defineProps({
 <style lang="scss">
 .icon-button {
   @apply flex aspect-square h-9 w-auto items-center justify-center rounded-full transition-colors;
+  &:is(label) {
+    @apply cursor-pointer;
+  }
   &.variant- {
     &primary {
       @apply bg-primary-100/50 text-primary-400;
       &:enabled,
-      &:is(a) {
+      &:is(a, label) {
         &:not([aria-disabled="true"]) {
           @apply hover:bg-primary-100/75;
         }
@@ -39,7 +43,7 @@ defineProps({
     &primary-solid {
       @apply bg-primary-400 text-base text-white;
       &:enabled,
-      &:is(a) {
+      &:is(a, label) {
         &:not([aria-disabled="true"]) {
           @apply hover:bg-primary-400;
         }
@@ -51,7 +55,7 @@ defineProps({
     &error {
       @apply bg-red-100/50 text-red-400;
       &:enabled,
-      &:is(a) {
+      &:is(a, label) {
         &:not([aria-disabled="true"]) {
           @apply hover:bg-red-100/75;
         }

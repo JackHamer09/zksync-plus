@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CommonBackButton as="RouterLink" :to="{ name: 'transaction-zksync-lite-receive' }" />
+    <BackButton :fallback="{ name: 'transaction-zksync-lite-receive' }" />
 
     <h1 class="h1">Receive</h1>
     <Receive :address="address">

@@ -45,21 +45,12 @@
       </template>
     </ConfirmTransactionModal>
 
-    <CommonBackButton @click="emit('back')" />
-    <div class="transaction-header">
-      <div class="transaction-header-info">
-        <h1 class="transaction-header-title h1">Send to</h1>
-        <div class="transaction-header-address hidden xs:block" :title="props.address">{{ props.address }}</div>
-        <div class="transaction-header-address xs:hidden" :title="props.address">
-          {{ shortenAddress(props.address, 5) }}
-        </div>
-      </div>
-      <AddressAvatar class="transaction-header-avatar" :address="props.address">
-        <template #icon>
-          <img v-tooltip="`Sending to ${destination.label}`" :src="destination.iconUrl" :alt="destination.label" />
-        </template>
-      </AddressAvatar>
-    </div>
+    <TransactionHeader
+      title="Send to"
+      :address="props.address"
+      :destination="destination"
+      :destination-tooltip="`Sending to ${destination.label}`"
+    />
 
     <CommonErrorBlock v-if="balanceError" @try-again="fetchBalances">
       {{ balanceError.message }}
@@ -73,7 +64,6 @@
         :maxAmount="maxAmount"
         :loading="balancesLoading"
         autofocus
-        @enter="openConfirmationModal"
       />
       <CommonErrorBlock v-if="feeError" class="mt-2" @try-again="estimate">
         Fee estimation error: {{ feeError.message }}
@@ -166,7 +156,7 @@ import { useLiteProviderStore } from "@/store/zksync/lite/provider";
 import { useLiteTokensStore } from "@/store/zksync/lite/tokens";
 import { useLiteWalletStore } from "@/store/zksync/lite/wallet";
 import { LITE_ACCOUNT_ACTIVATION, LITE_FEE_PAYING, LITE_WITHDRAWAL_TIMES } from "@/utils/doc-links";
-import { checksumAddress, decimalToBigNumber, formatRawTokenPrice, shortenAddress } from "@/utils/formatters";
+import { checksumAddress, decimalToBigNumber, formatRawTokenPrice } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionOpacity } from "@/utils/transitions";
 
 const props = defineProps({
@@ -179,10 +169,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const emit = defineEmits<{
-  (eventName: "back"): void;
-}>();
 
 const route = useRoute();
 
@@ -412,21 +398,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-.transaction-header {
-  @apply flex items-center justify-between pb-6;
-
-  .transaction-header-info {
-    .transaction-header-title {
-      @apply pb-1;
-    }
-    .transaction-header-address {
-      @apply text-sm font-semibold text-primary-400;
-    }
-  }
-  .transaction-header-avatar {
-    @apply mt-5 h-14 w-14;
-  }
-}
 .change-fee-token-button {
   @apply ml-2 mt-1 flex w-max cursor-pointer items-center rounded bg-primary-100/50 py-1 px-1.5 text-xs font-medium text-primary-400 transition-colors hover:bg-primary-100 xs:-mr-4 xs:mt-0;
 

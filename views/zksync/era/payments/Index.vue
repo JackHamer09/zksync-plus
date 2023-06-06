@@ -8,6 +8,12 @@
           </template>
           <template #default>Send</template>
         </CommonButton>
+        <CommonButton as="RouterLink" :to="{ name: 'transaction-zksync-era-swap' }">
+          <template #icon>
+            <ArrowsRightLeftIcon aria-hidden="true" />
+          </template>
+          <template #default>Swap</template>
+        </CommonButton>
       </CommonButtonsLineGroup>
       <div class="transactions-block-container">
         <div class="flex items-center justify-between py-4">
@@ -46,7 +52,7 @@
 <script lang="ts" setup>
 import { onBeforeUnmount } from "vue";
 
-import { PaperAirplaneIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, PaperAirplaneIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import EraTransactionLineItem from "@/components/transaction/zksync/era/EraTransactionLineItem.vue";

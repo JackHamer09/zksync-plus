@@ -1,22 +1,15 @@
 <template>
   <div>
-    <BackButton :fallback="{ name: 'transaction-zksync-era' }" />
-    <h1 class="h1">Choose provider</h1>
+    <BackButton :fallback="{ name: 'index' }" />
+    <h1 class="h1">Swap tokens</h1>
 
     <CommonCardWithLineButtons>
       <DestinationItem
-        v-bind="destinations.layerswap"
+        v-bind="destinations.syncswap"
         :icon="ArrowUpRightIcon"
         as="a"
         target="_blank"
-        href="https://www.layerswap.io/?sourceExchangeName=ZKSYNCERA_MAINNET&destNetwork=ZKSYNC_MAINNET"
-      />
-      <DestinationItem
-        v-bind="destinations.orbiter"
-        :icon="ArrowUpRightIcon"
-        as="a"
-        target="_blank"
-        href="https://www.orbiter.finance/?source=zkSync%20Era&dest=zkSync%20Lite"
+        href="https://syncswap.xyz/"
       />
     </CommonCardWithLineButtons>
   </div>

@@ -40,3 +40,7 @@ export const getNetworkUrl = (network: ExtendedChain, routePath: string) => {
   }
   return network.hostnames[0] + routePath;
 };
+
+export const isMobile = () => {
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+};

@@ -1,10 +1,17 @@
 <template>
   <div>
-    <CommonBackButton @click="emit('back')" />
     <h1 class="h1">{{ title }}</h1>
     <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
       <template #icon>
         <MagnifyingGlassIcon aria-hidden="true" />
+      </template>
+      <template #right>
+        <label
+          class="aspect-square h-full w-auto scale-125 cursor-pointer rounded p-0.5 transition-colors hover:bg-gray-300"
+        >
+          <QrCodeIcon class="aspect-square h-full w-auto" aria-hidden="true" />
+          <CommonQrAddressInput id="qr-code-input" @selected="emit('selected', $event)" />
+        </label>
       </template>
     </CommonSmallInput>
     <div v-if="displayedAddresses.length">
@@ -98,7 +105,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (eventName: "back"): void;
   (eventName: "selected", address: string): void;
 }>();
 

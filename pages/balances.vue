@@ -1,5 +1,6 @@
 <template>
-  <CommonPage title="Balances" :back-button-location="{ name: 'index' }">
+  <BackButton :fallback="{ name: 'index' }" />
+  <CommonPage title="Balances">
     <template #era>
       <BalancesEra />
     </template>

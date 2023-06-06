@@ -6,9 +6,10 @@
       <span class="account-name" :class="{ 'hidden xl:block': isButton }">
         {{ name ? name : shortenAddress(account.address!) }}
       </span>
+      <ChevronDownIcon class="account-dropdown-icon" aria-hidden="true" />
       <button v-tooltip="copied ? 'Address copied' : 'Copy address'" class="copy-button" @click="copy">
-        <DocumentDuplicateIcon v-if="!copied" class="copy-button-icon" tabindex="-1" />
-        <CheckIcon v-else class="copy-button-icon check-icon" tabindex="-1" />
+        <DocumentDuplicateIcon v-if="!copied" class="copy-button-icon" aria-hidden="true" tabindex="-1" />
+        <CheckIcon v-else class="copy-button-icon check-icon" aria-hidden="true" tabindex="-1" />
       </button>
     </div>
   </component>
@@ -17,7 +18,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-import { CheckIcon, DocumentDuplicateIcon } from "@heroicons/vue/24/outline";
+import { CheckIcon, ChevronDownIcon, DocumentDuplicateIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import useCopy from "@/composables/useCopy";
@@ -42,10 +43,13 @@ const { copy, copied } = useCopy(contactAddress, 700);
 
 <style lang="scss" scoped>
 .account-button {
-  @apply flex w-full items-center rounded-xl bg-transparent py-3 px-3 xl:px-4;
+  @apply flex w-full items-center rounded-xl bg-transparent py-3 px-3;
   &.is-button {
     .copy-button {
       @apply hidden;
+    }
+    .account-dropdown-icon {
+      @apply block;
     }
     .account-name-container {
       @apply hidden xl:grid;
@@ -54,6 +58,9 @@ const { copy, copied } = useCopy(contactAddress, 700);
 
   .account-icon {
     @apply aspect-square h-8 w-8;
+  }
+  .account-dropdown-icon {
+    @apply -mr-0.5 hidden h-5 w-5 text-gray-secondary;
   }
   .account-name-container {
     @apply ml-3 grid w-full grid-cols-[1fr_max-content] items-center justify-between;

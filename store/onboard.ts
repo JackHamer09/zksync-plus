@@ -123,7 +123,7 @@ export const useOnboardStore = defineStore("onboard", () => {
 
     const provider = Object.assign(signer.provider, signer.provider.provider, {
       request: signer.provider.request ?? signer.provider.provider.request,
-      send: signer.provider.send ?? signer.provider.send,
+      send: signer.provider.send ?? signer.provider.provider.send,
       sendAsync: signer.provider.sendAsync ?? signer.provider.provider.sendAsync,
     });
     return provider;

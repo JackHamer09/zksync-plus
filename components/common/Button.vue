@@ -25,11 +25,14 @@ defineProps({
 <style lang="scss">
 .default-button {
   @apply flex h-[2.25rem] w-max items-center justify-center rounded-[10px] px-4 text-sm font-medium backdrop-blur-sm transition-colors;
+  &:is(label) {
+    @apply cursor-pointer;
+  }
   &.variant- {
     &primary {
       @apply whitespace-nowrap bg-primary-100/50 text-primary-400;
       &:enabled,
-      &:is(a) {
+      &:is(a, label) {
         &:not([aria-disabled="true"]) {
           @apply hover:bg-primary-100/75;
         }
@@ -38,7 +41,7 @@ defineProps({
     &primary-solid {
       @apply h-max w-full max-w-sm rounded-2xl bg-primary-400 py-3 text-base text-white;
       &:enabled,
-      &:is(a) {
+      &:is(a, label) {
         &:not([aria-disabled="true"]) {
           @apply hover:bg-primary-400;
         }
@@ -51,7 +54,7 @@ defineProps({
     &error {
       @apply bg-red-100/50 text-red-400;
       &:enabled,
-      &:is(a) {
+      &:is(a, label) {
         &:not([aria-disabled="true"]) {
           @apply hover:bg-red-100/75;
         }
