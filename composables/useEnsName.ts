@@ -4,9 +4,9 @@ import type { Ref } from "vue";
 
 export default (ensName: Ref<string>) => {
   const {
-    inProgress,
-    error,
-    result: address,
+    result: ensAddress,
+    inProgress: ensParseInProgress,
+    error: ensParseError,
     execute: parseEns,
   } = usePromise(
     async () => {
@@ -16,9 +16,9 @@ export default (ensName: Ref<string>) => {
   );
 
   return {
-    inProgress,
-    error,
-    address,
+    ensAddress,
+    ensParseInProgress,
+    ensParseError,
     parseEns,
   };
 };

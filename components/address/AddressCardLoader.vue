@@ -1,14 +1,12 @@
 <template>
   <CommonButtonLineWithImg :as="as" class="address-card-loader">
     <template #image>
-      <div class="address-avatar">
-        <CommonContentLoader class="address-avatar-img" />
-      </div>
+      <CommonContentLoader class="address-avatar-img" />
     </template>
     <template #default>
-      <div class="address-card-loader-info">
-        <div class="address-card-loader-name"><CommonContentLoader :length="36" /></div>
-        <div class="address-card-loader-address"><CommonContentLoader :length="26" /></div>
+      <div class="address-card-info">
+        <div class="address-card-name pb-1"><CommonContentLoader :length="36" /></div>
+        <div class="address-card-address"><CommonContentLoader :length="26" /></div>
       </div>
     </template>
   </CommonButtonLineWithImg>
@@ -27,25 +25,8 @@ defineProps({
 <style lang="scss">
 .address-card-loader {
   @apply pointer-events-none select-none;
-  .address-card-loader-avatar {
-    @apply aspect-square h-auto w-full;
-  }
-  .address-card-loader-info {
-    @apply flex w-full flex-col justify-between whitespace-nowrap;
-
-    .address-card-loader-name {
-      @apply overflow-hidden text-ellipsis font-medium leading-relaxed;
-    }
-    .address-card-loader-address {
-      @apply text-sm leading-tight text-gray-secondary;
-    }
-  }
-  .address-avatar {
-    @apply relative;
-
-    .address-avatar-img {
-      @apply block aspect-square h-full w-full rounded-full;
-    }
+  .address-avatar-img {
+    @apply block aspect-square h-full w-full rounded-full;
   }
 }
 </style>

@@ -61,19 +61,38 @@
           </CommonCardWithLineButtons>
         </template>
       </div>
-      <div v-else-if="inProgress">
+      <div v-else-if="ensParseInProgress">
         <CommonCardWithLineButtons>
           <AddressCardLoader></AddressCardLoader>
         </CommonCardWithLineButtons>
       </div>
-      <div v-else-if="error">
-        <CommonErrorBlock @try-again="clearSearch">
-          {{ error }}
+      <div v-else-if="ensParseError">
+        <CommonErrorBlock @try-again="reparseEns">
+          {{ ensParseError }}
         </CommonErrorBlock>
+      </div>
+      <div v-else-if="inputtedAddress && inputtedAddress.name">
+        <CommonCardWithLineButtons>
+          <AddressCard
+            :name="inputtedAddress.name"
+            :address="inputtedAddress.address"
+            :key="inputtedAddress.address"
+            @click="addInputtedAddress"
+          >
+            <template #right>
+              <CommonIconButton as="div" :icon="PlusIcon" />
+            </template>
+          </AddressCard>
+        </CommonCardWithLineButtons>
       </div>
       <div v-else-if="inputtedAddress">
         <CommonCardWithLineButtons>
-          <AddressCard name="" :address="inputtedAddress" :key="inputtedAddress" @click="addInputtedAddress">
+          <AddressCard
+            name=""
+            :address="inputtedAddress.address"
+            :key="inputtedAddress.address"
+            @click="addInputtedAddress"
+          >
             <template #right>
               <CommonIconButton as="div" :icon="PlusIcon" />
             </template>
@@ -101,13 +120,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 import { MagnifyingGlassIcon, PaperAirplaneIcon, PlusIcon, QrCodeIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import useEns from "@/composables/useEns";
+import useEns from "@/composables/useEnsName";
+import useEnsParserWatcher from "@/composables/useEnsParserWatcher";
 
 import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
@@ -123,25 +143,28 @@ const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
 const search = ref("");
 const inputtedValidAddress = computed(() => isAddress(search.value));
-
-const inputtedAddress = computed(() => {
-  if (address.value && address.value.length) {
-    return checksumAddress(address.value);
-  } else if (inputtedValidAddress.value) {
-    return checksumAddress(search.value);
-  }
-  return null;
-});
-
-const { inProgress, parseEns, address, error } = useEns(search);
-
-const clearSearch = () => (search.value = "");
-
-watch(search, async (newValue) => {
-  address.value = undefined;
-  if (newValue.endsWith(".eth")) {
+const { ensAddress, ensParseInProgress, ensParseError, parseEns } = useEns(search);
+useEnsParserWatcher(search, ensAddress, parseEns);
+const reparseEns = async () => {
+  ensAddress.value = undefined;
+  if (search.value.endsWith(".eth")) {
     await parseEns();
   }
+};
+
+const inputtedAddress = computed(() => {
+  if (ensAddress.value?.length) {
+    return {
+      name: search.value.slice(0, -4),
+      address: checksumAddress(ensAddress.value),
+    };
+  } else if (inputtedValidAddress.value) {
+    return {
+      name: "",
+      address: checksumAddress(search.value),
+    };
+  }
+  return null;
 });
 
 const addContactModalOpened = ref(false);
@@ -165,16 +188,16 @@ const addContact = (contact: Contact) => {
   }
 };
 const addInputtedAddress = () => {
-  if (address.value) {
+  if (ensAddress.value) {
     addContactModalContactPreset.value = {
-      name: "",
-      address: address.value!,
+      name: search.value.slice(0, -4),
+      address: ensAddress.value!,
     };
     addContactModalOpened.value = true;
   } else if (inputtedValidAddress.value) {
     addContactModalContactPreset.value = {
       name: "",
-      address: inputtedAddress.value!,
+      address: inputtedAddress.value?.address as string,
     };
     addContactModalOpened.value = true;
   }
@@ -210,6 +233,7 @@ function findContactsByText(contacts: ContactWithIcon[], text: string) {
       .some((value) => (value as string).toLowerCase().includes(lowercaseSearch))
   );
 }
+
 const displayedAddresses = computed<AddressesGroup[]>(() => {
   const groups: Record<string, AddressesGroup> = {
     default: {
@@ -217,7 +241,6 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
       addresses: [],
     },
   };
-
   for (const [contactsGroupCharacter, contactsGroup] of Object.entries(userContactsByFirstCharacter.value)) {
     groups[contactsGroupCharacter] = {
       title: contactsGroupCharacter,

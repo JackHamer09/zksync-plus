@@ -46,14 +46,14 @@
         </span>
       </CommonEmptyBlock>
     </div>
-    <div v-else-if="inProgress">
+    <div v-else-if="ensParseInProgress">
       <CommonCardWithLineButtons>
-        <AddressCardLoader></AddressCardLoader>
+        <AddressCardLoader />
       </CommonCardWithLineButtons>
     </div>
-    <div v-else-if="error">
-      <CommonErrorBlock @try-again="clearSearch">
-        {{ error }}
+    <div v-else-if="ensParseError">
+      <CommonErrorBlock @try-again="reparseEns">
+        {{ ensParseError }}
       </CommonErrorBlock>
     </div>
     <div v-else>
@@ -67,13 +67,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
-import { ClockIcon, MagnifyingGlassIcon, UserIcon } from "@heroicons/vue/24/outline";
+import { ClockIcon, MagnifyingGlassIcon, QrCodeIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
-import useEns from "@/composables/useEns";
+import useEns from "@/composables/useEnsName";
+import useEnsParserWatcher from "@/composables/useEnsParserWatcher";
 
 import type { Contact } from "@/store/contacts";
 import type { TransactionDestination } from "@/store/destinations";
@@ -115,17 +116,14 @@ const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const search = ref("");
 const isAddressValid = computed(() => isAddress(search.value));
-
-const { inProgress, parseEns, address, error } = useEns(search);
-
-const clearSearch = () => (search.value = "");
-
-watch(search, async (newValue) => {
-  address.value = undefined;
-  if (newValue.endsWith(".eth")) {
+const { ensAddress, ensParseInProgress, ensParseError, parseEns } = useEns(search);
+useEnsParserWatcher(search, ensAddress, parseEns);
+const reparseEns = async () => {
+  ensAddress.value = undefined;
+  if (search.value.endsWith(".eth")) {
     await parseEns();
   }
-});
+};
 
 function findContactsByText(contacts: ContactWithIcon[], text: string) {
   const lowercaseSearch = text.toLowerCase();
@@ -137,10 +135,10 @@ function findContactsByText(contacts: ContactWithIcon[], text: string) {
 }
 
 const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
-  if (address.value && address.value.length) {
+  if (ensAddress.value?.length) {
     return {
-      name: "",
-      address: checksumAddress(address.value),
+      name: search.value.slice(0, -4),
+      address: checksumAddress(ensAddress.value),
     };
   } else if (isAddressValid.value) {
     return {
