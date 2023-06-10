@@ -67,28 +67,14 @@
         </CommonCardWithLineButtons>
       </div>
       <div v-else-if="ensParseError">
-        <CommonErrorBlock @try-again="reparseEns">
+        <CommonErrorBlock @try-again="parseEns">
           {{ ensParseError }}
         </CommonErrorBlock>
-      </div>
-      <div v-else-if="inputtedAddress && inputtedAddress.name">
-        <CommonCardWithLineButtons>
-          <AddressCard
-            :name="inputtedAddress.name"
-            :address="inputtedAddress.address"
-            :key="inputtedAddress.address"
-            @click="addInputtedAddress"
-          >
-            <template #right>
-              <CommonIconButton as="div" :icon="PlusIcon" />
-            </template>
-          </AddressCard>
-        </CommonCardWithLineButtons>
       </div>
       <div v-else-if="inputtedAddress">
         <CommonCardWithLineButtons>
           <AddressCard
-            name=""
+            :name="inputtedAddress.name"
             :address="inputtedAddress.address"
             :key="inputtedAddress.address"
             @click="addInputtedAddress"
@@ -127,7 +113,6 @@ import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
 import useEns from "@/composables/useEnsName";
-import useEnsParserWatcher from "@/composables/useEnsParserWatcher";
 
 import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
@@ -143,14 +128,7 @@ const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
 const search = ref("");
 const inputtedValidAddress = computed(() => isAddress(search.value));
-const { ensAddress, ensParseInProgress, ensParseError, parseEns } = useEns(search);
-useEnsParserWatcher(search, ensAddress, parseEns);
-const reparseEns = async () => {
-  ensAddress.value = undefined;
-  if (search.value.endsWith(".eth")) {
-    await parseEns();
-  }
-};
+const { address: ensAddress, inProgress: ensParseInProgress, error: ensParseError, parseEns } = useEns(search);
 
 const inputtedAddress = computed(() => {
   if (ensAddress.value?.length) {
@@ -188,15 +166,9 @@ const addContact = (contact: Contact) => {
   }
 };
 const addInputtedAddress = () => {
-  if (ensAddress.value) {
+  if (inputtedValidAddress.value) {
     addContactModalContactPreset.value = {
-      name: search.value.slice(0, -4),
-      address: ensAddress.value!,
-    };
-    addContactModalOpened.value = true;
-  } else if (inputtedValidAddress.value) {
-    addContactModalContactPreset.value = {
-      name: "",
+      name: inputtedAddress.value?.name as string,
       address: inputtedAddress.value?.address as string,
     };
     addContactModalOpened.value = true;

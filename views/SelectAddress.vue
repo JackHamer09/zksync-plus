@@ -52,7 +52,7 @@
       </CommonCardWithLineButtons>
     </div>
     <div v-else-if="ensParseError">
-      <CommonErrorBlock @try-again="reparseEns">
+      <CommonErrorBlock @try-again="parseEns">
         {{ ensParseError }}
       </CommonErrorBlock>
     </div>
@@ -74,7 +74,6 @@ import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
 import useEns from "@/composables/useEnsName";
-import useEnsParserWatcher from "@/composables/useEnsParserWatcher";
 
 import type { Contact } from "@/store/contacts";
 import type { TransactionDestination } from "@/store/destinations";
@@ -116,14 +115,7 @@ const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const search = ref("");
 const isAddressValid = computed(() => isAddress(search.value));
-const { ensAddress, ensParseInProgress, ensParseError, parseEns } = useEns(search);
-useEnsParserWatcher(search, ensAddress, parseEns);
-const reparseEns = async () => {
-  ensAddress.value = undefined;
-  if (search.value.endsWith(".eth")) {
-    await parseEns();
-  }
-};
+const { address: ensAddress, inProgress: ensParseInProgress, error: ensParseError, parseEns } = useEns(search);
 
 function findContactsByText(contacts: ContactWithIcon[], text: string) {
   const lowercaseSearch = text.toLowerCase();
