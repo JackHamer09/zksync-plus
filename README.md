@@ -12,13 +12,6 @@ Latest deployment - [![Netlify Status](https://api.netlify.com/api/v1/badges/999
 ## Contributing
 All contributions are welcome! Feel free to make the codebase better and submit your pull request [here](https://github.com/JackHamer09/zksync-plus/pulls).
 
-## Donations
-Loving the experience? Feel free to send a token of appreciation!
-
-ENS - `JackHamer.eth`
-
-Address - `0xa1cf087DB965Ab02Fb3CFaCe1f5c63935815f044`
-
 ---
 ## Development
 ### Setup
