@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="h1">{{ title }}</h1>
-    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus>
+    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or ENS or contact name" autofocus>
       <template #icon>
         <MagnifyingGlassIcon aria-hidden="true" />
       </template>
@@ -129,12 +129,12 @@ function findContactsByText(contacts: ContactWithIcon[], text: string) {
 const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
   if (ensAddress.value?.length) {
     return {
-      name: search.value.slice(0, -4),
+      name: search.value,
       address: checksumAddress(ensAddress.value),
     };
   } else if (isAddressValid.value) {
     return {
-      name: "",
+      name: search.value,
       address: checksumAddress(search.value),
     };
   }

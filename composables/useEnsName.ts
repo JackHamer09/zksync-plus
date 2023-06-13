@@ -5,13 +5,6 @@ import { fetchEnsAddress } from "@wagmi/core";
 import type { Ref } from "vue";
 
 export default (ensName: Ref<string>) => {
-  watch(ensName, async (newValue) => {
-    address.value = undefined;
-    if (newValue.endsWith(".eth")) {
-      await parseEns();
-    }
-  });
-
   const {
     result: address,
     inProgress,
@@ -23,6 +16,13 @@ export default (ensName: Ref<string>) => {
     },
     { cache: false }
   );
+
+  watch(ensName, async (newValue) => {
+    address.value = undefined;
+    if (newValue.endsWith(".eth")) {
+      await parseEns();
+    }
+  });
 
   return {
     address,

@@ -23,7 +23,12 @@
       </CommonButton>
     </div>
     <div>
-      <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus="desktop">
+      <CommonSmallInput
+        v-model.trim="search"
+        class="mb-4"
+        placeholder="Address or ENS or contact name"
+        autofocus="desktop"
+      >
         <template #icon>
           <MagnifyingGlassIcon aria-hidden="true" />
         </template>
@@ -71,12 +76,12 @@
           {{ ensParseError }}
         </CommonErrorBlock>
       </div>
-      <div v-else-if="inputtedAddress">
+      <div v-else-if="inputtedContact">
         <CommonCardWithLineButtons>
           <AddressCard
-            :name="inputtedAddress.name"
-            :address="inputtedAddress.address"
-            :key="inputtedAddress.address"
+            :name="inputtedContact.name"
+            :address="inputtedContact.address"
+            :key="inputtedContact.address"
             @click="addInputtedAddress"
           >
             <template #right>
@@ -130,10 +135,10 @@ const search = ref("");
 const inputtedValidAddress = computed(() => isAddress(search.value));
 const { address: ensAddress, inProgress: ensParseInProgress, error: ensParseError, parseEns } = useEns(search);
 
-const inputtedAddress = computed(() => {
+const inputtedContact = computed(() => {
   if (ensAddress.value?.length) {
     return {
-      name: search.value.slice(0, -4),
+      name: search.value,
       address: checksumAddress(ensAddress.value),
     };
   } else if (inputtedValidAddress.value) {
@@ -166,10 +171,10 @@ const addContact = (contact: Contact) => {
   }
 };
 const addInputtedAddress = () => {
-  if (inputtedValidAddress.value) {
+  if (inputtedContact.value) {
     addContactModalContactPreset.value = {
-      name: inputtedAddress.value?.name as string,
-      address: inputtedAddress.value?.address as string,
+      name: inputtedContact.value?.name as string,
+      address: inputtedContact.value?.address as string,
     };
     addContactModalOpened.value = true;
   }
