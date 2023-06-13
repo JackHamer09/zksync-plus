@@ -23,7 +23,12 @@
       </CommonButton>
     </div>
     <div>
-      <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or name" autofocus="desktop">
+      <CommonSmallInput
+        v-model.trim="search"
+        class="mb-4"
+        placeholder="Address or ENS or contact name"
+        autofocus="desktop"
+      >
         <template #icon>
           <MagnifyingGlassIcon aria-hidden="true" />
         </template>
@@ -61,9 +66,24 @@
           </CommonCardWithLineButtons>
         </template>
       </div>
-      <div v-else-if="inputtedAddress">
+      <div v-else-if="ensParseInProgress">
         <CommonCardWithLineButtons>
-          <AddressCard name="" :address="inputtedAddress" :key="inputtedAddress" @click="addInputtedAddress">
+          <AddressCardLoader></AddressCardLoader>
+        </CommonCardWithLineButtons>
+      </div>
+      <div v-else-if="ensParseError">
+        <CommonErrorBlock @try-again="parseEns">
+          {{ ensParseError }}
+        </CommonErrorBlock>
+      </div>
+      <div v-else-if="inputtedContact">
+        <CommonCardWithLineButtons>
+          <AddressCard
+            :name="inputtedContact.name"
+            :address="inputtedContact.address"
+            :key="inputtedContact.address"
+            @click="addInputtedAddress"
+          >
             <template #right>
               <CommonIconButton as="div" :icon="PlusIcon" />
             </template>
@@ -97,6 +117,8 @@ import { MagnifyingGlassIcon, PaperAirplaneIcon, PlusIcon, QrCodeIcon } from "@h
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
+import useEns from "@/composables/useEnsName";
+
 import type { Contact } from "@/store/contacts";
 import type { Component } from "vue";
 
@@ -111,7 +133,22 @@ const { userContactsByFirstCharacter } = storeToRefs(contactsStore);
 
 const search = ref("");
 const inputtedValidAddress = computed(() => isAddress(search.value));
-const inputtedAddress = computed(() => (inputtedValidAddress.value ? checksumAddress(search.value) : null));
+const { address: ensAddress, inProgress: ensParseInProgress, error: ensParseError, parseEns } = useEns(search);
+
+const inputtedContact = computed(() => {
+  if (ensAddress.value?.length) {
+    return {
+      name: search.value,
+      address: checksumAddress(ensAddress.value),
+    };
+  } else if (inputtedValidAddress.value) {
+    return {
+      name: "",
+      address: checksumAddress(search.value),
+    };
+  }
+  return null;
+});
 
 const addContactModalOpened = ref(false);
 const addContactModalContactPreset = ref<Contact | undefined>();
@@ -134,10 +171,10 @@ const addContact = (contact: Contact) => {
   }
 };
 const addInputtedAddress = () => {
-  if (inputtedValidAddress.value) {
+  if (inputtedContact.value) {
     addContactModalContactPreset.value = {
-      name: "",
-      address: inputtedAddress.value!,
+      name: inputtedContact.value?.name as string,
+      address: inputtedContact.value?.address as string,
     };
     addContactModalOpened.value = true;
   }
@@ -173,6 +210,7 @@ function findContactsByText(contacts: ContactWithIcon[], text: string) {
       .some((value) => (value as string).toLowerCase().includes(lowercaseSearch))
   );
 }
+
 const displayedAddresses = computed<AddressesGroup[]>(() => {
   const groups: Record<string, AddressesGroup> = {
     default: {
@@ -180,7 +218,6 @@ const displayedAddresses = computed<AddressesGroup[]>(() => {
       addresses: [],
     },
   };
-
   for (const [contactsGroupCharacter, contactsGroup] of Object.entries(userContactsByFirstCharacter.value)) {
     groups[contactsGroupCharacter] = {
       title: contactsGroupCharacter,
