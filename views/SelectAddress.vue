@@ -1,22 +1,19 @@
 <template>
   <div>
     <h1 class="h1">{{ title }}</h1>
-    <div class="mb-4 flex gap-x-2.5">
-      <CommonSmallInput v-model.trim="search" placeholder="Address or name" autofocus="desktop">
-        <template #icon>
-          <MagnifyingGlassIcon aria-hidden="true" />
-        </template>
-        <template #right>
-          <label
-            class="aspect-square h-full w-auto scale-125 cursor-pointer rounded p-0.5 transition-colors hover:bg-gray-300"
-          >
-            <QrCodeIcon class="aspect-square h-full w-auto" aria-hidden="true" />
-            <CommonQrAddressInput id="qr-code-input" @selected="emit('selected', $event)" />
-          </label>
-        </template>
-      </CommonSmallInput>
-    </div>
-
+    <CommonSmallInput v-model.trim="search" class="mb-4" placeholder="Address or ENS or contact name" autofocus>
+      <template #icon>
+        <MagnifyingGlassIcon aria-hidden="true" />
+      </template>
+      <template #right>
+        <label
+          class="aspect-square h-full w-auto scale-125 cursor-pointer rounded p-0.5 transition-colors hover:bg-gray-300"
+        >
+          <QrCodeIcon class="aspect-square h-full w-auto" aria-hidden="true" />
+          <CommonQrAddressInput id="qr-code-input" @selected="emit('selected', $event)" />
+        </label>
+      </template>
+    </CommonSmallInput>
     <div v-if="displayedAddresses.length">
       <template v-for="(group, groupIndex) in displayedAddresses" :key="groupIndex">
         <TypographyCategoryLabel v-if="group.title" class="group-category-label">
@@ -49,6 +46,16 @@
         </span>
       </CommonEmptyBlock>
     </div>
+    <div v-else-if="ensParseInProgress">
+      <CommonCardWithLineButtons>
+        <AddressCardLoader />
+      </CommonCardWithLineButtons>
+    </div>
+    <div v-else-if="ensParseError">
+      <CommonErrorBlock @try-again="parseEns">
+        {{ ensParseError }}
+      </CommonErrorBlock>
+    </div>
     <div v-else>
       <CommonEmptyBlock class="search-empty-block">
         Nothing was found for "{{ search }}"
@@ -65,6 +72,8 @@ import { computed, ref } from "vue";
 import { ClockIcon, MagnifyingGlassIcon, QrCodeIcon, UserIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
+
+import useEns from "@/composables/useEnsName";
 
 import type { Contact } from "@/store/contacts";
 import type { TransactionDestination } from "@/store/destinations";
@@ -106,6 +115,7 @@ const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 
 const search = ref("");
 const isAddressValid = computed(() => isAddress(search.value));
+const { address: ensAddress, inProgress: ensParseInProgress, error: ensParseError, parseEns } = useEns(search);
 
 function findContactsByText(contacts: ContactWithIcon[], text: string) {
   const lowercaseSearch = text.toLowerCase();
@@ -117,9 +127,14 @@ function findContactsByText(contacts: ContactWithIcon[], text: string) {
 }
 
 const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
-  if (isAddressValid.value) {
+  if (ensAddress.value?.length) {
     return {
-      name: "",
+      name: search.value,
+      address: checksumAddress(ensAddress.value),
+    };
+  } else if (isAddressValid.value) {
+    return {
+      name: search.value,
       address: checksumAddress(search.value),
     };
   }
