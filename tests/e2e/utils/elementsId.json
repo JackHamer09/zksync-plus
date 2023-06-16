@@ -1,0 +1,85 @@
+{
+  "connectMetamaskButton": "core-connect-metamask-button",
+  "spinner": "loader-spinner",
+  "logo": "sign-in-logo",
+  "nav": {
+    "menu": {
+      "logo": "menu-logo",
+      "template": "menu-nav-",
+      "wallet": "menu-nav-wallet",
+      "bridge": "menu-nav-bridge",
+      "faucet": "menu-nav-faucet"
+    },
+    "wallet": {
+      "balances": "wallet-nav-balances",
+      "transfer": "wallet-nav-transfer",
+      "receive": "wallet-nav-receive"
+    },
+    "bridge": {
+      "deposit": "bridge-nav-deposit",
+      "withdraw": "bridge-nav-withdraw"
+    }
+  },
+  "faucet": {
+    "request": "faucet-request"
+  },
+  "deposit": {
+    "submit": "deposit-submit-transaction"
+  },
+  "transfer": {
+    "submit": "transfer-submit-transaction"
+  },
+  "withdraw": {
+    "submit": "withdraw-submit-transaction",
+    "toggleAddress": "withdraw-to-address-button-toggle"
+  },
+  "tokenLabel": {
+    "buttons": {
+      "edit": "token-label-edit-button",
+      "remove": "token-label-remove-button"
+    }
+  },
+  "tokenDropdown": {
+    "dropdown": "token-dropdown",
+    "item": "token-dropdown-item-",
+    "loading": "token-dropdown-loading"
+  },
+  "amount": {
+    "container": "amount-input-container",
+    "inputField": "amount-input-field",
+    "fieldValue": "amount-field-value",
+    "balance": "amount-balance",
+    "balanceLoading": "amount-balance-loading",
+    "max": "amount-max-button"
+  },
+  "address": {
+    "inputField": "address-block-input-field",
+    "depositInputField": "deposit-address-block-input-field"
+  },
+  "fee": {
+    "field": "fee-field",
+    "value": "fee-value",
+    "loading": "fee-loading"
+  },
+  "balanceInfo": {
+    "balanceAmount": "balance-total-amount",
+    "balanceDecimal": "balance-decimal-amount",
+    "balanceTokenTable": "balance-token-table",
+    "main": "balance-info",
+    "value": "balance-info-value",
+    "loading": "balance-info-loading"
+  },
+  "transaction": {
+    "receiptLinkL1": "transaction-receipt-link-l1",
+    "receiptLinkL2": "transaction-receipt-link-l2",
+    "receiptBack": "transaction-receipt-back",
+    "reset": "transaction-receipt-reset"
+  },
+  "alert": {
+    "transaction": "error-alert",
+    "description": "error-alert-description"
+  },
+  "metamask": {
+    "approveButton": "page-container-footer-next"
+  }
+}

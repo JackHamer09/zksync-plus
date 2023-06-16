@@ -1,8 +1,11 @@
 node_modules
 *.log*
+.idea
 .nuxt
 .nitro
 .cache
 .output
 dist
 .DS_Store
+tests/e2e/src/support/extension
+allure-results
