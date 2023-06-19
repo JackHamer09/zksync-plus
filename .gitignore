@@ -8,4 +8,6 @@ node_modules
 dist
 .DS_Store
 tests/e2e/src/support/extension
+tests/e2e/reports
+tests/e2e/artifacts
 allure-results

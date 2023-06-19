@@ -22,13 +22,8 @@ export enum NetworkSwitcher {
   zkSyncEraMainnet = "/?network=mainnet",
 }
 
-export enum SubDirectory {
-  balances = "/",
-  transfer = "/transfer",
-  receive = "/receive",
-  deposit = "/bridge",
-  withdraw = "/bridge/withdraw",
-  faucet = "/faucet",
+export enum Routes {
+  withdraw = "/transaction/zksync/era/withdraw",
 }
 
 export const mainWalletPhrase = [

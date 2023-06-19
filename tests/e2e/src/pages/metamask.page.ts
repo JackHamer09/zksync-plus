@@ -1,27 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { setTimeout } from "timers/promises";
+
 import { BasePage } from "./base.page";
 import { Extension, MetamaskWallet } from "../data/data";
 import { Helper } from "../helpers/helper";
 import { config } from "../support/config";
 
 import elementsId from "../../utils/elementsId.json";
-import metamaskId from "../../utils/metamaskId.json";
 
 import type { ICustomWorld } from "../support/custom-world";
 
 let page: any;
 let element: any;
-let networkIsChecked: any;
-let metamaskAdvSettingsUrl: string;
 let metamaskHomeUrl: string;
 let metamaskWelcomeUrl: string;
-let metamaskNetworkSettingsUrl: string;
 let testId: any;
 let logoutTrigger: any = undefined;
 
 export class MetamaskPage extends BasePage {
   constructor(world: ICustomWorld) {
     super(world);
+  }
+
+  get continueBtn() {
+    return "//*[@class='transaction-footer-row']//button";
   }
 
   get aggressiveFee() {
@@ -44,20 +46,8 @@ export class MetamaskPage extends BasePage {
     return "//*[@data-testid='advanced-setting-reset-account']//button[1]"; // //button[contains(text(),'Reset')]|
   }
 
-  get metamaskConfirmResetButton() {
-    return "//button[@role='button'][2]"; // //button[text()='Reset']|
-  }
-
-  get startWorkBtn() {
-    return ".button.btn--rounded.btn-primary.first-time-flow__button";
-  }
-
   get extensionDetailsBtn() {
     return "id=detailsButton";
-  }
-
-  get feeCurrency() {
-    return "//*[contains(text(),'$')]";
   }
 
   get acceptMetricsBtn() {
@@ -70,10 +60,6 @@ export class MetamaskPage extends BasePage {
 
   get declineBtn() {
     return "//*[@data-testid='page-container-footer-cancel']";
-  }
-
-  get secretPhraseField() {
-    return "//*[@type='password'][1]";
   }
 
   get newPasswordField() {
@@ -104,10 +90,6 @@ export class MetamaskPage extends BasePage {
     return "//button[@role='button']";
   }
 
-  get arrowDown() {
-    return "data-testid=signature-request-scroll-button";
-  }
-
   get confirmBtn() {
     return "//div[@class='confirmation-footer']//button[2]";
   }
@@ -122,10 +104,6 @@ export class MetamaskPage extends BasePage {
 
   async metamaskValue(value: string) {
     return `@value='${value}'`;
-  }
-
-  async networkAttribute(attribute: string) {
-    return `//*[${this.metamaskFormField} and ${await this.metamaskValue(attribute)}]`;
   }
 
   //metamask home page
@@ -193,39 +171,31 @@ export class MetamaskPage extends BasePage {
     logoutTrigger = false;
   }
 
-  async operateTransaction(triggeredElement: string, actionType: string) {
-    // await this.w
-    // const incorrectNetworkMsg = " Incorrect network selected in your MetaMask wallet ";
-    // if ((await this.world.page?.$(incorrectNetworkMsg)) !== null) {
-    await this.clickBy("xpath", "//div[@class='transaction-footer-row']//button");
-    // };
-
-    const popUpContext = await this.catchPopUpByClick(triggeredElement);
-    await popUpContext?.setViewportSize(config.popUpWindowSize);
-
-    if (networkIsChecked == undefined) {
-      //change network
-      try {
+  async operateTransaction(triggeredElement: string) {
+    //change network
+    try {
+      const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
+      const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);
+      if (await switchNetworkBtnElement.isEnabled()) {
+        console.log("trigger");
+        const popUpContext = await this.catchPopUpByClick(switchNetworkBtnSelector);
+        await popUpContext?.setViewportSize(config.popUpWindowSize);
         await popUpContext?.click(this.confirmBtn);
-        const transactionConfirmationElement: any = await popUpContext
-          ?.locator(this.confirmTransaction)
-          .isVisible(config.increasedTimeout);
-        const networkConfirmationElement: any = await popUpContext
-          ?.locator(this.confirmBtn)
-          .isVisible(config.increasedTimeout);
-        if (!transactionConfirmationElement && networkConfirmationElement) {
-          await popUpContext?.click(this.confirmBtn);
-        }
-      } finally {
-        const transactionContext = await this.catchPopUp();
-        //confirm transaction
-        await this.processTransaction(transactionContext, actionType);
+        await popUpContext?.click(this.confirmBtn);
       }
-    } else {
-      await this.processTransaction(popUpContext, actionType);
+    } finally {
+      await setTimeout(2.5 * 1000);
+      await this.click(this.continueBtn);
+      // const confirmBtnSelector = "//*[@class='alert-body']//button";
+      // const confirmBtn: any = await this.world.page?.locator(confirmBtnSelector);
+      // if (await confirmBtn.isEnabled()) {
+      //   console.log("spotted");
+      //   await this.click(confirmBtn);
+      // }
+      const popUpContext = await this.catchPopUpByClick(`//span[contains(text(),'${triggeredElement}')]`);
+      await popUpContext?.setViewportSize(config.popUpWindowSize);
+      await popUpContext?.click(this.confirmTransaction);
     }
-    networkIsChecked = true;
-    return networkIsChecked;
   }
 
   async catchPopUpByClick(element: string) {
@@ -251,8 +221,6 @@ export class MetamaskPage extends BasePage {
     extractedId = await extractedId.match("\\=(.*)")[1];
     metamaskHomeUrl = Extension.specifiedExtensionUrl + extractedId + Extension.metamaskHomeHtml;
     metamaskWelcomeUrl = metamaskHomeUrl + Extension.metamaskInitialize;
-    metamaskAdvSettingsUrl = metamaskHomeUrl + Extension.metamaskAdvSettings;
-    metamaskNetworkSettingsUrl = metamaskHomeUrl + Extension.metamaskNetworkSettings;
   }
 
   private async processTransaction(context: any, actionType: string) {
@@ -266,32 +234,6 @@ export class MetamaskPage extends BasePage {
     } else {
       console.error("Incorrect actionType value: it should be only confirm or reject");
     }
-  }
-
-  async resetNonce() {
-    page = this.world.page;
-    await page.goto(metamaskAdvSettingsUrl);
-    await this.click(this.metamaskResetButton);
-    await this.click(this.metamaskConfirmResetButton);
-    await page.waitForTimeout(1.5 * 1000);
-  }
-
-  async checkNetworkAttribute(attribute: string) {
-    page = this.world.page;
-    await page.goto(metamaskNetworkSettingsUrl);
-    if (attribute === "zkSync Era Testnet") {
-      element = await this.networkAttribute(metamaskId.zksyncGoerliNetwork.networkName);
-    } else if (attribute === "https://testnet.era.zksync.dev") {
-      element = await this.networkAttribute(metamaskId.zksyncGoerliNetwork.newRpcUrl);
-    } else if (attribute === "280") {
-      element = await this.networkAttribute(metamaskId.zksyncGoerliNetwork.chainId);
-    } else if (attribute === "ETH") {
-      element = await this.networkAttribute(metamaskId.zksyncGoerliNetwork.currencySymbol);
-    } else if (attribute === "https://goerli.explorer.zksync.io") {
-      element = await this.networkAttribute(metamaskId.zksyncGoerliNetwork.blockExplorerUrl);
-    }
-    await page.waitForTimeout(1.5 * 1000);
-    return element;
   }
 
   async selectAggressiveFee(context: any) {
