@@ -177,7 +177,6 @@ export class MetamaskPage extends BasePage {
       const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
       const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);
       if (await switchNetworkBtnElement.isEnabled()) {
-        console.log("trigger");
         const popUpContext = await this.catchPopUpByClick(switchNetworkBtnSelector);
         await popUpContext?.setViewportSize(config.popUpWindowSize);
         await popUpContext?.click(this.confirmBtn);
