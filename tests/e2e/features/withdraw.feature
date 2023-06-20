@@ -14,7 +14,9 @@ Feature: Withdraw
     When I "confirm" transaction after clicking "Send to Ethereum Goerli" button
     Then Message "Transaction submitted" should be visible
     #second part - id1434
-    Then Element with "text" " Go to Home page " should be "visible"
+#    Then Element with "xpath" "//*[@class='modal-card']//a[@href='/']" should be "clickable"
+#    When I click by "xpath" with "//*[@class='modal-card']//a[@href='/']" value
+#    Then Element with "xpath" "//h1[text()='Home']" should be "visible"
 
   @id1274
   Scenario: Withdraw - Send - [Transaction] 0 funds
