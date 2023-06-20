@@ -174,14 +174,7 @@ export class MetamaskPage extends BasePage {
   async operateTransaction(triggeredElement: string) {
     //change network
     try {
-      const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
-      const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);
-      if (await switchNetworkBtnElement.isEnabled()) {
-        const popUpContext = await this.catchPopUpByClick(switchNetworkBtnSelector);
-        await popUpContext?.setViewportSize(config.popUpWindowSize);
-        await popUpContext?.click(this.confirmBtn);
-        await popUpContext?.click(this.confirmBtn);
-      }
+      await this.switchNetwork();
     } finally {
       await setTimeout(2.5 * 1000);
       await this.click(this.continueBtn);
@@ -211,6 +204,17 @@ export class MetamaskPage extends BasePage {
   async catchPopUp() {
     const [popUp] = await Promise.all([this.world.context?.waitForEvent("page")]);
     return popUp;
+  }
+
+  async switchNetwork() {
+    const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
+    const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);
+    if (await switchNetworkBtnElement.isEnabled()) {
+      const popUpContext = await this.catchPopUpByClick(switchNetworkBtnSelector);
+      await popUpContext?.setViewportSize(config.popUpWindowSize);
+      await popUpContext?.click(this.confirmBtn);
+      await popUpContext?.click(this.confirmBtn);
+    }
   }
 
   private async getMetamaskExtensionUrl() {

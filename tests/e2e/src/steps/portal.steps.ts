@@ -6,12 +6,14 @@ import { Helper } from "../helpers/helper";
 import { BasePage } from "../pages/base.page";
 import { LoginPage } from "../pages/login.page";
 import { MainPage } from "../pages/main.page";
+import { MetamaskPage } from "../pages/metamask.page";
 import { config } from "../support/config";
 
 import type { ICustomWorld } from "../support/custom-world";
 
 let basePage: BasePage;
 let mainPage: MainPage;
+let metamaskPage: MetamaskPage;
 let helper: Helper;
 let result: any;
 let element: any;
@@ -61,8 +63,6 @@ When(
     mainPage = new MainPage(this);
     await mainPage.insertAmount(amount);
     await mainPage.chooseToken(token);
-
-    // return await mainPage.skipTestIfFeeIsHigh(); //skip next steps, if fee is higher than expected
   }
 );
 
@@ -109,3 +109,13 @@ Then(
     }
   }
 );
+
+When("I insert {string} as amount", config.stepTimeout, async function (this: ICustomWorld, amount: string) {
+  mainPage = new MainPage(this);
+  await mainPage.insertAmount(amount);
+});
+
+When("I confirm the network switching", config.stepTimeout, async function (this: ICustomWorld) {
+  metamaskPage = new MetamaskPage(this);
+  await metamaskPage.switchNetwork();
+});
