@@ -55,7 +55,7 @@ defineProps({
       @apply font-medium leading-relaxed;
     }
     .destination-item-description {
-      @apply text-sm leading-tight text-gray-secondary;
+      @apply text-sm leading-tight text-gray-secondary dark:text-neutral-400;
     }
   }
   .destination-icon {

@@ -60,7 +60,7 @@
       <CommonEmptyBlock class="search-empty-block">
         Nothing was found for "{{ search }}"
         <br />
-        <span class="mt-1.5 inline-block">Please enter a valid ethereum address</span>
+        <span class="mt-1.5 inline-block">Please enter a valid Ethereum address</span>
       </CommonEmptyBlock>
     </div>
   </div>

@@ -18,13 +18,17 @@ import { watch } from "vue";
 
 import { storeToRefs } from "pinia";
 
-import { useRoute } from "#app";
+import { useRoute, useRouter } from "#app";
 import LoginLayout from "@/layouts/login.vue";
 import { useOnboardStore } from "@/store/onboard";
 import { usePreferencesStore } from "@/store/preferences";
 import LoginPage from "@/views/Login.vue";
 
 const route = useRoute();
+const router = useRouter();
+router.onError((err) => {
+  console.log("\n\n\n\n\n\nrouter error", err, "\n\n\n\n\n\n");
+});
 const { account, isConnectingWallet } = storeToRefs(useOnboardStore());
 const { version } = storeToRefs(usePreferencesStore());
 watch(
@@ -43,6 +47,7 @@ watch(
 watch(
   version,
   () => {
+    document.documentElement.classList.add("dark");
     document.documentElement.classList.remove("lite", "era");
     document.documentElement.classList.add(version.value);
   },

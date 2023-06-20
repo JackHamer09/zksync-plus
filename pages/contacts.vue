@@ -95,7 +95,7 @@
           Enter address in the search bar
           <br />
           <span class="mt-1.5 inline-block">
-            Or <span class="link cursor-pointer" @click="openAddContactModal">create a contact</span>
+            Or <button class="link cursor-pointer" @click="openAddContactModal">create a contact</button>
           </span>
         </CommonEmptyBlock>
       </div>
@@ -103,7 +103,7 @@
         <CommonEmptyBlock class="search-empty-block">
           Nothing was found for "{{ search }}"
           <br />
-          <span class="mt-1.5 inline-block">Please enter a valid ethereum address</span>
+          <span class="mt-1.5 inline-block">Please enter a valid Ethereum address</span>
         </CommonEmptyBlock>
       </div>
     </div>

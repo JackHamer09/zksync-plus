@@ -15,9 +15,7 @@
           <div class="token-balance-amount"><CommonContentLoader :length="20" /></div>
           <div class="token-balance-price"><CommonContentLoader :length="20" /></div>
         </div>
-        <div v-if="sendRouteName" class="send-button">
-          <CommonContentLoader class="send-button-loader" />
-        </div>
+        <CommonIconButton loading class="send-button" />
       </div>
     </template>
   </CommonButtonLineWithImg>
@@ -38,46 +36,6 @@ defineProps({
 
   .token-balance-image-container {
     @apply block aspect-square rounded-full;
-  }
-  .send-button {
-    @apply bg-transparent;
-
-    .send-button-loader {
-      @apply block aspect-square h-full w-full rounded-full;
-    }
-  }
-}
-.token-balance {
-  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
-
-  .token-balance-image-container {
-    @apply h-auto w-full;
-  }
-  .token-info,
-  .token-balances {
-    @apply flex flex-col justify-between whitespace-nowrap;
-
-    .token-symbol,
-    .token-balance-amount {
-      @apply leading-relaxed;
-    }
-    .token-address,
-    .token-balance-price {
-      @apply text-sm leading-tight;
-    }
-  }
-  .token-info {
-    @apply w-full;
-  }
-  .token-balance-side {
-    @apply flex items-center;
-
-    .token-balances {
-      @apply w-max text-right;
-    }
-    .send-button {
-      @apply ml-4 hidden aspect-square h-9 w-auto rounded-full transition-colors xs:block;
-    }
   }
 }
 </style>

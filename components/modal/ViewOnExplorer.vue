@@ -1,5 +1,6 @@
 <template>
   <CommonModal v-bind="$attrs" title="View on explorer">
+    <TypographyCategoryLabel>Recommended</TypographyCategoryLabel>
     <CommonCardWithLineButtons>
       <DestinationItem
         v-bind="destinations.era"
@@ -8,6 +9,10 @@
         :href="`${eraBlockExplorerUrl}/address/${account.address}`"
         target="_blank"
       />
+    </CommonCardWithLineButtons>
+
+    <TypographyCategoryLabel>Other networks</TypographyCategoryLabel>
+    <CommonCardWithLineButtons>
       <DestinationItem
         v-bind="destinations.zkSyncLite"
         as="a"

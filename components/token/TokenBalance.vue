@@ -109,9 +109,9 @@ const displayedAmount = computed(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .token-balance {
-  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
+  @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
   &.is-zero-amount {
     .token-balance-amount,
     .send-button {

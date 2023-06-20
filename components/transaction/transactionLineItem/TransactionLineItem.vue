@@ -1,5 +1,5 @@
 <template>
-  <CommonButtonLineWithImg class="transaction-line-item" :as="as">
+  <CommonButtonLineWithImg class="transaction-line-item" as="a" :href="transactionUrl" target="_blank">
     <template #image>
       <div class="transaction-line-item-icon-container">
         <XMarkIcon v-if="failed" class="transaction-line-item-icon failed-badge-icon" aria-hidden="true" />
@@ -19,14 +19,7 @@
           <slot name="top-right" />
           <slot name="bottom-right" />
         </div>
-        <a
-          v-tooltip="'Click to view on explorer'"
-          :href="transactionUrl"
-          target="_blank"
-          class="view-on-explorer-button"
-        >
-          <ArrowUpRightIcon aria-hidden="true" />
-        </a>
+        <ArrowUpRightIcon class="transaction-line-item-side-icon" aria-hidden="true" />
       </div>
     </template>
   </CommonButtonLineWithImg>
@@ -38,10 +31,6 @@ import { ArrowUpRightIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 import type { Component, PropType } from "vue";
 
 defineProps({
-  as: {
-    type: [String, Object] as PropType<string | Component>,
-    default: "div",
-  },
   icon: {
     type: [String, Object, Function] as PropType<string | Component>,
   },
@@ -61,10 +50,10 @@ defineProps({
   @apply grid grid-cols-[35px_1fr_max-content] items-center gap-2.5 rounded-lg xs:grid-cols-[40px_1fr_max-content] xs:gap-4;
 
   .transaction-line-item-icon-container {
-    @apply relative flex aspect-square h-auto w-full items-center justify-center rounded-full border border-primary-100 bg-primary-100/10;
+    @apply relative flex aspect-square h-auto w-full items-center justify-center rounded-full border border-primary-100 bg-primary-100/10 dark:border-none;
 
     .transaction-line-item-icon {
-      @apply h-4 w-4 text-primary-500;
+      @apply h-4 w-4 text-primary-500 dark:text-white;
       &.failed-badge-icon {
         @apply h-5 w-5 text-red-500;
       }
@@ -100,12 +89,8 @@ defineProps({
     .transaction-line-items {
       @apply w-max text-right;
     }
-    .view-on-explorer-button {
-      @apply ml-4 flex aspect-square h-9 w-auto items-center justify-center rounded-full bg-primary-100/50 transition-colors hover:bg-primary-100/75;
-
-      svg {
-        @apply h-4 w-4 text-primary-400;
-      }
+    .transaction-line-item-side-icon {
+      @apply mr-3 ml-5 h-4 w-4 text-gray-secondary;
     }
   }
 }

@@ -1,7 +1,6 @@
 <template>
   <nav class="navbar-container">
     <ModalNetworkChange v-model:opened="networkChangeModalOpened" />
-    <ModalSupport v-model:opened="supportModalOpened" />
 
     <nav class="navbar-inner">
       <SidebarAccountButton />
@@ -29,10 +28,6 @@
           <span class="navbar-link-label">{{ selectedEthereumNetwork.name }}</span>
           <ChevronDownIcon class="dropdown-icon" aria-hidden="true" />
         </button>
-        <button class="navbar-link navbar-bottom-button support-button" @click="supportModalOpened = true">
-          <HeartIcon class="navbar-link-icon" aria-hidden="true" />
-          <span class="navbar-link-label">Support</span>
-        </button>
       </div>
     </nav>
   </nav>
@@ -41,7 +36,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { ArrowsRightLeftIcon, ChevronDownIcon, HeartIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, ChevronDownIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import { useNetworkStore } from "@/store/network";
@@ -49,7 +44,6 @@ import { useNetworkStore } from "@/store/network";
 const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 
 const networkChangeModalOpened = ref(false);
-const supportModalOpened = ref(false);
 </script>
 
 <style lang="scss" scoped>
@@ -65,15 +59,16 @@ const supportModalOpened = ref(false);
   }
 
   .navbar-inner {
-    @apply grid h-full min-w-[3.5rem] grid-cols-[max-content_1fr] grid-rows-[repeat(2,_max-content)_1fr] bg-white md:max-w-[3.5rem] md:grid-cols-1 md:bg-transparent xl:max-w-[12.5rem]; /* hidden md:block */
+    @apply grid h-full min-w-[3.5rem] grid-cols-[max-content_1fr] grid-rows-[repeat(2,_max-content)_1fr] bg-white dark:bg-neutral-900 md:max-w-[3.5rem] md:grid-cols-1 md:bg-transparent dark:md:bg-transparent xl:max-w-[12.5rem]; /* hidden md:block */
 
     .navbar-links-container {
       @apply flex justify-around space-y-1 pr-3 md:mt-6 md:flex-col md:pr-0;
     }
     .navbar-link {
-      @apply flex items-center rounded-xl bg-transparent text-gray-secondary no-underline transition-colors md:w-full md:py-3 md:px-4 md:hover:bg-gray-200/60;
+      @apply flex items-center rounded-2xl bg-transparent text-gray-secondary no-underline transition-colors md:w-full md:py-3 md:px-4 md:hover:bg-gray-200/60;
+      @apply dark:text-white;
       &.router-link-exact-active {
-        @apply bg-white text-primary-400;
+        @apply bg-white text-primary-400 dark:bg-neutral-900 dark:text-white;
       }
 
       .navbar-link-icon {
@@ -87,16 +82,10 @@ const supportModalOpened = ref(false);
       @apply mt-auto hidden space-y-2 md:block;
 
       .navbar-bottom-button {
-        @apply border bg-gray-100 hover:border-gray-300;
+        @apply border bg-gray-100 hover:border-gray-300 dark:border-none dark:bg-neutral-900;
 
         .navbar-link-label {
           @apply text-sm;
-        }
-      }
-      .support-button {
-        @apply py-2;
-        .navbar-link-icon {
-          @apply text-pink-600/70;
         }
       }
       .network-switch {

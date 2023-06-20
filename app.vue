@@ -7,15 +7,21 @@
 <script lang="ts" setup></script>
 
 <style lang="scss">
+html.dark {
+  @apply bg-neutral-950;
+}
 html,
 body {
-  @apply min-h-full w-full bg-[#f7f7f7] font-sans leading-[1.15] antialiased;
+  @apply min-h-full w-full bg-gray font-sans leading-[1.15] antialiased dark:bg-neutral-950 dark:text-white;
   -webkit-text-size-adjust: 100%;
 
   .link {
-    @apply font-medium text-primary-400 transition-colors;
-    &:enabled:not([aria-disabled="true"]) {
-      @apply hover:text-primary-300;
+    @apply font-medium text-primary-400 transition-colors dark:text-primary-300;
+    &:enabled,
+    &:is(a) {
+      &:not([aria-disabled="true"]) {
+        @apply hover:text-primary-300 dark:hover:text-primary-200;
+      }
     }
   }
 

@@ -6,6 +6,6 @@
 
 <style lang="scss" scoped>
 .category-label {
-  @apply py-4 text-sm font-medium text-gray-secondary;
+  @apply py-4 text-sm font-medium text-gray-secondary dark:text-neutral-200;
 }
 </style>
