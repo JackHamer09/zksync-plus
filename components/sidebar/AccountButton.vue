@@ -35,6 +35,21 @@
             </button>
           </MenuItem>
           <MenuItem v-slot="{ active }" as="template">
+            <button class="account-menu-item" :class="{ active }" @click.prevent="switchColorMode">
+              <div class="account-menu-item-icon overflow-hidden p-2">
+                <transition v-bind="TransitionPrimaryButtonText" mode="out-in">
+                  <MoonIcon
+                    v-if="selectedColorMode === 'dark'"
+                    class="aspect-square h-full w-full"
+                    aria-hidden="true"
+                  />
+                  <SunIcon v-else class="aspect-square h-full w-full" aria-hidden="true" />
+                </transition>
+              </div>
+              Theme
+            </button>
+          </MenuItem>
+          <MenuItem v-slot="{ active }" as="template">
             <button class="account-menu-item" :class="{ active }" @click="viewOnExplorerModalOpened = true">
               <Squares2X2Icon class="account-menu-item-icon p-2" aria-hidden="true" />
               View on explorer
@@ -56,14 +71,17 @@
 import { ref } from "vue";
 
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { ChevronDownIcon, Squares2X2Icon } from "@heroicons/vue/24/outline";
+import { ChevronDownIcon, MoonIcon, Squares2X2Icon, SunIcon } from "@heroicons/vue/24/outline";
 import { PowerIcon } from "@heroicons/vue/24/solid";
 import { useBreakpoints } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
+import useColorMode from "@/composables/useColorMode";
+
 import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 
+const { selectedColorMode, switchColorMode } = useColorMode();
 const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const onboardStore = useOnboardStore();
 
