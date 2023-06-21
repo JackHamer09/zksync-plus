@@ -9,7 +9,7 @@
     "test:unit:ci": "TZ=UTC-3 vitest --environment jsdom --run",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && npm run metamask:install",
+    "postinstall": "nuxt prepare",
     "prepare": "husky install",
     "metamask:install": "METAMASK_VERSION=10.14.1 node tests/e2e/utils/metamaskDownloader.mjs",
     "test:e2e": "cucumber-js --tags \"@withdraw and not @incognito\"",

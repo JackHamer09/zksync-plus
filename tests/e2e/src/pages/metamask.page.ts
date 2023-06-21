@@ -6,8 +6,6 @@ import { Extension, MetamaskWallet } from "../data/data";
 import { Helper } from "../helpers/helper";
 import { config } from "../support/config";
 
-import elementsId from "../../utils/elementsId.json";
-
 import type { ICustomWorld } from "../support/custom-world";
 
 let page: any;
@@ -51,7 +49,7 @@ export class MetamaskPage extends BasePage {
   }
 
   get acceptMetricsBtn() {
-    return elementsId.metamask.approveButton;
+    return "page-container-footer-next";
   }
 
   get confirmTransaction() {

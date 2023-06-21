@@ -7,8 +7,6 @@ import { Routes } from "../data/data";
 import { Helper } from "../helpers/helper";
 import { config } from "../support/config";
 
-import elementsId from "../../utils/elementsId.json";
-
 import type { ICustomWorld } from "../support/custom-world";
 
 let metamaskPage: any;
@@ -27,28 +25,8 @@ export class MainPage extends BasePage {
     return "token-dropDown";
   }
 
-  get walletAddressField() {
-    return "#address";
-  }
-
-  get withdrawAddressField() {
-    return elementsId.address.inputField;
-  }
-
-  get depositAddressField() {
-    return elementsId.address.depositInputField;
-  }
-
-  get feeValue() {
-    return elementsId.fee.value;
-  }
-
   get selectedNetwork() {
     return ".network-item-label";
-  }
-
-  get selectedLanguage() {
-    return ".selected-language-label";
   }
 
   get getFirstToken() {
