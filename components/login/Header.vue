@@ -5,7 +5,7 @@
     <img class="login-header-logo" src="/logo.svg" alt="zkSync Plus" />
     <button class="navbar-link navbar-bottom-button network-switch" @click="networkChangeModalOpened = true">
       <img class="navbar-link-icon" src="/img/ethereum.svg" alt="Selected Ethereum network" />
-      <span class="navbar-link-label">{{ selectedEthereumNetwork.name }}</span>
+      <span class="navbar-link-label" data-testid="network-switcher">{{ selectedEthereumNetwork.name }}</span>
       <ChevronDownIcon class="dropdown-icon" aria-hidden="true" />
     </button>
   </div>

@@ -10,7 +10,7 @@
       <div class="amount-input-token">
         <CommonContentLoader v-if="loading" :length="10" />
         <template v-else-if="selectedToken">
-          <div class="flex items-center" @click="selectTokenModalOpened = true">
+          <div class="flex items-center" @click="selectTokenModalOpened = true" data-testid="token-dropDown">
             <TokenImage class="-ml-0.5 h-5 w-5" v-bind="selectedToken" />
             <span class="ml-1 inline-block">{{ selectedToken.symbol }}</span>
           </div>

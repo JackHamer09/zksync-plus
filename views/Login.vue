@@ -60,7 +60,7 @@
     <h1 class="h1 text-center">Log in to zkSync Plus</h1>
     <button v-if="!account.address" autofocus class="login-btn" @click="onboardStore.openModal">
       <div class="login-btn-inner">
-        <IconsEthereum class="mr-2 h-20 w-auto" />
+        <IconsEthereum class="mr-2 h-20 w-auto" data-testid="login-button" />
         <div class="login-btn-description">Connect your Ethereum wallet to experience zkSync Plus</div>
         <ChevronRightIcon class="block h-6 w-6" aria-hidden="true" />
       </div>

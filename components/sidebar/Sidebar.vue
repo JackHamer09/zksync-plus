@@ -23,6 +23,7 @@
         <button
           v-tooltip="'Change network'"
           class="navbar-link navbar-bottom-button network-switch"
+          data-testid="network-switcher"
           @click="networkChangeModalOpened = true"
         >
           <img class="navbar-link-icon" src="/img/ethereum.svg" alt="Selected Ethereum network" />

@@ -8,7 +8,7 @@
       </AddressAvatar>
     </template>
     <template #default>
-      <div class="address-card-info">
+      <div class="address-card-info" data-testid="your-account">
         <div v-if="name" class="address-card-name">{{ name }}</div>
         <div class="address-card-address" :title="address">{{ shortenAddress(address) }}</div>
       </div>
