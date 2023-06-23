@@ -24,12 +24,10 @@
             v-for="item in group.addresses"
             :name="item.name"
             :address="item.address"
+            :icon="item.icon"
             :key="item.address"
             @click="emit('selected', item.address)"
           >
-            <template #icon v-if="item.icon">
-              <component :is="item.icon" class="mr-3 text-gray-secondary" aria-hidden="true" />
-            </template>
             <template #address-icon v-if="destination">
               <img v-tooltip="destinationTooltip" :src="destination!.iconUrl" :alt="destination!.label" />
             </template>

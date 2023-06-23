@@ -10,12 +10,7 @@
         <EraTransactionLineItem :transaction="transaction" />
       </CommonCardWithLineButtons>
 
-      <CommonAlert
-        v-if="selectedEthereumNetwork.network === 'mainnet'"
-        class="mt-3"
-        variant="neutral"
-        :icon="InformationCircleIcon"
-      >
+      <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
           Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
           after a <a :href="ERA_WITHDRAWAL_DELAY" target="_blank" class="link">~24-hour delay</a>. During this time, the
@@ -51,7 +46,6 @@ import type { EraTransaction } from "@/utils/zksync/era/mappers";
 import type { PropType } from "vue";
 
 import { useDestinationsStore } from "@/store/destinations";
-import { useNetworkStore } from "@/store/network";
 import { ERA_WITHDRAWAL_DELAY } from "@/utils/doc-links";
 
 defineProps({
@@ -61,7 +55,6 @@ defineProps({
   },
 });
 
-const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 </script>
 

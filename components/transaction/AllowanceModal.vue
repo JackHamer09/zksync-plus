@@ -34,7 +34,9 @@
         </a>
       </CommonAlert>
 
-      <div class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm">
+      <div
+        class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm dark:bg-neutral-950 dark:bg-opacity-60"
+      >
         <div class="mx-4 mb-3 border-t border-dashed border-gray-300"></div>
         <div v-if="error" class="mx-4">
           <CommonErrorBlock :retry-button="false" class="mt-3">
@@ -85,15 +87,11 @@
           :icon="LockOpenIcon"
           :transaction-url="`${blockExplorerUrl}/tx/${transactionReceipt?.hash}`"
         >
-          <template #top-left>
-            <div class="transaction-line-label">Allowance</div>
-          </template>
+          <template #top-left>Allowance</template>
           <template #top-right>
             <TokenAmount :token="transaction.token" :amount="transaction.amount" />
           </template>
-          <template #bottom-right>
-            <div class="transaction-line-item-price">Approved amount</div>
-          </template>
+          <template #bottom-right>Approved amount</template>
         </TransactionLineItem>
       </CommonCardWithLineButtons>
 

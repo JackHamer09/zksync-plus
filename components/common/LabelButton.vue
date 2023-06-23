@@ -17,11 +17,11 @@ defineProps({
 
 <style lang="scss" scoped>
 .label-button {
-  @apply block text-sm font-medium text-primary-400 transition-colors;
+  @apply block text-sm font-medium text-primary-400 transition-colors dark:text-primary-500;
   &:enabled,
   &:is(a) {
     &:not([aria-disabled="true"]) {
-      @apply hover:text-primary-300;
+      @apply hover:text-primary-300 dark:hover:text-primary-400;
     }
   }
 }

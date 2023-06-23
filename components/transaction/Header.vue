@@ -48,7 +48,7 @@ defineProps({
       @apply pb-1;
     }
     .transaction-header-address {
-      @apply text-sm font-semibold text-primary-400;
+      @apply text-sm font-semibold text-primary-400 dark:text-primary-200;
     }
   }
   .transaction-header-avatar {

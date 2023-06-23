@@ -109,7 +109,7 @@ watch(
   }
 
   .app-layout-main {
-    @apply flex flex-col px-4 py-2 md:px-0 md:py-4;
+    @apply flex min-h-0 min-w-0 flex-col px-4 py-2 md:px-0 md:py-4;
     grid-area: main / main / main / main;
   }
 }

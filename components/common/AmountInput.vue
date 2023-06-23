@@ -250,7 +250,6 @@ const recalculateInputWidth = () => {
     }
   }
   &.has-error {
-    // @apply bg-red-100;
     @apply ring-1 ring-inset ring-red-500;
   }
 
@@ -263,12 +262,12 @@ const recalculateInputWidth = () => {
     @apply flex flex-row-reverse items-center justify-start gap-2 overflow-hidden pl-2;
 
     .amount-input-max-button {
-      @apply rounded bg-primary-100/50 px-1.5 py-1 text-xs font-medium uppercase text-primary-400 transition-all;
+      @apply rounded bg-primary-100/50 px-1.5 py-1 text-xs font-medium uppercase text-primary-400 transition-all dark:bg-neutral-700 dark:text-neutral-400;
       &:not(.is-max) {
-        @apply cursor-pointer hover:bg-primary-100;
+        @apply cursor-pointer hover:bg-primary-100 dark:hover:bg-neutral-600;
       }
       &.is-max {
-        @apply cursor-default bg-primary-600 text-white;
+        @apply cursor-default bg-primary-600 text-white dark:bg-primary-300;
       }
     }
     .amount-input-field {

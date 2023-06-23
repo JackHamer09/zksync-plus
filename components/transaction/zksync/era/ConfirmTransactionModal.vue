@@ -30,7 +30,9 @@
 
       <TransactionFeeDetails class="my-2" label="Fee:" :fee-token="feeToken" :fee-amount="lastFee" />
 
-      <div class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm">
+      <div
+        class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm dark:bg-neutral-950 dark:bg-opacity-60"
+      >
         <slot name="alerts" />
         <div class="mx-4 mb-3 border-t border-dashed border-gray-300"></div>
         <TransactionFeeDetails
@@ -55,7 +57,7 @@
           </CommonErrorBlock>
         </div>
         <a
-          v-if="destination.key === 'ethereum' && selectedEthereumNetwork.network === 'mainnet'"
+          v-if="destination.key === 'ethereum'"
           class="link mx-auto mt-2 -mb-1 flex items-center justify-center text-center text-sm"
           :href="ERA_WITHDRAWAL_DELAY"
           target="_blank"
@@ -119,7 +121,6 @@ import type { BigNumberish } from "ethers";
 import type { PropType } from "vue";
 
 import { useDestinationsStore } from "@/store/destinations";
-import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { usePreferencesStore } from "@/store/preferences";
 import { useEraProviderStore } from "@/store/zksync/era/provider";
@@ -175,7 +176,6 @@ const eraTransactionsHistoryStore = useEraTransactionsHistoryStore();
 const walletEraStore = useEraWalletStore();
 const eraProviderStore = useEraProviderStore();
 const { account, walletName } = storeToRefs(useOnboardStore());
-const { selectedEthereumNetwork } = storeToRefs(useNetworkStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());
 

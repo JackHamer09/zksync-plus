@@ -81,13 +81,10 @@
           <AddressCard
             :name="inputtedContact.name"
             :address="inputtedContact.address"
+            :icon="PlusIcon"
             :key="inputtedContact.address"
             @click="addInputtedAddress"
-          >
-            <template #right>
-              <CommonIconButton as="div" :icon="PlusIcon" />
-            </template>
-          </AddressCard>
+          />
         </CommonCardWithLineButtons>
       </div>
       <div v-else-if="!search">

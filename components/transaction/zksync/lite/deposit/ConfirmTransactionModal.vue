@@ -30,7 +30,9 @@
 
       <TransactionFeeDetails class="my-2" label="Fee:" :fee-token="feeToken" :fee-amount="lastFee" />
 
-      <div class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm">
+      <div
+        class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm dark:bg-neutral-950 dark:bg-opacity-60"
+      >
         <div class="mx-4 mb-3 border-t border-dashed border-gray-300"></div>
         <TransactionFeeDetails
           v-for="(item, index) in totalOfEachToken"
@@ -87,9 +89,7 @@
           :icon="transactionReceiptIcon"
           :transaction-url="`${blockExplorerUrl}/tx/${ethTransactionHash}`"
         >
-          <template #top-left>
-            <div class="transaction-line-label">Deposit</div>
-          </template>
+          <template #top-left>Deposit</template>
           <template #top-right>
             <TokenAmount
               :token="transaction.token"

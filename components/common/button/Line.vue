@@ -17,8 +17,7 @@ defineProps({
 
 <style lang="scss" scoped>
 .line-button-container {
-  @apply h-[59.5px] w-full rounded-[1.24rem] p-2 transition-colors dark:bg-neutral-900;
-  text-align: inherit;
+  @apply w-full rounded-[1.24rem] p-2 transition-colors dark:bg-neutral-900;
   &:enabled,
   &:is(a) {
     &:not([aria-disabled="true"]) {
