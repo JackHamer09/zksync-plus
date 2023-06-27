@@ -8,7 +8,7 @@
       </AddressAvatar>
     </template>
     <template #default>
-      <CommonButtonLineBodyInfo class="text-left">
+      <CommonButtonLineBodyInfo class="text-left" data-testid="your-account">
         <template #label v-if="name">{{ name }} </template>
         <template #underline>
           <span class="address-card-address" :title="address">{{ shortenAddress(address) }}</span>

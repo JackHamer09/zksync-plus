@@ -22,6 +22,7 @@
         <button
           v-tooltip="'Change network'"
           class="navbar-link navbar-bottom-button network-switch"
+          data-testid="network-switcher"
           @click="networkChangeModalOpened = true"
         >
           <IconsEra v-if="version === 'era'" class="navbar-link-icon" />

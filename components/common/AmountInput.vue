@@ -14,6 +14,7 @@
             type="button"
             class="flex w-max items-center space-x-1.5"
             @click.prevent="selectTokenModalOpened = true"
+            data-testid="token-dropDown"
           >
             <TokenImage class="-ml-0.5 h-5 w-5" v-bind="selectedToken" />
             <span class="inline-block">{{ selectedToken.symbol }}</span>

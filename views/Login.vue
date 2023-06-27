@@ -60,7 +60,7 @@
     </div>
 
     <h1 class="h1 text-center">zkSync Portal</h1>
-    <button autofocus class="login-btn" @click="onboardStore.openModal">
+    <button autofocus class="login-btn" @click="onboardStore.openModal" data-testid="login-button">
       <div class="login-btn-inner">
         <IconsEra class="login-btn-icon" />
         <div class="login-btn-description">Connect your Ethereum wallet to zkSync Portal</div>
@@ -69,17 +69,15 @@
     </button>
 
     <footer class="login-footer">
-      <div>
-        <button class="network-switch" @click="networkChangeModalOpened = true">
-          <IconsEra v-if="version === 'era'" class="navbar-link-icon" />
-          <IconsZkSyncLite v-else-if="version === 'lite'" class="navbar-link-icon" />
-          <span class="navbar-link-label">
-            <span class="capitalize">{{ version }}</span>
-            {{ selectedEthereumNetwork.network === "mainnet" ? selectedEthereumNetwork.name : "Testnet" }}
-          </span>
-          <ChevronDownIcon class="dropdown-icon" aria-hidden="true" />
-        </button>
-      </div>
+      <button class="network-switch" @click="networkChangeModalOpened = true" data-testid="network-switcher">
+        <IconsEra v-if="version === 'era'" class="navbar-link-icon" />
+        <IconsZkSyncLite v-else-if="version === 'lite'" class="navbar-link-icon" />
+        <span class="navbar-link-label">
+          <span class="capitalize">{{ version }}</span>
+          {{ selectedEthereumNetwork.network === "mainnet" ? selectedEthereumNetwork.name : "Testnet" }}
+        </span>
+        <ChevronDownIcon class="dropdown-icon" aria-hidden="true" />
+      </button>
       <div></div>
       <a
         href="https://github.com/matter-labs/dapp-portal"
