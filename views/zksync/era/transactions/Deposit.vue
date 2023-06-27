@@ -90,8 +90,8 @@
             <button type="button" class="link inline underline underline-offset-2" @click="setAmountToAllowance">
               {{ parseTokenAmount(allowance!, selectedToken!.decimals) }}
             </button>
-            <span class="wrap-balance">
-              &nbsp;Depositing more than that will require you to approve a new allowance.
+            <span class="block wrap-balance">
+              Depositing more than that will require you to approve a new allowance.
             </span>
           </p>
           <a :href="TOKEN_ALLOWANCE" target="_blank" class="alert-link">
