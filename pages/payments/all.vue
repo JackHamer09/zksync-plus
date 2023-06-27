@@ -1,5 +1,5 @@
 <template>
-  <BackButton :fallback="{ name: 'transactions' }" />
+  <BackButton :fallback="{ name: 'payments' }" />
   <CommonPage title="All transactions">
     <template #era>
       <AllTransactionsEra />
@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import AllTransactionsEra from "@/views/zksync/era/transactions/All.vue";
-import AllTransactionsLite from "@/views/zksync/lite/transactions/All.vue";
+import AllTransactionsEra from "@/views/zksync/era/payments/All.vue";
+import AllTransactionsLite from "@/views/zksync/lite/payments/All.vue";
 </script>
 
 <style lang="scss" scoped></style>
