@@ -116,6 +116,19 @@ const networkChangeModalOpened = ref(false);
 </script>
 
 <style lang="scss" scoped>
+.lite.dark {
+  .login-view {
+    .login-btn {
+      @apply bg-primary-300;
+      &:hover:not(:disabled),
+      &:focus:not(:disabled) {
+        .login-btn-inner {
+          @apply bg-primary-200/20;
+        }
+      }
+    }
+  }
+}
 .login-view {
   @apply sm:pb-20;
 
