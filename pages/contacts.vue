@@ -33,12 +33,7 @@
           <MagnifyingGlassIcon aria-hidden="true" />
         </template>
         <template #right>
-          <label
-            class="aspect-square h-full w-auto scale-125 cursor-pointer rounded p-0.5 transition-colors hover:bg-gray-300"
-          >
-            <QrCodeIcon class="aspect-square h-full w-auto" aria-hidden="true" />
-            <CommonQrAddressInput id="qr-code-input" @selected="search = $event" />
-          </label>
+          <CommonQrUploadIconButton class="md:hidden" id="qr-code-input" @selected="search = $event" />
         </template>
       </CommonSmallInput>
 
@@ -110,7 +105,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 
-import { MagnifyingGlassIcon, PaperAirplaneIcon, PlusIcon, QrCodeIcon } from "@heroicons/vue/24/outline";
+import { MagnifyingGlassIcon, PaperAirplaneIcon, PlusIcon } from "@heroicons/vue/24/outline";
 import { isAddress } from "ethers/lib/utils";
 import { storeToRefs } from "pinia";
 
