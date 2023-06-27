@@ -55,9 +55,7 @@
     </transition>
 
     <div v-if="buttonStep === 'network'" class="transaction-footer-row">
-      <div class="mb-2 text-center text-sm text-gray-secondary">
-        Incorrect network selected in your {{ walletName }} wallet
-      </div>
+      <CommonButtonTopInfo>Incorrect network selected in your {{ walletName }} wallet</CommonButtonTopInfo>
       <CommonButton
         :disabled="switchingNetworkInProgress"
         variant="primary-solid"
@@ -67,9 +65,7 @@
       </CommonButton>
     </div>
     <div v-else-if="buttonStep === 'authorize'" class="transaction-footer-row">
-      <button class="link mb-2 text-sm underline-offset-2" @click="modalWalletAuthorizationOpened = true">
-        What is authorization?
-      </button>
+      <CommonButtonTopLink @click="modalWalletAuthorizationOpened = true">What is authorization?</CommonButtonTopLink>
       <CommonButton
         :disabled="authorizationInProgress || accountActivationCheckInProgress"
         variant="primary-solid"
@@ -79,9 +75,9 @@
       </CommonButton>
     </div>
     <div v-else-if="buttonStep === 'activate'" class="transaction-footer-row">
-      <button class="link mb-2 text-sm underline-offset-2" @click="modalAccountActivationOpened = true">
+      <CommonButtonTopLink @click="modalAccountActivationOpened = true">
         What is account activation?
-      </button>
+      </CommonButtonTopLink>
       <CommonButton
         :disabled="!canSignAccountActivation || accountActivationSigningInProgress"
         variant="primary-solid"
@@ -94,7 +90,7 @@
       <slot name="after-checks" />
     </div>
 
-    <TransactionContinueInWallet :opened="continueInWalletTipDisplayed" />
+    <TransactionButtonUnderlineContinueInWallet :opened="continueInWalletTipDisplayed" />
   </div>
 </template>
 

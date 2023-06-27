@@ -1,8 +1,8 @@
 <template>
-  <div class="w-full rounded-xl bg-white p-3">
+  <div class="w-full rounded-xl bg-white p-3 dark:bg-neutral-900">
     <div class="flex justify-between">
-      <div class="text-sm text-gray-secondary">{{ label }}</div>
-      <button v-if="content" class="text-sm font-medium text-primary-400" @click="copy">
+      <div class="text-sm text-gray-secondary dark:text-neutral-400">{{ label }}</div>
+      <button v-if="content" class="text-sm font-medium text-primary-400 dark:text-primary-500" @click="copy">
         <template v-if="!copied">
           <DocumentDuplicateIcon class="relative -top-px inline-block h-4 w-4" aria-hidden="true" />
           Copy

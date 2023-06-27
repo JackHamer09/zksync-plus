@@ -15,7 +15,6 @@
             :destination="destinations.ethereum"
             :tooltip="`Add funds from ${destinations.ethereum.label} (L1)`"
           />
-          <div class="-mx-1 border-b border-dashed"></div>
           <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" />
         </CommonCardWithLineButtons>
         <TransactionItemIcon :icon="ArrowDownIcon" />
@@ -30,50 +29,40 @@
 
       <TransactionFeeDetails class="my-2" label="Fee:" :fee-token="feeToken" :fee-amount="lastFee" />
 
-      <div
-        class="sticky bottom-0 z-[1] mt-auto w-full bg-gray bg-opacity-60 backdrop-blur-sm dark:bg-neutral-950 dark:bg-opacity-60"
-      >
-        <div class="mx-4 mb-3 border-t border-dashed border-gray-300"></div>
-        <TransactionFeeDetails
-          v-for="(item, index) in totalOfEachToken"
-          class="-my-0.5"
-          :key="item.token.address"
-          :label="index === 0 ? 'Total:' : ''"
-          :fee-token="item.token"
-          :fee-amount="item.amount"
-        />
-        <transition v-bind="TransitionAlertScaleInOutTransition">
-          <div v-if="!buttonDisabled && newFeeAlert" class="mx-4 mt-3">
-            <CommonAlert variant="warning" :icon="ExclamationCircleIcon">
-              <p>Fee has changed since you started the transaction. Please confirm the updated fee to proceed.</p>
-              <CommonButton @click="newFeeAlert = false">Confirm</CommonButton>
-            </CommonAlert>
-          </div>
-        </transition>
-        <div v-if="error" class="mx-4">
-          <CommonErrorBlock :retry-button="false" class="mt-3">
-            {{ error.message }}
-          </CommonErrorBlock>
-        </div>
-        <CommonButton
-          :disabled="buttonDisabled || newFeeAlert || status !== 'not-started'"
-          class="mx-auto mt-3"
-          variant="primary-solid"
-          @click="makeTransaction"
-        >
-          <transition v-bind="TransitionPrimaryButtonText" mode="out-in">
-            <span v-if="status === 'processing'">Processing...</span>
-            <span v-else-if="status === 'waiting-for-signature'">Waiting for confirmation</span>
-            <span v-else>Add funds to {{ destinations.zkSyncLite.label }}</span>
+      <TransactionConfirmModalFooter>
+        <template #alerts>
+          <slot name="alerts" />
+        </template>
+        <template #default>
+          <TransactionTotalByToken :total-by-token="totalOfEachToken" />
+          <transition v-bind="TransitionAlertScaleInOutTransition">
+            <div v-if="!buttonDisabled && newFeeAlert" class="mx-4 mt-3">
+              <CommonAlert variant="warning" :icon="ExclamationCircleIcon">
+                <p>Fee has changed since you started the transaction. Please confirm the updated fee to proceed.</p>
+                <CommonButton @click="newFeeAlert = false">Confirm</CommonButton>
+              </CommonAlert>
+            </div>
           </transition>
-        </CommonButton>
-        <CommonHeightTransition :opened="status === 'waiting-for-signature'">
-          <div class="text-center text-sm font-medium text-gray-500">
-            <div class="pt-1"></div>
-            Confirm this transaction in your {{ walletName }} wallet
+          <div v-if="error" class="mx-4">
+            <CommonErrorBlock :retry-button="false" class="mt-3">
+              {{ error.message }}
+            </CommonErrorBlock>
           </div>
-        </CommonHeightTransition>
-      </div>
+          <CommonButton
+            :disabled="buttonDisabled || newFeeAlert || status !== 'not-started'"
+            class="mx-auto mt-3"
+            variant="primary-solid"
+            @click="makeTransaction"
+          >
+            <transition v-bind="TransitionPrimaryButtonText" mode="out-in">
+              <span v-if="status === 'processing'">Processing...</span>
+              <span v-else-if="status === 'waiting-for-signature'">Waiting for confirmation</span>
+              <span v-else>Add funds to {{ destinations.zkSyncLite.label }}</span>
+            </transition>
+          </CommonButton>
+          <TransactionButtonUnderlineConfirmTransaction :opened="status === 'waiting-for-signature'" />
+        </template>
+      </TransactionConfirmModalFooter>
     </div>
   </CommonModal>
 
@@ -121,11 +110,11 @@
         </a>
       </CommonAlert>
 
-      <div class="sticky bottom-0 z-[1] mt-auto flex w-full flex-col items-center">
-        <CommonButton as="RouterLink" :to="{ name: 'index' }" class="mx-auto mt-8" variant="primary-solid">
+      <TransactionConfirmModalFooter>
+        <CommonButton as="RouterLink" :to="{ name: 'index' }" class="mx-auto mt-4" variant="primary-solid">
           Go to Home page
         </CommonButton>
-      </div>
+      </TransactionConfirmModalFooter>
     </div>
   </CommonModal>
 </template>
@@ -203,7 +192,7 @@ const closeModal = () => emit("update:opened", false);
 const liteTransactionsHistoryStore = useLiteTransactionsHistoryStore();
 const walletLiteStore = useLiteWalletStore();
 const liteEthereumBalanceStore = useLiteEthereumBalanceStore();
-const { account, walletName } = storeToRefs(useOnboardStore());
+const { account } = storeToRefs(useOnboardStore());
 const { destinations } = storeToRefs(useDestinationsStore());
 const { blockExplorerUrl } = storeToRefs(useNetworkStore());
 const { previousTransactionAddress } = storeToRefs(usePreferencesStore());

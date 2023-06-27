@@ -27,7 +27,7 @@
       <slot name="after-checks" />
     </div>
 
-    <TransactionContinueInWallet :opened="continueInWalletTipDisplayed" />
+    <TransactionButtonUnderlineContinueInWallet :opened="continueInWalletTipDisplayed" />
   </div>
 </template>
 

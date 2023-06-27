@@ -19,7 +19,7 @@
   @apply leading-tight;
   .button-line-body-info-label,
   .button-line-body-info-secondary {
-    @apply min-h-[1.5rem] overflow-hidden text-ellipsis;
+    @apply inline min-h-[1.5rem] overflow-hidden text-ellipsis align-middle;
   }
   .button-line-body-info-label {
     @apply font-medium;

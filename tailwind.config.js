@@ -26,6 +26,14 @@ module.exports = {
           input: "#edeff2",
           "input-focus": "#dfe3e7",
         },
+        warning: {
+          400: "#FFC81A",
+          600: "#E5AF00",
+        },
+        success: {
+          400: "#33FF99",
+          600: "#00CC66",
+        },
       },
     },
     screens: {
@@ -39,7 +47,7 @@ module.exports = {
     },
   },
   plugins: [
-    plugin(function ({ addBase, theme }) {
+    plugin(function ({ addBase, addUtilities, theme }) {
       addBase({
         ".h1": {
           fontSize: "32px",
@@ -54,6 +62,11 @@ module.exports = {
           lineHeight: theme("lineHeight.tight"),
           paddingTop: theme("padding.5"),
           paddingBottom: theme("padding.4"),
+        },
+      });
+      addUtilities({
+        ".wrap-balance": {
+          textWrap: "balance",
         },
       });
     }),

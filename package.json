@@ -1,6 +1,6 @@
 {
-  "name": "zksync-plus",
-  "description": "zkSync Plus - all in one wallet for zkSync",
+  "name": "zksync-portal",
+  "description": "zkSync Portal - all in one wallet for zkSync",
   "private": true,
   "scripts": {
     "build": "nuxt build",

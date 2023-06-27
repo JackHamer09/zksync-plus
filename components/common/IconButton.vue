@@ -29,6 +29,21 @@ defineProps({
 </script>
 
 <style lang="scss" scoped>
+.lite.dark {
+  .icon-button {
+    &.variant- {
+      &primary {
+        @apply bg-primary-400;
+        &:enabled,
+        &:is(a, label) {
+          &:not([aria-disabled="true"]) {
+            @apply hover:bg-primary-300;
+          }
+        }
+      }
+    }
+  }
+}
 .icon-button {
   @apply flex aspect-square h-9 w-auto items-center justify-center rounded-full transition-colors;
   &:is(label) {
@@ -37,10 +52,11 @@ defineProps({
   &.variant- {
     &primary {
       @apply bg-primary-100/50 text-primary-400;
+      @apply dark:bg-primary-300 dark:text-white;
       &:enabled,
       &:is(a, label) {
         &:not([aria-disabled="true"]) {
-          @apply hover:bg-primary-100/75;
+          @apply hover:bg-primary-100/75 dark:hover:bg-primary-200;
         }
       }
     }

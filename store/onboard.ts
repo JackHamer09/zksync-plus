@@ -24,7 +24,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     autoConnect: true,
     connectors: w3mConnectors({
       projectId: env.walletConnectProjectID,
-      version: 1,
+      version: 2,
       chains: extendedChains,
     }),
     provider,

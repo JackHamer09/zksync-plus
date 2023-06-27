@@ -23,8 +23,31 @@ defineProps({
 </script>
 
 <style lang="scss">
+.lite.dark {
+  .default-button {
+    &.variant- {
+      &primary {
+        @apply bg-primary-400;
+        &:enabled,
+        &:is(a, label) {
+          &:not([aria-disabled="true"]) {
+            @apply hover:bg-primary-300;
+          }
+        }
+      }
+      &primary-solid {
+        &:enabled,
+        &:is(a, label) {
+          &:not([aria-disabled="true"]) {
+            @apply hover:bg-primary-300;
+          }
+        }
+      }
+    }
+  }
+}
 .default-button {
-  @apply flex h-[3rem] w-max items-center justify-center rounded-3xl px-4 text-sm font-medium backdrop-blur-sm transition-colors;
+  @apply flex h-[3rem] w-max items-center justify-center rounded-3xl px-4 text-center text-sm font-medium backdrop-blur-sm transition-colors wrap-balance;
   &:is(label) {
     @apply cursor-pointer;
   }
@@ -49,15 +72,15 @@ defineProps({
       }
       &:disabled,
       &[aria-disabled="true"] {
-        @apply bg-opacity-50;
+        @apply bg-opacity-50 dark:bg-neutral-900 dark:bg-opacity-50;
       }
     }
     &error {
-      @apply bg-red-100/50 text-red-400;
+      @apply bg-red-100/50 text-red-400 dark:bg-red-700 dark:text-white;
       &:enabled,
       &:is(a, label) {
         &:not([aria-disabled="true"]) {
-          @apply hover:bg-red-100/75;
+          @apply hover:bg-red-100/75 dark:hover:bg-red-600;
         }
       }
     }
