@@ -132,7 +132,7 @@ const inputtedAddressAccount = computed<ContactWithIcon | null>(() => {
     };
   } else if (isAddressValid.value) {
     return {
-      name: search.value,
+      name: "",
       address: checksumAddress(search.value),
     };
   }

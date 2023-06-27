@@ -23,7 +23,7 @@
       <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
           It can take <span class="font-medium">up to 7 hours</span> until funds arrive on
-          <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
+          <span class="font-medium">{{ destinations.ethereum.label }}</span>
         </p>
         <a :href="LITE_WITHDRAWAL_TIMES" target="_blank" class="alert-link">
           Learn more

@@ -13,7 +13,7 @@
           <AddressCardParsed
             :address="account.address!"
             :destination="destinations.ethereum"
-            :tooltip="`Add funds from ${destinations.ethereum.label} (L1)`"
+            :tooltip="`Add funds from ${destinations.ethereum.label}`"
           />
           <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" />
         </CommonCardWithLineButtons>
@@ -22,7 +22,7 @@
           <AddressCardParsed
             :address="transaction.to"
             :destination="destinations.era"
-            :tooltip="`Add funds to ${destinations.era.label} (L2)`"
+            :tooltip="`Add funds to ${destinations.era.label}`"
           />
         </CommonCardWithLineButtons>
       </template>
@@ -99,10 +99,10 @@
 
       <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
-          Your funds will be available on <span class="font-medium">{{ destinations.era.label }}</span> (L2) after the
-          transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1) and then
-          processed on <span class="font-medium">{{ destinations.era.label }}</span> (L2). You are free to close this
-          page.
+          Your funds will be available on <span class="font-medium">{{ destinations.era.label }}</span> after the
+          transaction is committed on <span class="font-medium">{{ destinations.ethereum.label }}</span> and then
+          processed on <span class="font-medium">{{ destinations.era.label }}</span
+          >. You are free to close this page.
         </p>
         <a :href="`${blockExplorerUrl}/tx/${ethTransactionHash}`" target="_blank" class="alert-link">
           Track status

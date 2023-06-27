@@ -39,6 +39,9 @@ function toggleMenu(isOpened: boolean, open: boolean) {
   if ((open && !isOpened) || (!open && isOpened)) {
     button.value.$el.click();
   }
+  if (!open && isOpened) {
+    button.value.$el.blur();
+  }
 }
 </script>
 

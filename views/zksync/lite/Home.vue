@@ -50,7 +50,7 @@
           <template v-else>
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">
               <div class="wrap-balance">
-                You don't have any balances on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span> (L2)
+                You don't have any balances on <span class="font-medium">{{ destinations.zkSyncLite.label }}</span>
               </div>
               <span class="mt-1.5 inline-block">
                 Proceed to

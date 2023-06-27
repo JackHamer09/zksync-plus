@@ -25,7 +25,7 @@
           <AddressCardParsed
             :address="account.address!"
             :destination="destinations.zkSyncLite"
-            :tooltip="`${getActionName(item.type)} from ${destinations.zkSyncLite.label} (L2)`"
+            :tooltip="`${getActionName(item.type)} from ${destinations.zkSyncLite.label}`"
           />
           <TokenBalance v-bind="item.token" as="div" :amount="item.amount" />
         </CommonCardWithLineButtons>

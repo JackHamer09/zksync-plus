@@ -12,8 +12,8 @@
 
       <CommonAlert class="mt-3" variant="neutral" :icon="InformationCircleIcon">
         <p>
-          Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> (L1)
-          after a <a :href="ERA_WITHDRAWAL_DELAY" target="_blank" class="link">~24-hour delay</a>. During this time, the
+          Your funds will be available on the <span class="font-medium">{{ destinations.ethereum.label }}</span> after a
+          <a :href="ERA_WITHDRAWAL_DELAY" target="_blank" class="link">~24-hour delay</a>. During this time, the
           transaction will be processed and finalized. You are free to close this page.
         </p>
         <a :href="ERA_WITHDRAWAL_DELAY" target="_blank" class="alert-link">

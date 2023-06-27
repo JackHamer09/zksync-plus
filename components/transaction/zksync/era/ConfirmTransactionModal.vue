@@ -13,7 +13,7 @@
           <AddressCardParsed
             :address="account.address!"
             :destination="destinations.era"
-            :tooltip="`${transactionActionName} from ${destinations.era.label} (L2)`"
+            :tooltip="`${transactionActionName} from ${destinations.era.label}`"
           />
           <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" />
         </CommonCardWithLineButtons>

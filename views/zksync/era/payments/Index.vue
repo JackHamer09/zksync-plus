@@ -40,7 +40,7 @@
           <template v-else>
             <CommonEmptyBlock class="mx-3 mb-3 mt-1">
               You currently don't have any transactions on
-              <span class="font-medium">{{ destinations.era.label }}</span> (L2)
+              <span class="font-medium">{{ destinations.era.label }}</span>
             </CommonEmptyBlock>
           </template>
         </div>
