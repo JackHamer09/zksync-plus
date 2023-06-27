@@ -48,15 +48,15 @@ const networks = computed(() => {
   return [
     {
       destination: destinations.value.era,
-      link: `${eraBlockExplorerUrl.value}/address/${account.value}`,
+      link: `${eraBlockExplorerUrl.value}/address/${account.value.address}`,
     },
     {
       destination: destinations.value.zkSyncLite,
-      link: `${liteBlockExplorerUrl.value}/address/${account.value}`,
+      link: `${liteBlockExplorerUrl.value}/address/${account.value.address}`,
     },
     {
       destination: destinations.value.ethereum,
-      link: `${ethereumBlockExplorerUrl.value}/address/${account.value}`,
+      link: `${ethereumBlockExplorerUrl.value}/address/${account.value.address}`,
     },
   ];
 });

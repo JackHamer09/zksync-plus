@@ -32,6 +32,7 @@
           type="text"
           maxlength="20"
           spellcheck="false"
+          autocomplete="false"
           :style="{ width: `${inputWidth}px` }"
           @keyup.enter="emit('enter')"
         />
