@@ -36,7 +36,7 @@
           Make another transaction
         </CommonButtonTopLink>
         <CommonButton as="RouterLink" :to="{ name: 'index' }" class="mx-auto" variant="primary-solid">
-          Go to Home page
+          Go to Assets page
         </CommonButton>
       </TransactionConfirmModalFooter>
     </div>

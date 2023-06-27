@@ -6,12 +6,12 @@
       <SidebarAccountButton />
       <div class="navbar-links-container">
         <NuxtLink :to="{ name: 'index' }" class="navbar-link">
-          <HomeIcon class="navbar-link-icon" aria-hidden="true" />
-          <span class="navbar-link-label">Home</span>
+          <WalletIcon class="navbar-link-icon" aria-hidden="true" />
+          <span class="navbar-link-label">Assets</span>
         </NuxtLink>
         <NuxtLink :to="{ name: 'payments' }" class="navbar-link">
           <ArrowsRightLeftIcon class="navbar-link-icon" aria-hidden="true" />
-          <span class="navbar-link-label">Payments</span>
+          <span class="navbar-link-label">Transactions</span>
         </NuxtLink>
         <NuxtLink :to="{ name: 'contacts' }" class="navbar-link">
           <UserGroupIcon class="navbar-link-icon" aria-hidden="true" />
@@ -41,7 +41,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-import { ArrowsRightLeftIcon, ChevronDownIcon, HomeIcon, UserGroupIcon } from "@heroicons/vue/24/outline";
+import { ArrowsRightLeftIcon, ChevronDownIcon, UserGroupIcon, WalletIcon } from "@heroicons/vue/24/outline";
 import { storeToRefs } from "pinia";
 
 import { useNetworkStore } from "@/store/network";

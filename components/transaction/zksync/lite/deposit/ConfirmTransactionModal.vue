@@ -112,7 +112,7 @@
 
       <TransactionConfirmModalFooter>
         <CommonButton as="RouterLink" :to="{ name: 'index' }" class="mx-auto mt-4" variant="primary-solid">
-          Go to Home page
+          Go to Assets page
         </CommonButton>
       </TransactionConfirmModalFooter>
     </div>

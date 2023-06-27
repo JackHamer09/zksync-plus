@@ -38,7 +38,7 @@ const title = computed(() => {
   if (walletName.value) {
     return `Logging in with ${walletName.value}`;
   }
-  return "Logging in...";
+  return "Loading...";
 });
 </script>
 
