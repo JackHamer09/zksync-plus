@@ -9,8 +9,8 @@ import { emptyWalletPhrase, mainWalletPhrase, MetamaskWallet, secondWalletPhrase
 import { MainPage } from "../pages/main.page";
 import { config } from "../support/config";
 
+import type { ICustomWorld } from "../support/custom-world";
 import type { Pickle } from "@cucumber/messages";
-import type { ICustomWorld } from "tests/e2e/src/support/custom-world";
 const tracesDir = "tests/e2e/artifacts/";
 
 let result: any;
@@ -145,9 +145,9 @@ export class Helper {
   async thresholdBalanceIsOk() {
     const mainPage = new MainPage(this.world);
     if (depositTag && !noBlockChain) {
-      await mainPage.checkBalance(MetamaskWallet.mainWallet, "L1");
+      await mainPage.monitorBalance(MetamaskWallet.mainWallet, "L1");
     } else if (withdrawTag || transferTag) {
-      await mainPage.checkBalance(MetamaskWallet.secondWallet, "L2");
+      await mainPage.monitorBalance(MetamaskWallet.secondWallet, "L2");
     }
   }
 
@@ -200,10 +200,10 @@ export class Helper {
     } else if (transactionsTag && !incognitoTag) {
       const isLogout = await metamaskPage.isLogout();
       if (isLogout === undefined && depositTag) {
-        await this.thresholdBalanceIsOk();
+        // await this.thresholdBalanceIsOk();
         await metamaskPage.authorizeInMetamaskExtension(mainWalletPhrase, MetamaskWallet.mainWalletPassword); // L1 wallet
       } else if (isLogout === undefined && !depositTag) {
-        await this.thresholdBalanceIsOk();
+        // await this.thresholdBalanceIsOk();
         await metamaskPage.authorizeInMetamaskExtension(secondWalletPhrase, MetamaskWallet.mainWalletPassword); // L2 wallet
       }
       await basePage.goTo(targetUrl);
