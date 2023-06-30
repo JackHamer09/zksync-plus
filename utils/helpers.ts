@@ -1,7 +1,11 @@
 import { BigNumber } from "ethers";
 
 import type { ExtendedChain } from "@/store/network";
+import type { Version } from "@/store/preferences";
+import type { TokenAmount } from "@/types";
 import type { BigNumberish } from "ethers";
+
+import { parseTokenAmount } from "@/utils/formatters";
 
 export function generateAvatarColors(address: string) {
   const seedArr = address.match(/.{1,7}/g)?.splice(0, 5);
@@ -32,15 +36,32 @@ export function calculateFee(gasLimit: BigNumberish, gasPrice: BigNumberish) {
   return BigNumber.from(gasLimit).mul(gasPrice);
 }
 
-export const getNetworkUrl = (network: ExtendedChain, routePath: string) => {
+export const getNetworkUrl = (network: ExtendedChain, routePath: string, version?: Version) => {
   const hostname = window.location.hostname;
 
   if (hostname === "localhost" || !network.hostnames?.length) {
-    return `${routePath}?network=${network.network}`;
+    const url = new URL(routePath, window.location.origin);
+    url.searchParams.set("network", network.network);
+    if (version) {
+      url.searchParams.set("version", version);
+    }
+    return url.toString();
   }
   return network.hostnames[0] + routePath;
 };
 
 export const isMobile = () => {
   return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent);
+};
+
+export const replaceVersionInString = (url: string, replacement: Version) => {
+  const regex = new RegExp("\\bera\\b|\\blite\\b", "gi");
+  return url.replace(regex, replacement);
+};
+
+export const calculateTotalTokensPrice = (tokens: TokenAmount[]) => {
+  return tokens.reduce((acc, { amount, decimals, price }) => {
+    if (typeof price !== "number") return acc;
+    return acc + parseFloat(parseTokenAmount(amount, decimals)) * price;
+  }, 0);
 };
