@@ -46,13 +46,8 @@ export const getNetworkUrl = (network: ExtendedChain, routePath: string, version
       url.searchParams.set("version", version);
     }
     return url.toString();
-  } else {
-    const url = new URL(routePath, network.hostnames[0]);
-    if (version) {
-      url.searchParams.set("version", version);
-    }
-    return url.toString();
   }
+  return network.hostnames[0] + routePath;
 };
 
 export const isMobile = () => {
