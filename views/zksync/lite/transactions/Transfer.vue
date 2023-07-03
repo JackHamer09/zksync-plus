@@ -240,6 +240,7 @@ const {
   inProgress: feeInProgress,
   error: feeError,
   estimateFee,
+  resetFee,
 
   tokensAvailableForFee,
   feeToken,
@@ -338,6 +339,7 @@ watch(
     isAccountActivated,
   ],
   () => {
+    resetFee();
     estimate();
   },
   { immediate: true }

@@ -260,6 +260,7 @@ const {
   feeToken,
   enoughBalanceToCoverFee,
   estimateFee,
+  resetFee,
 } = useFee(tokens, balance, walletLiteStore.getWalletInstance, onboardStore.getPublicClient);
 watch(
   () => feeToken?.value?.symbol,
@@ -342,6 +343,7 @@ const feeAutoUpdateEstimate = async () => {
 watch(
   [() => props.address, () => selectedToken.value?.symbol, () => account.value.address],
   () => {
+    resetFee();
     estimate();
   },
   { immediate: true }
