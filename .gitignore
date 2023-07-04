@@ -10,4 +10,9 @@ dist
 tests/e2e/src/support/extension
 tests/e2e/reports
 tests/e2e/artifacts
+/tests/e2e/artifacts/
 allure-results
+tests/e2e/tests/
+
+.env.local
+crypto.ts
