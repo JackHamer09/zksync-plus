@@ -1,17 +1,26 @@
 <template>
-  <CommonModal v-model:opened="walletWarningModal" :close-on-background-click="false" title="Wallet warning">
+  <CommonModal :initialFocus="checkbox" v-model:opened="walletWarningModal" :closable="false" title="Wallet warning">
     <p class="leading-normal">
-      zkSync Portal is still in beta. For the best experience, we recommend using
-      <span class="font-medium">MetaMask</span>. Some features may not work properly with other wallets.
+      Make sure your wallet supports zkSync Era network before adding funds to your account. Otherwise, this can result
+      in <span class="font-medium text-red-600">loss of funds</span>. See the list of supported wallets on the
+      <a class="link" href="https://ecosystem.zksync.io/?filter=WALLET" target="_blank">Ecosystem</a> website.
     </p>
 
-    <div class="mt-3 flex items-start">
-      <CommonCheckbox v-model="doNotShowWarning">Do not show again</CommonCheckbox>
-    </div>
+    <CommonCheckbox ref="checkbox" v-model="warningChecked" class="mt-3">I understand the risk</CommonCheckbox>
 
-    <CommonButton class="mx-auto mt-4" variant="primary-solid" @click="walletWarningModal = false">
-      Proceed
-    </CommonButton>
+    <div class="mt-4">
+      <CommonHeightTransition :opened="warningChecked">
+        <CommonButtonTopLink @click="doNotShowAgain">Do not show again</CommonButtonTopLink>
+      </CommonHeightTransition>
+      <CommonButton
+        class="mx-auto"
+        variant="primary-solid"
+        :disabled="!warningChecked"
+        @click="walletWarningModal = false"
+      >
+        Proceed
+      </CommonButton>
+    </div>
   </CommonModal>
 </template>
 
@@ -21,20 +30,30 @@ import { ref, watch } from "vue";
 import { useStorage } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 
+import { useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 
 const { walletName } = storeToRefs(useOnboardStore());
+const { version } = storeToRefs(useNetworkStore());
+const checkbox = ref<HTMLInputElement | undefined>();
 
 const doNotShowWarning = useStorage("wallet-warning-hidden", false);
+const warningChecked = ref(false);
 const walletWarningModal = ref(false);
 watch(
-  walletName,
-  (name) => {
+  [walletName, version],
+  ([wallet, zkSyncVersion]) => {
     if (doNotShowWarning.value) return;
-    if (name && name !== "MetaMask") {
+    if (!wallet) return;
+    if (zkSyncVersion === "era" && walletName.value !== "MetaMask") {
       walletWarningModal.value = true;
     }
   },
   { immediate: true }
 );
+
+const doNotShowAgain = () => {
+  doNotShowWarning.value = true;
+  walletWarningModal.value = false;
+};
 </script>

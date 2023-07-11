@@ -32,21 +32,36 @@ export const useOnboardStore = defineStore("onboard", () => {
   });
   const ethereumClient = new EthereumClient(wagmiClient, extendedChains);
 
-  const getWalletName = () => {
-    // TODO: Figure out how to get wallet name in WalletConnect v2
-    return undefined;
-  };
-
   const account = ref(ethereumClient.getAccount());
   const network = ref(ethereumClient.getNetwork());
   const connectorName = ref(wagmiClient.connector?.name);
-  const walletName = ref<string | undefined>(getWalletName());
+  const walletName = ref<string | undefined>();
+  const identifyWalletName = async () => {
+    const provider = await wagmiClient.connector?.getProvider();
+    const name = provider?.session?.peer?.metadata?.name;
+
+    if (!name && wagmiClient.connector?.name !== "WalletConnect") {
+      walletName.value = wagmiClient.connector?.name.replace(/ Wallet$/, "").trim();
+    } else {
+      walletName.value = name?.replace(/ Wallet$/, "").trim();
+    }
+  };
+  identifyWalletName();
   const web3modal = new Web3Modal(
     {
       projectId: env.walletConnectProjectID,
       enableNetworkView: false,
       enableAccountView: true,
       themeMode: selectedColorMode.value,
+      explorerRecommendedWalletIds: [
+        "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+        "38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662",
+        "971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709",
+        "1aa28414c95f5024133faf5766d376bb9c853c280d158cd3e22dc2b7b0a95a2d",
+        "7674bb4e353bf52886768a3ddc2a4562ce2f4191c80831291218ebd90f5f5e26",
+      ],
+      termsOfServiceUrl: "https://zksync.io/terms",
+      privacyPolicyUrl: "https://zksync.io/privacy",
     },
     ethereumClient
   );
@@ -59,7 +74,7 @@ export const useOnboardStore = defineStore("onboard", () => {
     }
     account.value = updatedAccount;
     connectorName.value = wagmiClient.connector?.name;
-    walletName.value = getWalletName();
+    identifyWalletName();
   });
   ethereumClient.watchNetwork((updatedNetwork) => {
     network.value = updatedNetwork;
