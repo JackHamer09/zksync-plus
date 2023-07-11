@@ -57,13 +57,23 @@ export class MainPage extends BasePage {
     return `${this.byTestId}fee-amount`;
   }
 
+  get balanceValue() {
+    return "//span[@class='break-all']";
+  }
+
   async selectTransaction(transactionType: string) {
     try {
       let route: string;
       if (transactionType === "Withdraw") {
         route = Routes.withdraw;
-        await this.world.page?.goto(config.BASE_URL + route + config.DAPP_NETWORK);
+      } else if (transactionType === "Deposit") {
+        route = Routes.deposit;
+      } else {
+        throw new Error("Unknown transaction type");
       }
+
+      await this.world.page?.goto(config.BASE_URL + route + config.DAPP_NETWORK);
+      return route;
     } catch (e) {
       console.error(e);
     }
