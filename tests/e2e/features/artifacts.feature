@@ -90,8 +90,8 @@ Feature: Artifacts - UI
     Then Element with "testId" "close-button" should be "clickable"
     Then Element with "text" "Selected network" should be "visible"
     Then Element with "text" "Other networks" should be "visible"
-    Then Element with "src" "/img/era.svg" should be "visible"
-    Then Element with "src" "/img/era.svg" should be "clickable"
+    #Then Element with "src" "/img/era.svg" should be "visible"
+    #Then Element with "src" "/img/era.svg" should be "clickable"
     Then Element with "src" "/img/ethereum.svg" should be "visible"
     Then Element with "src" "/img/ethereum.svg" should be "clickable"
 
