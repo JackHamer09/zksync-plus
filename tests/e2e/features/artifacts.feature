@@ -142,7 +142,7 @@ Feature: Artifacts - UI
     Then Element with "text" "Save contact" should be "visible"
     Then Element with "text" "Save contact" should be "clickable"
 
-  @id1336 @deposit 
+  @id1336 @deposit
   Scenario: Check artifacts on the Add fund to page - Deposits
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-mainnet"
@@ -246,7 +246,7 @@ Feature: Artifacts - UI
     When I go to page "/transaction/zksync/era/receive-address"
     Then Element with "text" "Receive" should be "visible"
     Then Element with "class" "qr-code-container" should be "visible"
-    Then Element with "text" "0x586607...975" should be "visible"
+    Then Element with "text" "0xa439ba...046" should be "visible"
     Then Element with "text" "Scan to copy address" should be "visible"
     Then Element with "text" "Copy" should be "visible"
     Then Element with "text" "Copy" should be "clickable"
