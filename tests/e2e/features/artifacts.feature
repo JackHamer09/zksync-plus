@@ -142,10 +142,9 @@ Feature: Artifacts - UI
     Then Element with "text" "Save contact" should be "visible"
     Then Element with "text" "Save contact" should be "clickable"
 
-  @id1336 @deposit # добавить кошелёк с мейннет балансом
+  @id1336 @deposit 
   Scenario: Check artifacts on the Add fund to page - Deposits
     Given I am on the Main page
-    Given A wallet should be <string>
     Given I go to page "/transaction/zksync/era/deposit/?network=era-mainnet"
     When I click by "testId" with "your-account" value
     Then Element with "text" "Add funds to" should be "visible"
