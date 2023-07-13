@@ -145,7 +145,7 @@ Feature: Artifacts - UI
   @id1336 @deposit
   Scenario: Check artifacts on the Add fund to page - Deposits
     Given I am on the Main page
-    Given I go to page "/transaction/zksync/era/deposit/?network=era-mainnet"
+    Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
     Then Element with "text" "Add funds to" should be "visible"
     Then Element with "id" "amount-input" should be "visible"
@@ -164,7 +164,7 @@ Feature: Artifacts - UI
   @id1398 @deposit
   Scenario: Check artifacts on the Confirm transaction modal - Deposits
     Given I am on the Main page
-    Given I go to page "/transaction/zksync/era/deposit/?network=era-mainnet"
+    Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
     When I confirm the network switching
     When I choose "USDC" as token and insert "0.00001" as amount
@@ -176,7 +176,7 @@ Feature: Artifacts - UI
   @id1438 @deposit
   Scenario: Check artifacts on the Approve allowance modal - Deposits
     Given I am on the Main page
-    Given I go to page "/transaction/zksync/era/deposit"
+    Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
     When I confirm the network switching
     When I choose "USDC" as token and insert "0.00001" as amount
