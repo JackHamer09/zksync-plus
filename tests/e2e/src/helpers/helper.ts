@@ -228,14 +228,14 @@ export class Helper {
       const isLogout = await metamaskPage.isLogout();
       if (isLogout === undefined && depositTag) {
         // await this.thresholdBalanceIsOk();
-        await metamaskPage.authorizeInMetamaskExtension(wallet_2, wallet_password); // L1 wallet
+        await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password); // L1 wallet
       } else if (isLogout === undefined && !depositTag) {
         // await this.thresholdBalanceIsOk();
-        await metamaskPage.authorizeInMetamaskExtension(wallet_0, wallet_password); // L2 wallet
+        await metamaskPage.authorizeInMetamaskExtension(wallet_2, wallet_password); // L2 wallet
       }
       await basePage.goTo(targetUrl);
     } else if (emptyWalletTag) {
-      await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password);
+      await metamaskPage.authorizeInMetamaskExtension(wallet_0, wallet_password);
       await basePage.goTo(targetUrl);
     } else if (process.env.INCOGNITO_MODE === "true" && incognitoTag) {
       await basePage.goTo(targetUrl);
