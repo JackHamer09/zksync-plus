@@ -166,10 +166,10 @@ Feature: Artifacts - UI
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
-    When I confirm the network switching
     When I choose "USDC" as token and insert "0.00001" as amount
+    When I click by text " Change wallet network to"
+    When I confirm the network switching
     Then Element with "text" " Continue " should be "clickable"
-    When I click by text " Continue "
     Then Element with "text" "Confirm transaction" should be "visible"
     Then Element with "text" "Your Ethereum Goerli account" should be "visible"
 
