@@ -223,6 +223,7 @@ export class Helper {
     await this.predefineTags(filteredTag);
     if (!incognitoTag && !transactionsTag && !emptyWalletTag) {
       await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password);
+      console.log("WALLET ADDRESS =   " + wallet_1);
       await basePage.goTo(targetUrl);
       console.log(
         "!incognitoTag && !transactionsTag && !emptyWalletTag" + (!incognitoTag && !transactionsTag && !emptyWalletTag)
