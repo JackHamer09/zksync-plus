@@ -224,20 +224,31 @@ export class Helper {
     if (!incognitoTag && !transactionsTag && !emptyWalletTag) {
       await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password);
       await basePage.goTo(targetUrl);
+      console.log(
+        "!incognitoTag && !transactionsTag && !emptyWalletTag" + !incognitoTag && !transactionsTag && !emptyWalletTag
+      );
     } else if (transactionsTag && !incognitoTag) {
+      console.log("transactionsTag && !incognitoTag " + (transactionsTag && !incognitoTag));
       const isLogout = await metamaskPage.isLogout();
       if (isLogout === undefined && depositTag) {
         // await this.thresholdBalanceIsOk();
+        console.log("(isLogout === undefined && depositTag) " + (isLogout === undefined && depositTag));
         await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password); // L1 wallet
       } else if (isLogout === undefined && !depositTag) {
+        console.log("(isLogout === undefined && !depositTag) " + (isLogout === undefined && !depositTag));
         // await this.thresholdBalanceIsOk();
         await metamaskPage.authorizeInMetamaskExtension(wallet_2, wallet_password); // L2 wallet
       }
       await basePage.goTo(targetUrl);
     } else if (emptyWalletTag) {
+      console.log("emptyWalletTag " + emptyWalletTag);
       await metamaskPage.authorizeInMetamaskExtension(wallet_0, wallet_password);
       await basePage.goTo(targetUrl);
     } else if (process.env.INCOGNITO_MODE === "true" && incognitoTag) {
+      console.log(
+        'process.env.INCOGNITO_MODE === "true" && incognitoTag ' +
+          (process.env.INCOGNITO_MODE === "true" && incognitoTag)
+      );
       await basePage.goTo(targetUrl);
     }
   }
