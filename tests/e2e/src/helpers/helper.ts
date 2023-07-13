@@ -225,7 +225,7 @@ export class Helper {
       await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password);
       await basePage.goTo(targetUrl);
       console.log(
-        "!incognitoTag && !transactionsTag && !emptyWalletTag" + !incognitoTag && !transactionsTag && !emptyWalletTag
+        "!incognitoTag && !transactionsTag && !emptyWalletTag" + (!incognitoTag && !transactionsTag && !emptyWalletTag)
       );
     } else if (transactionsTag && !incognitoTag) {
       console.log("transactionsTag && !incognitoTag " + (transactionsTag && !incognitoTag));
@@ -246,8 +246,7 @@ export class Helper {
       await basePage.goTo(targetUrl);
     } else if (process.env.INCOGNITO_MODE === "true" && incognitoTag) {
       console.log(
-        'process.env.INCOGNITO_MODE === "true" && incognitoTag ' +
-          (process.env.INCOGNITO_MODE === "true" && incognitoTag)
+        "process.env.INCOGNITO_MODE === true && incognitoTag?" + (process.env.INCOGNITO_MODE === "true" && incognitoTag)
       );
       await basePage.goTo(targetUrl);
     }
