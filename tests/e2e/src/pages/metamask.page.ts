@@ -207,6 +207,7 @@ export class MetamaskPage extends BasePage {
   }
 
   async switchNetwork() {
+    await setTimeout(6 * 1000);
     const switchNetworkBtnSelector = "//button[text()='Switch network']";
     //const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
     const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);

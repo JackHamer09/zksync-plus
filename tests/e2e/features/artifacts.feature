@@ -136,8 +136,8 @@ Feature: Artifacts - UI
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
-    #When I click by text " Change wallet network to"
-    #When I confirm the network switching
+    When I click by text " Change wallet network to"
+    When I confirm the network switching
     Then Element with "text" "Add funds to" should be "visible"
     Then Element with "id" "amount-input" should be "visible"
     Then Element with "text" " Balance: " should be "visible"
