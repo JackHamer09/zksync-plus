@@ -224,12 +224,12 @@ export class Helper {
     if (!incognitoTag && !transactionsTag && !emptyWalletTag) {
       await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password);
       await basePage.goTo(targetUrl);
-    } else if (transactionsTag && !incognitoTag) {
+    } else if (transactionsTag && !incognitoTag && !emptyWalletTag) {
       const isLogout = await metamaskPage.isLogout();
-      if (isLogout === undefined && depositTag) {
+      if (isLogout === undefined && depositTag && !emptyWalletTag) {
         // await this.thresholdBalanceIsOk();
         await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password); // L1 wallet
-      } else if (isLogout === undefined && !depositTag) {
+      } else if (isLogout === undefined && !depositTag && !emptyWalletTag) {
         // await this.thresholdBalanceIsOk();
         await metamaskPage.authorizeInMetamaskExtension(wallet_2, wallet_password); // L2 wallet
       }
