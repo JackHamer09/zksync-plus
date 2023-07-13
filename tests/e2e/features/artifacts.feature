@@ -244,7 +244,7 @@ Feature: Artifacts - UI
     Then Element with "text" "zkSync Era∎ Goerli" should be "visible"
     Then Element with "text" " to successfully receive them " should be "visible"
 
-  @id1332 @emptyWallet
+  @emptyWallet @id1332
   Scenario: Check artifacts for an empty wallet
     Then A wallet should be "empty"
     Then Message " You don't have any balances on " should be visible
