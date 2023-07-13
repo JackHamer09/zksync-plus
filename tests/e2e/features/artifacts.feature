@@ -4,7 +4,7 @@ Feature: Artifacts - UI
   Background:
     Given Connect Metamask extension with login action
 
-  @id1332 @emptyWallet
+  @id1332
   Scenario: Check artifacts for an empty wallet
     Then A wallet should be "empty"
     Then Message " You don't have any balances on " should be visible
@@ -92,7 +92,7 @@ Feature: Artifacts - UI
     Then Element with "text" "Selected network" should be "visible"
     Then Element with "text" "Other networks" should be "visible"
     Then Element with "src" "/img/era.svg" should be "visible"
-    #Then Element with "src" "/img/era.svg" should be "clickable"
+    Then Element with "src" "/img/era.svg" should be "clickable"
     Then Element with "src" "/img/ethereum.svg" should be "visible"
     Then Element with "src" "/img/ethereum.svg" should be "clickable"
 
