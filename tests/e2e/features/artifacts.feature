@@ -44,7 +44,8 @@ Feature: Artifacts - UI
 
   @id1379
   Scenario: Check artifacts on the Networks switcher
-    Given I click by "testId" with "network-switcher" value
+    #Given I click by "testId" with "network-switcher" value
+    Given I click by "partial class" with "network-switch" value
     Then Message "Change network" should be visible
     Then Element with "text" "zkSync Era∎" should be "visible"
     Then Element with "text" " Preferred network " should be "visible"
