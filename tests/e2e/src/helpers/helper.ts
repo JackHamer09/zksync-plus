@@ -221,7 +221,6 @@ export class Helper {
     const tags = pickle.tags;
     const filteredTag = (tag: string) => tags.filter((i) => i.name.includes(tag)).length > 0;
     await this.predefineTags(filteredTag);
-    console.log("emptyWalletTag" + emptyWalletTag);
     if (!incognitoTag && !transactionsTag && !emptyWalletTag) {
       await metamaskPage.authorizeInMetamaskExtension(wallet_1, wallet_password);
       await basePage.goTo(targetUrl);
