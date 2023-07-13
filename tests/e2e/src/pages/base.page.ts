@@ -54,7 +54,7 @@ export class BasePage {
 
   async clickByText(text: string) {
     selector = `text=${text}`;
-    await this.world.page?.locator(selector).first().click();
+    await this.world.page?.locator(selector).first().click(config.increasedTimeout);
   }
 
   async pressButton(buttonName: string) {

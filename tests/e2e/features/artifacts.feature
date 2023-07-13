@@ -136,7 +136,6 @@ Feature: Artifacts - UI
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
-    When I click by text " Change wallet network to"
     When I confirm the network switching
     Then Element with "text" "Add funds to" should be "visible"
     Then Element with "id" "amount-input" should be "visible"
@@ -157,11 +156,10 @@ Feature: Artifacts - UI
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
-    When I choose "USDC" as token and insert "0.00001" as amount
-    When I click by text " Change wallet network to"
+    When I choose "ETH" as token and insert "0.0001" as amount
     When I confirm the network switching
-    When I click by text " Continue "
     Then Element with "text" " Continue " should be "clickable"
+    When I click by text " Continue "
     Then Element with "text" "Confirm transaction" should be "visible"
     Then Element with "text" "Your Ethereum Goerli account" should be "visible"
 
@@ -170,17 +168,16 @@ Feature: Artifacts - UI
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
     When I click by "testId" with "your-account" value
-    When I choose "LINK" as token and insert "0.00001" as amount
-    When I click by text " Change wallet network to"
     When I confirm the network switching
+    When I choose "DAI" as token and insert "6" as amount
     Then Element with "text" " Continue " should be "clickable"
     When I click by text " Continue "
     Then Element with "text" "Allowance" should be "visible"
     Then Element with "text" "Your Ethereum Goerli account" should be "visible"
     Then Element with "partial class" "address-card-avatar" should be "visible"
-    Then Modal card element with the "//*[text()='0x5866...975']" xpath should be "visible"
-    Then Modal card element with the "//*[@alt='USDC token icon']" xpath should be "visible"
-    Then Modal card element with the "//*[text()='0x0faF6d...2A9']" xpath should be "visible"
+    Then Modal card element with the "//*[text()='0xa439...046']" xpath should be "visible"
+    Then Modal card element with the "//*[@alt='DAI token icon']" xpath should be "visible"
+    Then Modal card element with the "//*[text()='0x3e7676...D4b']" xpath should be "visible"
     Then Modal card element with the "//*[@class='token-balance-price']" xpath should be "visible"
     Then Modal card element with the "//*[text()='Approving allowance for deposit']" xpath should be "visible"
     Then Modal card element with the "//*[@src='/img/era.svg']" xpath should be "visible"

@@ -207,14 +207,12 @@ export class MetamaskPage extends BasePage {
   }
 
   async switchNetwork() {
-    await setTimeout(6 * 1000);
-    const switchNetworkBtnSelector = "//button[text()='Switch network']";
-    //const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
+    const switchNetworkBtnSelector = "//div[@class='transaction-footer-row']//button";
     const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);
     if (await switchNetworkBtnElement.isEnabled()) {
       const popUpContext = await this.catchPopUpByClick(switchNetworkBtnSelector);
+      await this.world.page?.locator(this.confirmBtn);
       await popUpContext?.setViewportSize(config.popUpWindowSize);
-      await popUpContext?.click(this.confirmBtn);
       await popUpContext?.click(this.confirmBtn);
     }
   }
