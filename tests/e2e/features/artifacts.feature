@@ -131,7 +131,7 @@ Feature: Artifacts - UI
     Then Element with "text" "Save contact" should be "visible"
     Then Element with "text" "Save contact" should be "clickable"
 
-  @artifacts
+  @id1336 @deposit
   Scenario: Check artifacts on the Add fund to page - Deposits
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
