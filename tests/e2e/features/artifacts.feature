@@ -131,7 +131,7 @@ Feature: Artifacts - UI
     Then Element with "text" "Save contact" should be "visible"
     Then Element with "text" "Save contact" should be "clickable"
 
-  @id1336 @deposit and not @emptyWallet
+  @artifacts
   Scenario: Check artifacts on the Add fund to page - Deposits
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
@@ -151,7 +151,7 @@ Feature: Artifacts - UI
     Then Fee should have "ETH" value
     Then Element with "text" " Continue " should be "visible"
 
-  @id1398 @deposit and not @emptyWallet
+  @id1398 @deposit
   Scenario: Check artifacts on the Confirm transaction modal - Deposits
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
@@ -163,7 +163,7 @@ Feature: Artifacts - UI
     Then Element with "text" "Confirm transaction" should be "visible"
     Then Element with "text" "Your Ethereum Goerli account" should be "visible"
 
-  @id1438 @deposit and not @emptyWallet
+  @id1438 @deposit
   Scenario: Check artifacts on the Approve allowance modal - Deposits
     Given I am on the Main page
     Given I go to page "/transaction/zksync/era/deposit/?network=era-goerli"
