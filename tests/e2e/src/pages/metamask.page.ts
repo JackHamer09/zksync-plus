@@ -211,11 +211,11 @@ export class MetamaskPage extends BasePage {
     const switchNetworkBtnElement: any = await this.world.page?.locator(switchNetworkBtnSelector);
     if (await switchNetworkBtnElement.isEnabled()) {
       const popUpContext = await this.catchPopUpByClick(switchNetworkBtnSelector);
-      await this.world.page?.locator(this.confirmBtn);
       await popUpContext?.setViewportSize(config.popUpWindowSize);
       if (!depositTag) {
         await popUpContext?.click(this.confirmBtn);
       }
+      await popUpContext?.click(this.confirmBtn);
       await popUpContext?.click(this.confirmBtn);
     }
   }
