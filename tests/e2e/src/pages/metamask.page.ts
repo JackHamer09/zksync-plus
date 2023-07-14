@@ -216,7 +216,6 @@ export class MetamaskPage extends BasePage {
         await popUpContext?.click(this.confirmBtn);
       }
       await popUpContext?.click(this.confirmBtn);
-      await popUpContext?.click(this.confirmBtn);
     }
   }
 
