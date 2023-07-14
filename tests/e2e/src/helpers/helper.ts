@@ -17,7 +17,7 @@ const key = Buffer.from(wallet.secret, "hex"); // crypto.randomBytes(32);
 const iv = Buffer.from(wallet.salt, "hex"); //crypto.randomBytes(16);
 
 let result: any;
-let depositTag: boolean;
+export let depositTag: boolean;
 let withdrawTag: boolean;
 let transferTag: boolean;
 let authorizedTag: boolean;

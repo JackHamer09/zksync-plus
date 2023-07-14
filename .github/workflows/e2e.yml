@@ -56,10 +56,13 @@ jobs:
       max-parallel: 20
       matrix:
         command: ["xvfb-run --auto-servernum --server-args '-screen 0 1920x1080x24' npx cucumber-js --tags "]
-        tags: [ #"@withdraw",
-                "@artifacts and not @emptyWallet",
+        tags: [
+                "@withdraw",
+                "@artifactsSuite1 and not @emptyWallet",
+                "@artifactsSuite2 and not @emptyWallet",
+                "@artifactsSuite3 and not @emptyWallet",
                 "@artifacts and @emptyWallet",
-                #"@contacts"
+                "@contacts"
         ]
 
     name: '${{ matrix.tags }}'
