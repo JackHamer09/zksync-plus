@@ -1,5 +1,7 @@
 import { BigNumber } from "ethers";
 
+import useTimedCache from "@/composables/useTimedCache";
+
 import type { Token, TokenAmount } from "@/types";
 import type { BigNumberish } from "ethers";
 import type { Ref } from "vue";
@@ -46,21 +48,18 @@ export default (
     return true;
   });
 
-  const estimate = async (estimationParams: FeeEstimationParams) => {
-    params = estimationParams;
-    await estimateFee();
-  };
   const {
     inProgress,
     error,
-    execute: estimateFee,
+    execute: executeEstimateFee,
+    reset: resetEstimateFee,
   } = usePromise(
     async () => {
       if (!params) throw new Error("Params are not available");
 
       const provider = getProvider();
-      await Promise.all([
-        retry(() => provider.getGasPrice()).then((price) => (gasPrice.value = price)),
+      const [price, limit] = await Promise.all([
+        retry(() => provider.getGasPrice()),
         retry(() => {
           if (!params) throw new Error("Params are not available");
           return provider[params.type === "transfer" ? "estimateGasTransfer" : "estimateGasWithdraw"]({
@@ -69,11 +68,17 @@ export default (
             token: params.tokenAddress === ETH_L2_ADDRESS ? ETH_L1_ADDRESS : params.tokenAddress,
             amount: "1",
           });
-        }).then((limit) => (gasLimit.value = limit)),
+        }),
       ]);
+      gasPrice.value = price;
+      gasLimit.value = limit;
     },
     { cache: false }
   );
+  const cacheEstimateFee = useTimedCache<void, [FeeEstimationParams]>(() => {
+    resetEstimateFee();
+    return executeEstimateFee();
+  }, 1000 * 8);
 
   return {
     gasLimit,
@@ -81,7 +86,10 @@ export default (
     result: totalFee,
     inProgress,
     error,
-    estimateFee: estimate,
+    estimateFee: async (estimationParams: FeeEstimationParams) => {
+      params = estimationParams;
+      await cacheEstimateFee(params);
+    },
     resetFee: () => {
       gasLimit.value = undefined;
       gasPrice.value = undefined;

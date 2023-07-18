@@ -23,12 +23,31 @@
       </CommonAlert>
 
       <TransactionConfirmModalFooter>
-        <CommonButtonTopLink as="RouterLink" :to="{ name: 'transaction-zksync-era' }">
-          Make another transaction
-        </CommonButtonTopLink>
-        <CommonButton as="RouterLink" :to="{ name: 'index' }" class="mx-auto" variant="primary-solid">
-          Go to Assets page
-        </CommonButton>
+        <template v-if="layout === 'default'">
+          <CommonButtonTopLink as="RouterLink" :to="{ name: 'transaction-zksync-era' }">
+            Make another transaction
+          </CommonButtonTopLink>
+          <CommonButton as="RouterLink" :to="{ name: 'index' }" class="mx-auto" variant="primary-solid">
+            Go to Assets page
+          </CommonButton>
+        </template>
+        <template v-else-if="layout === 'bridge'">
+          <CommonButtonTopLink @click="emit('newTransaction')">Make another transaction</CommonButtonTopLink>
+          <CommonButton v-if="refererName" class="mx-auto" variant="primary-solid" @click="closeWindow">
+            Go back to {{ refererName }}
+          </CommonButton>
+          <CommonButton
+            v-else
+            as="a"
+            href="https://ecosystem.zksync.io"
+            target="_blank"
+            class="mx-auto"
+            variant="primary-solid"
+          >
+            Explore ecosystem
+            <ArrowUpRightIcon class="ml-1 mt-0.5 h-3.5 w-3.5" aria-hidden="true" />
+          </CommonButton>
+        </template>
       </TransactionConfirmModalFooter>
     </div>
   </CommonModal>
@@ -36,6 +55,7 @@
 
 <script lang="ts" setup>
 import { ArrowUpRightIcon, InformationCircleIcon } from "@heroicons/vue/24/outline";
+import { useRouteQuery } from "@vueuse/router";
 import { storeToRefs } from "pinia";
 
 import EraTransferLineItem from "@/components/transaction/zksync/era/EraTransferLineItem.vue";
@@ -47,13 +67,24 @@ import { useDestinationsStore } from "@/store/destinations";
 import { ERA_WITHDRAWAL_DELAY } from "@/utils/doc-links";
 
 defineProps({
+  layout: {
+    type: String as PropType<"default" | "bridge">,
+    default: "default",
+  },
   transfer: {
     type: Object as PropType<EraTransfer>,
     required: true,
   },
 });
 
+const emit = defineEmits<{
+  (eventName: "newTransaction"): void;
+}>();
+
 const { destinations } = storeToRefs(useDestinationsStore());
+
+const refererName = useRouteQuery("refererName");
+const closeWindow = () => window.close();
 </script>
 
 <style lang="scss">

@@ -17,7 +17,7 @@
         </CommonCardWithLineButtons>
         <TransactionItemIcon :icon="LockOpenIcon" />
         <CommonCardWithLineButtons>
-          <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" />
+          <TokenBalance v-bind="transaction.token" as="div" :amount="transaction.amount" amount-display="full" />
           <DestinationItem v-bind="destination" as="div" description="Approving allowance for deposit" />
         </CommonCardWithLineButtons>
       </template>
@@ -137,7 +137,6 @@ import { formatError } from "@/utils/formatters";
 import { TransitionAlertScaleInOutTransition, TransitionPrimaryButtonText } from "@/utils/transitions";
 
 export type ConfirmationModalTransaction = {
-  to: string;
   token: Token;
   amount: BigNumberish;
 };

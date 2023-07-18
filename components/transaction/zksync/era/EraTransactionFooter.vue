@@ -11,6 +11,11 @@
       </CommonErrorBlock>
     </transition>
 
+    <div v-if="buttonStep === 'connect'" class="transaction-footer-row">
+      <CommonButton variant="primary-solid" :disabled="isConnectingWallet" @click="onboardStore.openModal">
+        Connect wallet
+      </CommonButton>
+    </div>
     <div v-if="buttonStep === 'network'" class="transaction-footer-row">
       <CommonButtonTopInfo>Incorrect network selected in your wallet</CommonButtonTopInfo>
       <CommonButton
@@ -47,12 +52,14 @@ import { TransitionAlertScaleInOutTransition } from "@/utils/transitions";
 const onboardStore = useOnboardStore();
 const eraWalletStore = useEraWalletStore();
 
-const { connectorName, walletName } = storeToRefs(onboardStore);
+const { account, isConnectingWallet, connectorName, walletName } = storeToRefs(onboardStore);
 const { isCorrectNetworkSet, switchingNetworkInProgress, switchingNetworkError } = storeToRefs(eraWalletStore);
 const { eraNetwork } = storeToRefs(useEraProviderStore());
 
 const buttonStep = computed(() => {
-  if (!isCorrectNetworkSet.value) {
+  if (!account.value.address || isConnectingWallet.value) {
+    return "connect";
+  } else if (!isCorrectNetworkSet.value) {
     return "network";
   } else {
     return "continue";
@@ -69,7 +76,7 @@ const continueInWalletTipDisplayed = computed(() => {
 
 <style lang="scss" scoped>
 .transaction-footer {
-  @apply sticky bottom-0 z-[2] mt-auto flex flex-col items-center bg-gray bg-opacity-60 pb-2 pt-4 backdrop-blur-sm dark:bg-neutral-950;
+  @apply sticky bottom-0 z-10 mt-auto flex flex-col items-center bg-gray bg-opacity-60 pb-2 pt-4 backdrop-blur-sm dark:bg-neutral-950;
 
   .transaction-footer-row {
     @apply flex w-full flex-col items-center;
