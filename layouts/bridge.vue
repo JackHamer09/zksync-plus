@@ -50,35 +50,12 @@ import { storeToRefs } from "pinia";
 
 import useColorMode from "@/composables/useColorMode";
 
-import { useHead, useRoute } from "#app";
+import { useRoute } from "#app";
 import { eraNetworks, useNetworkStore } from "@/store/network";
 import { useOnboardStore } from "@/store/onboard";
 import { checksumAddress } from "@/utils/formatters";
 import { findNetworkWithSameL1, getNetworkUrl } from "@/utils/helpers";
 import SelectAddress from "@/views/SelectAddress.vue";
-
-const meta = {
-  title: "zkSync Era Bridge | Transfer funds between zkSync Era Network and Ethereum Mainnet",
-  description:
-    "With the zkSync Era Bridge you can easily transfer funds between Ethereum Mainnet and zkSync Era Network. Enjoy faster, cheaper and more efficient transactions with the future proof zkEVM scaling Ethereum's security and values.",
-};
-useHead({
-  title: "zkSync Era Bridge | Transfer funds between zkSync Era Network and Ethereum Mainnet",
-  meta: [
-    {
-      name: "og:title",
-      content: meta.title,
-    },
-    {
-      name: "description",
-      content: meta.description,
-    },
-    {
-      name: "og:description",
-      content: meta.description,
-    },
-  ],
-});
 
 const route = useRoute();
 

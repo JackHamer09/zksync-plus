@@ -17,6 +17,10 @@ export default defineNuxtConfig({
           content: "https://portal.zksync.io/preview.jpg",
         },
         {
+          property: "og:image:alt",
+          content: "zkSync Portal",
+        },
+        {
           property: "og:image:type",
           content: "image/jpeg",
         },
@@ -27,10 +31,6 @@ export default defineNuxtConfig({
         {
           property: "og:image:height",
           content: "630",
-        },
-        {
-          property: "og:image:alt",
-          content: "zkSync Portal",
         },
       ],
       script: [
