@@ -21,3 +21,14 @@ Feature: Withdraw
     Then Element with "text" "Logout" should be "clickable"
     Then Modal card element with the "//button[@class='copy-button']" xpath should be "visible"
     Then Modal card element with the "//button[@class='copy-button']" xpath should be "clickable"
+
+  @id1603
+  Scenario: Check the Network Switcher Artifacts on the Bridge Page
+    Given I go to page "/bridge"
+    #click on the account dropdown
+    When I click by partial text "..."
+    Then Element with "text" "Bridge network" should be "visible"
+    Then I click by text "Bridge network"
+    Then Modal card element with the "//*[text()='zkSync Era Testnet']" xpath should be "visible"
+    Then Modal card element with the "//*[text()='zkSync Era Mainnet']" xpath should be "visible"
+
