@@ -32,3 +32,41 @@ Feature: Withdraw
     Then Modal card element with the "//*[text()='zkSync Era Testnet']" xpath should be "visible"
     Then Modal card element with the "//*[text()='zkSync Era Mainnet']" xpath should be "visible"
 
+
+  @id1604:I
+  Scenario: Check the View on Explorer Artifacts on the Bridge Page (Testnet)
+    Given I go to page "/bridge"
+    #click on the account dropdown
+    When I click by partial text "..."
+    Then Element with "text" "View on Explorer" should be "visible"
+    When I click by text "View on Explorer"
+    Then Modal card element with the "//*[text()='View on explorer']" xpath should be "visible"
+    Then Modal card element with the "//button[@data-testid='close-button']" xpath should be "visible"
+    Then Element with "text" "Selected network" should be "visible"
+    Then Element with "text" "Other networks" should be "visible"
+    Then Modal card element with the "//*[text()='zkSync Era Testnet']" xpath should be "visible"
+    Then Modal card element with the "//*[@src='/img/era.svg']" xpath should be "visible"
+    Then Modal card element with the "//*[text()='Ethereum Goerli']" xpath should be "visible"
+    Then Modal card element with the "//*[@src='/img/ethereum.svg']" xpath should be "visible"
+
+  @id1604:II
+  Scenario: Check the View on Explorer Artifacts on the Bridge Page (Mainnet)
+    Given I go to page "/bridge?network=era-mainnet"
+    #click on the account dropdown
+    When I click by partial text "..."
+    Then Element with "text" "View on Explorer" should be "visible"
+    When I click by text "View on Explorer"
+    Then Modal card element with the "//*[text()='View on explorer']" xpath should be "visible"
+    Then Modal card element with the "//button[@data-testid='close-button']" xpath should be "visible"
+    Then Element with "text" "Selected network" should be "visible"
+    Then Element with "text" "Other networks" should be "visible"
+    Then Modal card element with the "//*[text()='zkSync Era Mainnet']" xpath should be "visible"
+    Then Modal card element with the "//*[@src='/img/era.svg']" xpath should be "visible"
+    Then Modal card element with the "//*[text()='Ethereum Mainnet']" xpath should be "visible"
+    Then Modal card element with the "//*[@src='/img/ethereum.svg']" xpath should be "visible"
+
+
+
+
+
+
